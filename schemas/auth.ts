@@ -20,31 +20,32 @@ export const signupSchema = z
         required_error: "Username field is required",
         invalid_type_error: "Username field must be string",
       })
-      .min(1, "Username can't be empty"),
+      .min(1, "username_empty"),
     email: z
       .string({
         required_error: "Email field is required",
         invalid_type_error: "Email field must be string",
       })
-      .email("Invalid email"),
+      .email("invaid_email"),
     password: z
       .string({
         required_error: "Password field is required",
         invalid_type_error: "Password field must be string",
       })
-      .min(8, "Password field is too short")
-      .max(40, "Password field can not be longer than 40 characters")
+      .min(8, "password_too_small")
+      .max(40, "password_too_big")
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/,
-        "Password field must include: letters, numbers and special characters"
+        "password_format_error"
       ),
     code: z
       .string({
         required_error: "Code field is required",
         invalid_type_error: "Code field must be string",
       })
-      .length(6, "Code field include 6 characters"),
+      .length(6, "code_error"),
   })
   .strict();
+export const signupWithoutCodeSchema = signupSchema.omit({ code: true });
 export type SignInForm = z.infer<typeof signInSchema>;
 export type SignUpForm = z.infer<typeof signupSchema>;

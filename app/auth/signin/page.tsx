@@ -33,7 +33,7 @@ const SigninPage = () => {
     e.preventDefault();
     startTransistion(async () => {
       try {
-        await http.post<SignInForm>("/auth/signin", form, {
+        await http.post("/auth/signin", form, {
           credentials: "include",
         });
         router.push(DEFAULT_LOGIN_REDIRECT);
