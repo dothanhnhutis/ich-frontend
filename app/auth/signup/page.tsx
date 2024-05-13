@@ -9,13 +9,12 @@ import {
   signupWithoutCodeSchema,
 } from "@/schemas/auth";
 import Link from "next/link";
-import { awaitCustom, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
 import FormError from "../form-error";
-import FormSuccess from "../form-success";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
   InputOTP,
   InputOTPGroup,
@@ -23,8 +22,8 @@ import {
 } from "@/components/ui/input-otp";
 import useCountDown from "@/hook/useCountDown";
 import { omit } from "lodash";
-import { FetchHttpError, http } from "@/service/http";
-import { senOTP } from "@/service/api/auth.service";
+import { senOTP, signUp } from "@/service/api/auth.service";
+import { toast } from "sonner";
 
 const SignUpPage = () => {
   const [error, setError] = useState<string | undefined>();
@@ -32,6 +31,7 @@ const SignUpPage = () => {
   const [isHiddenPassword, setIsHiddenPassword] = React.useState<boolean>(true);
   const [focusingField, setOnFocusAt] = useState<string | undefined>();
   const [didFocusName, setDidFocusName] = useState<boolean>(false);
+  const [isPendingSendEmail, startTransistionSendEmail] = useTransition();
   const [isPending, startTransistion] = useTransition();
   const [tab, setTab] = useState<string>("tab1");
 
@@ -54,26 +54,23 @@ const SignUpPage = () => {
   }, [form.code]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("submit");
     e.preventDefault();
-    startTransistion(() => {
-      // signup(form)
-      //   .then((data) => {
-      //     setError(data.error);
-      //     setSuccess(data.success);
-      //     if (data.success) {
-      //       setForm({
-      //         name: "",
-      //         email: "",
-      //         password: "",
-      //         code: "",
-      //       });
-      //       setDidFocusName(false);
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
+    startTransistion(async () => {
+      setError(undefined);
+      const res = await signUp(form);
+      if (res.statusCode == 201) {
+        setDidFocusName(false);
+        setForm({
+          username: "",
+          email: "",
+          password: "",
+          code: "",
+        });
+        toast.success(res.message);
+        setTab("tab1");
+      } else {
+        setError(res.message);
+      }
     });
   };
 
@@ -82,7 +79,7 @@ const SignUpPage = () => {
   }, [tab]);
 
   const handleSendOTP = () => {
-    startTransistion(async () => {
+    startTransistionSendEmail(async () => {
       const data = await senOTP(form.email);
       if (data.statusCode == 200) {
         setCount();
@@ -134,7 +131,9 @@ const SignUpPage = () => {
       showSocial={tab == "tab1"}
       headerLaybel="Create an account"
       headerDescription={
-        tab == "tab1" ? "Fill out all fields below to create an account" : ""
+        tab == "tab1"
+          ? "Fill out all fields below to create an account"
+          : "Enter a 6-digit code from your email"
       }
       backButtonHref={tab == "tab1" ? "/auth/signin" : ""}
       backButtonLaybel="Already have an Account?"
@@ -280,16 +279,15 @@ const SignUpPage = () => {
                 </p>
               </div>
             </div>
-
             <Button
               disabled={
-                isPending ||
+                isPendingSendEmail ||
                 !signupWithoutCodeSchema.safeParse(omit(form, ["code"]))
                   .success ||
                 count > 0
               }
             >
-              {isPending ? (
+              {isPendingSendEmail ? (
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
               ) : count > 0 ? (
                 `${count}s`
@@ -322,19 +320,23 @@ const SignUpPage = () => {
             </InputOTP>
             <p className="text-sm text-muted-foreground">
               Did not receive otp code?{" "}
-              {count > 0 ? (
+              {isPendingSendEmail ? (
+                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin inline" />
+              ) : count > 0 ? (
                 <span>{count}s</span>
               ) : (
                 <span
                   onClick={handleSendOTP}
                   className="underline cursor-pointer"
                 >
-                  send
+                  Send
                 </span>
               )}
             </p>
+            <FormError message={error} />
             <div className="flex w-full gap-4">
               <Button
+                disabled={isPending}
                 className="w-full"
                 type="button"
                 onClick={() => setTab("tab1")}
@@ -346,7 +348,11 @@ const SignUpPage = () => {
                 className="w-full"
                 type="submit"
               >
-                Submit
+                {isPending ? (
+                  <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+                ) : (
+                  "Submit"
+                )}
               </Button>
             </div>
           </form>
