@@ -13,6 +13,7 @@ export function middleware(request: NextRequest) {
   const { nextUrl } = request;
 
   const isLoggedIn = !!request.cookies.get("session");
+  console.log(request.cookies.get("session"));
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);

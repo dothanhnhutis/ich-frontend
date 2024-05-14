@@ -1,5 +1,12 @@
 import configs from "@/config";
 
+export type ResData = {
+  statusCode: number;
+  status: string;
+  message: string;
+  metadata?: any;
+};
+
 type FetchHttpOption = RequestInit & {
   baseUrl?: string;
 };

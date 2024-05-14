@@ -13,6 +13,8 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { signIn } from "@/service/api/auth.service";
+import { toast } from "sonner";
 
 const SigninPage = () => {
   const router = useRouter();
@@ -32,18 +34,24 @@ const SigninPage = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     startTransistion(async () => {
-      try {
-        await http.post("/auth/signin", form, {
-          credentials: "include",
-        });
-        router.push(DEFAULT_LOGIN_REDIRECT);
-      } catch (error) {
-        if (error instanceof FetchHttpError) {
-          setError(error.message);
-        } else {
-          console.log(error);
-        }
+      const res = await signIn(form);
+      if (res.statusCode == 200) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
       }
+      // try {
+      //   await http.post("/auth/signin", form, {
+      //     credentials: "include",
+      //   });
+      //   router.push(DEFAULT_LOGIN_REDIRECT);
+      // } catch (error) {
+      //   if (error instanceof FetchHttpError) {
+      //     setError(error.message);
+      //   } else {
+      //     console.log(error);
+      //   }
+      // }
     });
   };
 
