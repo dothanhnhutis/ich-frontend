@@ -2,23 +2,22 @@
 import React, { useCallback, useState, useTransition } from "react";
 import { CardWrapper } from "../card-wrapper";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import { ResetPasswordForm, resetPasswordSchema } from "@/schemas/auth";
+import { ResetPasswordData, resetPasswordSchema } from "@/schemas/auth";
 import { resetPassword } from "@/service/api/auth.service";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const ResetPasswordPage = () => {
+const ResetPasswordForm = ({ token }: { token: string }) => {
   const router = useRouter();
   const [isPending, startTransistion] = useTransition();
   const [isHiddenPassword, setIsHiddenPassword] = React.useState<boolean>(true);
   const [focusingField, setOnFocusAt] = useState<string | undefined>();
 
-  const [form, setForm] = useState<ResetPasswordForm>({
+  const [form, setForm] = useState<ResetPasswordData>({
     password: "",
     confirmPassword: "",
   });
@@ -53,7 +52,7 @@ const ResetPasswordPage = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     startTransistion(async () => {
-      const res = await resetPassword("", form);
+      const res = await resetPassword(token, form);
       if (res.statusCode == 200) {
         setForm({ password: "", confirmPassword: "" });
         toast.success(res.message);
@@ -180,16 +179,17 @@ const ResetPasswordPage = () => {
               )}
             </button>
           </div>
-          {focusingField != "confirmPassword" &&
-            handleValidateError(["password_do_not_match"]) && (
-              <p className="text-red-500 font-medium text-xs">
-                {`Confirm password don't match`}
-              </p>
-            )}
+          {!focusingField && handleValidateError(["password_do_not_match"]) && (
+            <p className="text-red-500 font-medium text-xs">
+              {`Confirm password don't match`}
+            </p>
+          )}
         </div>
         <Button
           disabled={
             isPending ||
+            form.password.length == 0 ||
+            form.confirmPassword.length == 0 ||
             (!focusingField && !resetPasswordSchema.safeParse(form).success)
           }
         >
@@ -204,4 +204,4 @@ const ResetPasswordPage = () => {
   );
 };
 
-export default ResetPasswordPage;
+export default ResetPasswordForm;

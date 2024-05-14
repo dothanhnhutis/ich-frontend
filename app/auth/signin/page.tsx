@@ -1,8 +1,5 @@
 "use client";
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
-import { SignInForm, signInSchema } from "@/schemas/auth";
-import { FetchHttpError, http } from "@/service/http";
-import { useRouter } from "next/navigation";
+import { SignInData, signInSchema } from "@/schemas/auth";
 import React, { useEffect, useState, useTransition } from "react";
 import { CardWrapper } from "../card-wrapper";
 import { cn } from "@/lib/utils";
@@ -15,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { signIn } from "@/service/api/auth.service";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const SigninPage = () => {
   const router = useRouter();
@@ -22,7 +20,7 @@ const SigninPage = () => {
   const [isHiddenPassword, setIsHiddenPassword] = React.useState<boolean>(true);
   const [error, setError] = useState<string | undefined>();
 
-  const [form, setForm] = useState<SignInForm>({
+  const [form, setForm] = useState<SignInData>({
     email: "",
     password: "",
   });
@@ -37,21 +35,10 @@ const SigninPage = () => {
       const res = await signIn(form);
       if (res.statusCode == 200) {
         toast.success(res.message);
+        router.refresh();
       } else {
         toast.error(res.message);
       }
-      // try {
-      //   await http.post("/auth/signin", form, {
-      //     credentials: "include",
-      //   });
-      //   router.push(DEFAULT_LOGIN_REDIRECT);
-      // } catch (error) {
-      //   if (error instanceof FetchHttpError) {
-      //     setError(error.message);
-      //   } else {
-      //     console.log(error);
-      //   }
-      // }
     });
   };
 

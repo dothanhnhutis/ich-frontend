@@ -69,6 +69,6 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export type SignInForm = z.infer<typeof signInSchema>;
-export type SignUpForm = z.infer<typeof signupSchema>;
-export type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
+export type SignInData = z.infer<typeof signInSchema>;
+export type SignUpData = z.infer<typeof signupSchema>;
+export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;

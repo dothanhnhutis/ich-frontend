@@ -1,7 +1,9 @@
 "use server";
-import { ResetPasswordForm, SignInForm, SignUpForm } from "@/schemas/auth";
+import { ResetPasswordData, SignInData, SignUpData } from "@/schemas/auth";
 import { FetchHttpError, ResData, http } from "../http";
 import { cookies } from "next/headers";
+import configs from "@/config";
+import { parseCookie } from "@/lib/cookies-parser";
 
 export async function senOTP(email: string) {
   try {
@@ -27,7 +29,7 @@ export async function senOTP(email: string) {
   }
 }
 
-export async function signUp(data: SignUpForm) {
+export async function signUp(data: SignUpData) {
   try {
     const res = await http.post<ResData>("/auth/signup", data);
     return res.data;
@@ -49,13 +51,39 @@ export async function signUp(data: SignUpForm) {
   }
 }
 
-export async function signIn(data: SignInForm) {
+export async function signIn(data: SignInData) {
   try {
     const res = await http.post<ResData>("/auth/signin", data);
-    console.log(res.headers);
-    cookies().set("name", "value", {
-      expires: Date.now() + 24 * 60 * 60 * 1000,
-    });
+    for (const cookie of res.headers.getSetCookie()) {
+      const cookieParser = parseCookie(cookie);
+      cookies().set(cookieParser.name, cookieParser.value, { ...cookieParser });
+    }
+    return res.data;
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      return {
+        statusCode: error.statusCode,
+        status: error.status,
+        message: error.message,
+      };
+    } else {
+      console.log(error);
+      return {
+        statusCode: 500,
+        status: "error",
+        message: "unknown",
+      };
+    }
+  }
+}
+
+export async function signOut() {
+  try {
+    const res = await http.get<ResData>("/auth/signout");
+    for (const cookie of res.headers.getSetCookie()) {
+      const cookieParser = parseCookie(cookie);
+      cookies().set(cookieParser.name, cookieParser.value, { ...cookieParser });
+    }
     return res.data;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
@@ -99,7 +127,7 @@ export async function recover(email: string) {
   }
 }
 
-export async function resetPassword(token: string, data: ResetPasswordForm) {
+export async function resetPassword(token: string, data: ResetPasswordData) {
   try {
     const res = await http.patch<ResData>(
       "/auth/reset-password/" + token,

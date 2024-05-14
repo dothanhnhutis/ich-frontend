@@ -4,7 +4,7 @@ import { CardWrapper } from "../card-wrapper";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
-  SignUpForm,
+  SignUpData,
   signupSchema,
   signupWithoutCodeSchema,
 } from "@/schemas/auth";
@@ -35,7 +35,7 @@ const SignUpPage = () => {
   const [isPending, startTransistion] = useTransition();
   const [tab, setTab] = useState<string>("tab1");
 
-  const [form, setForm] = useState<SignUpForm>({
+  const [form, setForm] = useState<SignUpData>({
     username: "",
     email: "",
     password: "",
