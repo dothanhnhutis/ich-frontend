@@ -2,15 +2,22 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-// import LogoImage from "@/images/logos/logo.png";
+import LogoImage from "@/images/logos/logo.png";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="hidden lg:flex flex-col justify-between basis-1/2 border-r h-full p-4 bg-company bg-no-repea bg-cover bg-right-bottom">
         <div className="flex items-center gap-3">
-          <Link href="/" prefetch={false}>
-            <Image priority src="/logo.png" width={60} height={60} alt="logo" />
+          <Link href="/" prefetch={true}>
+            <Image
+              priority
+              src={LogoImage.src}
+              width={60}
+              height={60}
+              alt="logo"
+              className="w-full size-auto"
+            />
           </Link>
         </div>
         {/* <blockquote className="text-white">

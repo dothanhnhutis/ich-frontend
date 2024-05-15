@@ -1,9 +1,11 @@
 import { ReactNode } from "react";
 import Social from "./social";
+import LogoImage from "@/images/logos/logo.png";
 
 import { BackButton } from "./back-button";
 import Link from "next/link";
 import Image from "next/image";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 interface CardWrapperProps {
   children?: ReactNode;
   headerLaybel: string;
@@ -22,8 +24,17 @@ export const CardWrapper = ({
 }: CardWrapperProps) => {
   return (
     <div className="mx-auto flex flex-col items-center justify-center space-y-4 w-[400px] px-2">
-      <Link href="/" prefetch={false} className="lg:hidden">
-        <Image priority src="/logo.png" width={110} height={110} alt="logo" />
+      <Link href="/" className="lg:hidden size-28" prefetch={true}>
+        <AspectRatio ratio={1 / 1} className="flex items-center justify-center">
+          <Image
+            fill
+            priority
+            src={LogoImage}
+            sizes="100vw"
+            alt="logo"
+            title="logo-ich"
+          />
+        </AspectRatio>
       </Link>
       <div className="flex flex-col space-y-2 text-center">
         <div>

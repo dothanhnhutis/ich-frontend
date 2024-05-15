@@ -19,8 +19,8 @@ const config = {
     },
     extend: {
       backgroundImage: {
-        company: "url('../public/company.jpg')",
-        "not-found": "url('../public/gif/dribbble.gif')",
+        company: "url('../assets/backgrounds/company.jpg')",
+        "not-found": "url('../assets/gif/dribbble.gif')",
       },
       screens: {
         xs: "560px",
