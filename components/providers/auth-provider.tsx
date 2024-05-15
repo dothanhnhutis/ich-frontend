@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const fetchUserCurrent = async () => {
       const res = await getCurrentUser();
-      setCurrentUser(res.metadata.user);
+      setCurrentUser(res.metadata?.user);
     };
     fetchUserCurrent();
   }, []);

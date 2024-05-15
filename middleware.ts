@@ -4,12 +4,9 @@ import {
   DEFAULT_LOGIN_REDIRECT,
   apiAuthPrefix,
 } from "@/routes";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import configs from "./config";
 import { ResData, http } from "./service/http";
-import { parseCookie } from "./lib/cookies-parser";
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
@@ -48,7 +45,10 @@ export async function middleware(request: NextRequest) {
     }
     return;
   } else {
-    if (nextUrl.pathname.startsWith(DEFAULT_LOGIN_REDIRECT)) {
+    if (
+      nextUrl.pathname.startsWith("/manager") ||
+      nextUrl.pathname.startsWith("/user")
+    ) {
       return NextResponse.redirect(new URL("/auth/signin", nextUrl));
     }
     return;
