@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -14,8 +15,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useAuthContext } from "@/components/providers/auth-provider";
+import { UploadPhoto } from "./upload-photo";
 
 const ProfilePage = () => {
+  const currentUser = useAuthContext();
+  console.log(currentUser);
   return (
     <>
       <h3 className="text-lg font-medium">Profile</h3>
@@ -25,38 +30,20 @@ const ProfilePage = () => {
       <Separator className="my-4" />
       <div className="lg:flex lg:justify-center lg:items-start space-y-4 lg:space-y-0">
         <div className="order-last lg:w-1/4 lg:flex lg:justify-center">
-          <Dialog>
-            <DialogTrigger>
-              <Avatar className="size-40 cursor-pointer">
-                <AvatarImage src={AvatarDefault.src} />
-                <AvatarFallback className="bg-transparent">
-                  <Skeleton className="size-40 rounded-full" />
-                </AvatarFallback>
-              </Avatar>
-            </DialogTrigger>
-            <DialogContent className="lg:max-w-[700px]">
-              <DialogHeader>
-                <DialogTitle>Edit photo</DialogTitle>
-                <DialogDescription>
-                  Must be an actual photo of you. Logos, clip-art, group photos,
-                  and digitally-altered images are not allowed.
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+          <UploadPhoto url={currentUser.picture || undefined} />
         </div>
         <div className="relative w-full space-y-4">
           <div>
             <Label>User ID</Label>
-            <p>asdasd</p>
+            <p>{currentUser.id}</p>
           </div>
           <div>
             <Label>Username</Label>
-            <p>asdasd</p>
+            <p>{currentUser.username}</p>
           </div>
           <div>
             <Label>Email</Label>
-            <p>asdasd</p>
+            <p>{currentUser.email}</p>
           </div>
           <div>
             <Label>Phone</Label>
@@ -79,7 +66,7 @@ const ProfilePage = () => {
                   This is how others will see you on the site.
                 </DialogDescription>
               </DialogHeader>
-              <form action="" className="space-y-8">
+              <form onSubmit={() => {}} className="space-y-8">
                 <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
                   <Input type="text" id="username" />

@@ -113,6 +113,24 @@ body {
   animation: loader-dots3 0.6s infinite;
 }
 
+.cropper-photo .cropper-modal {
+  @apply bg-background opacity-100 overflow-hidden;
+}
+
+.cropper-photo .cropper-crop-box,
+.cropper-view-box {
+  border-radius: 50%;
+}
+
+.cropper-photo .cropper-view-box {
+  box-shadow: 0 0 0 1px transparent;
+  outline: 0;
+}
+
+.cropper-photo .cropper-face {
+  background: transparent;
+}
+
 .cropperjs .cropper-point {
   background: transparent;
   height: 30px !important;

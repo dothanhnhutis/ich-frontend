@@ -4,6 +4,6 @@ export type CurrentUser = {
   username: string;
   role: UserRole;
   picture: string | null;
-  isBlocked: string;
+  isBlocked: boolean;
 };
 export type UserRole = "ADMIN" | "MANAGER" | "SALER" | "WRITER" | "CUSTOMER";
