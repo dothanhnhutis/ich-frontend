@@ -17,9 +17,9 @@ const RecoverPage = () => {
       const res = await recover(email);
       setEmail("");
       if (res.statusCode == 200) {
-        toast.success(res.message);
+        toast.success(res.data.message);
       } else {
-        toast.error(res.message);
+        toast.error(res.data.message);
       }
     });
   };

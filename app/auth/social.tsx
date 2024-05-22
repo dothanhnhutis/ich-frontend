@@ -21,8 +21,8 @@ const Social = () => {
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <Button
+      <div className="grid grid-cols-1 gap-4">
+        {/* <Button
           type="button"
           variant="outline"
           onClick={() =>
@@ -30,7 +30,7 @@ const Social = () => {
           }
         >
           <BsGithub className="mr-2 h-5 w-5" /> Github
-        </Button>
+        </Button> */}
         <Button
           type="button"
           variant="outline"

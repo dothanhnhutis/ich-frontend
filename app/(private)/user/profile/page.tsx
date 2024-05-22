@@ -30,7 +30,7 @@ const ProfilePage = () => {
       <Separator className="my-4" />
       <div className="lg:flex lg:justify-center lg:items-start space-y-4 lg:space-y-0">
         <div className="order-last lg:w-1/4 lg:flex lg:justify-center">
-          <UploadPhoto url={currentUser.picture || undefined} />
+          <UploadPhoto url={currentUser.picture ?? undefined} />
         </div>
         <div className="relative w-full space-y-4">
           <div>

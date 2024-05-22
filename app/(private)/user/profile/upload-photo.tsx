@@ -24,7 +24,7 @@ export const UploadPhoto = ({ url }: { url: string | undefined }) => {
   const cropperRef = useRef<ReactCropperElement>(null);
   const [zoomSlider, setZoomSlider] = useState<number>(0.2);
   const [dataUrl, setDataUrl] = useState<string | undefined>(url);
-
+  console.log(url);
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -53,6 +53,12 @@ export const UploadPhoto = ({ url }: { url: string | undefined }) => {
     const cropper = cropperRef.current?.cropper;
     if (cropper) {
       cropper.rotate(90);
+    }
+  };
+
+  const handleSave = () => {
+    const cropper = cropperRef.current?.cropper;
+    if (cropper) {
     }
   };
 

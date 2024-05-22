@@ -15,7 +15,6 @@ export const Header = () => {
     <header className="sticky top-0 z-50 border-b backdrop-blur bg-background/60">
       <nav className="flex justify-between items-center p-2 pr-4 max-w-7xl mx-auto">
         <Logo className="order-2 sm:order-none" />
-
         <Sheet>
           <SheetTrigger asChild className="sm:hidden order-1">
             <Button variant="ghost">

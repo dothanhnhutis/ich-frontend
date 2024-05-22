@@ -1,44 +1,31 @@
 import configs from "@/config";
 
-export type ResData = {
-  statusCode: number;
-  status: string;
-  message: string;
-  metadata?: any;
-};
-
 type FetchHttpOption = RequestInit & {
   baseUrl?: string;
 };
 
 export interface IError {
-  status: string;
   statusCode: number;
-  message: string;
-}
-
-export interface IErrorResponse {
-  message: string;
-  statusCode: number;
-  status: string;
-  serializeErrors(): IError;
+  headers: Headers;
+  data: { message: string };
 }
 
 export class FetchHttpError extends Error {
-  public statusCode: number;
-  public status: string;
-
+  private headers: Headers;
+  private statusCode: number;
+  private data: { message: string };
   constructor(props: IError) {
-    super(props.message);
+    super(props.data.message);
+    this.headers = props.headers;
     this.statusCode = props.statusCode;
-    this.status = props.status;
+    this.data = props.data;
   }
 
   serialize(): IError {
     return {
-      status: this.status,
+      headers: this.headers,
+      data: this.data,
       statusCode: this.statusCode,
-      message: this.message,
     };
   }
 }
@@ -67,30 +54,31 @@ async function fetchHttp<ResponseData>(
     body,
     method,
   });
-
   if (!res.ok) {
-    const resError: IError = await res.json();
-    throw new FetchHttpError(resError);
+    const { message }: { message: string } = await res.json();
+    throw new FetchHttpError({
+      headers: res.headers,
+      statusCode: res.status,
+      data: { message },
+    });
   }
   const data: ResponseData = await res.json();
   return {
-    status: res.status,
-    data,
+    statusCode: res.status,
     headers: res.headers,
+    data,
   };
 }
 
-export const errorHandler = (error: any): IError => {
-  if (error instanceof FetchHttpError) {
-    return error.serialize();
-  } else {
-    return {
-      message: "unknown",
-      status: "error",
-      statusCode: 400,
-    };
-  }
-};
+// export const errorHandler = (error: any): IError => {
+//   if (error instanceof FetchHttpError) {
+//     return error.serialize();
+//   } else {
+//     return {
+//       message: "unknown",
+//     };
+//   }
+// };
 
 export const http = {
   get<ResponseData>(url: string, options?: Omit<FetchHttpOption, "body">) {

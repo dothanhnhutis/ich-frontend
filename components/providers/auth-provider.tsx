@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const fetchUserCurrent = async () => {
       const res = await getCurrentUser();
-      setCurrentUser(res.metadata?.user);
+      if (res.statusCode == 200) setCurrentUser(res.data as CurrentUser);
     };
     fetchUserCurrent();
   }, []);

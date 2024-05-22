@@ -34,10 +34,10 @@ const SigninPage = () => {
     startTransistion(async () => {
       const res = await signIn(form);
       if (res.statusCode == 200) {
-        toast.success(res.message);
+        toast.success(res.data.message);
         router.refresh();
       } else {
-        toast.error(res.message);
+        toast.error(res.data.message);
       }
     });
   };

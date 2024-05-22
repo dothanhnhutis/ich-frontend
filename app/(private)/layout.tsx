@@ -13,7 +13,7 @@ const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
     >
       <AuthProvider>
         <div className="bg-muted/40 min-h-screen">
-          <HeaderPrivate />
+          {/* <HeaderPrivate /> */}
           {children}
         </div>
       </AuthProvider>

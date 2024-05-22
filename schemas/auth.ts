@@ -38,15 +38,8 @@ export const signupSchema = z
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/,
         "password_format_error"
       ),
-    code: z
-      .string({
-        required_error: "Code field is required",
-        invalid_type_error: "Code field must be string",
-      })
-      .length(6, "code_error"),
   })
   .strict();
-export const signupWithoutCodeSchema = signupSchema.omit({ code: true });
 
 export const resetPasswordSchema = z
   .object({
