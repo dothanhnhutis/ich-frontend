@@ -15,7 +15,11 @@ export async function middleware(request: NextRequest) {
   const currentUser = await getCurrentUser();
   if (currentUser.statusCode == 200) {
     const user = currentUser.data as CurrentUser;
-    if (!user.emailVerified) {
+    if (
+      !user.emailVerified &&
+      (nextUrl.pathname.startsWith("/manager") ||
+        nextUrl.pathname.startsWith("/user"))
+    ) {
       return NextResponse.redirect(new URL("/auth/verify-email", nextUrl));
     }
   } else {

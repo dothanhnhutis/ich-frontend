@@ -4,6 +4,7 @@ import { FetchHttpError, http } from "../http";
 import { cookies } from "next/headers";
 import { parseCookie } from "@/lib/cookies-parser";
 import { UserRole } from "@/schemas/user";
+import { revalidatePath } from "next/cache";
 
 export type SignUpRes = {
   message: string;
@@ -91,9 +92,67 @@ export async function signOut() {
 
 export async function recover(email: string) {
   try {
-    const res = await http.patch<any>("/auth/recover", {
+    const res = await http.patch<{ message: string }>("/auth/recover", {
       email,
     });
+    return res;
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      return error.serialize();
+    } else {
+      console.log(error);
+      return {
+        statusCode: 500,
+        headers: error.headers,
+        data: { message: "unknown" },
+      };
+    }
+  }
+}
+
+export async function sendEmailVerify() {
+  const allCookies = cookies().getAll();
+  try {
+    const res = await http.get<{ message: string }>(
+      "/users/send-verify-email",
+      {
+        headers: {
+          Cookie: allCookies
+            .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+            .join("; "),
+        },
+      }
+    );
+    return res;
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      return error.serialize();
+    } else {
+      console.log(error);
+      return {
+        statusCode: 500,
+        headers: error.headers,
+        data: { message: "unknown" },
+      };
+    }
+  }
+}
+
+export async function changeEmail(data: { email: string }) {
+  const allCookies = cookies().getAll();
+  try {
+    const res = await http.patch<{ message: string }>(
+      "/users/change-email",
+      data,
+      {
+        headers: {
+          Cookie: allCookies
+            .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+            .join("; "),
+        },
+      }
+    );
+    revalidatePath("/auth/verify-email");
     return res;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {

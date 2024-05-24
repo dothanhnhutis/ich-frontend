@@ -1,38 +1,30 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { LogOutIcon, SettingsIcon } from "lucide-react";
 import LogoImage from "@/images/logos/logo.png";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
-import { LogOutIcon, MailIcon, SettingsIcon } from "lucide-react";
-
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuthContext } from "@/components/providers/auth-provider";
-import AvatarDefault from "@/images/avatars/user-1.jpg";
-
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-const VerifyEmailPage = () => {
-  const currentUser: any = {};
+import AvatarDefault from "@/images/avatars/user-1.jpg";
+import { getCurrentUser } from "@/service/api/user.service";
+import { CurrentUser } from "@/schemas/user";
+import SendAgainForm from "./change-email";
+import SendAgainBtn from "./send-again";
+import ChangeEmailForm from "./change-email";
+
+const VerifyEmailPage = async () => {
+  const { data: currentUser } = await getCurrentUser();
   return (
     <div className="flex flex-col min-h-screen ">
       <header className="sticky top-0 left-0 right-0">
@@ -52,7 +44,9 @@ const VerifyEmailPage = () => {
               <DropdownMenuTrigger className="outline-none">
                 <Avatar>
                   <AvatarImage
-                    src={currentUser?.picture ?? AvatarDefault.src}
+                    src={
+                      (currentUser as CurrentUser)?.picture ?? AvatarDefault.src
+                    }
                   />
                   <AvatarFallback className="bg-transparent">
                     <Skeleton className="h-10 w-10 rounded-full" />
@@ -67,14 +61,21 @@ const VerifyEmailPage = () => {
                 <DropdownMenuLabel className="flex flex-col items-center">
                   <Avatar className="w-24 h-24">
                     <AvatarImage
-                      src={currentUser?.picture ?? AvatarDefault.src}
+                      src={
+                        (currentUser as CurrentUser)?.picture ??
+                        AvatarDefault.src
+                      }
                     />
                     <AvatarFallback className="bg-transparent">
                       <Skeleton className="w-24 h-24 rounded-full" />
                     </AvatarFallback>
                   </Avatar>
-                  <p className="font-medium text-lg">Do Thanh Nhut</p>
-                  <p className="text-muted-foreground font-sm">admin</p>
+                  <p className="font-medium text-lg">
+                    {(currentUser as CurrentUser)?.username}
+                  </p>
+                  <p className="text-muted-foreground font-sm">
+                    {(currentUser as CurrentUser)?.role}
+                  </p>
                 </DropdownMenuLabel>
 
                 <DropdownMenuItem asChild>
@@ -97,7 +98,6 @@ const VerifyEmailPage = () => {
           </div>
         </div>
       </header>
-
       <div
         className="flex flex-col flex-grow sm:flex-grow-0 sm:grid grid-cols-12 transition-all
       "
@@ -113,7 +113,7 @@ const VerifyEmailPage = () => {
                   aria-hidden="true"
                   role="img"
                 >
-                  <g clip-path="url(#clip0_11448_56766)">
+                  <g clipPath="url(#clip0_11448_56766)">
                     <path
                       d="M143.906 114.414H1.095c-.605 0-1.095.49-1.095 1.095v.014c0 .604.49 1.094 1.095 1.094h142.811c.604 0 1.094-.49 1.094-1.094v-.014c0-.605-.49-1.095-1.094-1.095z"
                       fill="url(#paint0_linear_11448_56766-uid-3)"
@@ -125,8 +125,8 @@ const VerifyEmailPage = () => {
                     <path
                       d="M114.908 60.428a23.635 23.635 0 01-20.07-23.354"
                       stroke="#000"
-                      stroke-width="2"
-                      stroke-linejoin="round"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
                     ></path>
                     <path
                       d="M127.217 107.563l-50.19-37.952a7.207 7.207 0 00-9.055 0l-50.19 38.237v1.677c0 3.966 2.401 7.107 5.685 7.107h98.079c3.24 0 5.685-2.999 5.685-6.837l-.014-2.232z"
@@ -174,58 +174,58 @@ const VerifyEmailPage = () => {
                       y2="115.509"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop stop-color="#C3D2C3" stop-opacity="0"></stop>
+                      <stop stopColor="#C3D2C3" stopOpacity="0"></stop>
                       <stop
                         offset=".01"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".05"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".05"
                       ></stop>
                       <stop
                         offset=".03"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".3"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".3"
                       ></stop>
                       <stop
                         offset=".06"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".51"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".51"
                       ></stop>
                       <stop
                         offset=".09"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".69"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".69"
                       ></stop>
                       <stop
                         offset=".12"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".83"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".83"
                       ></stop>
                       <stop
                         offset=".15"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".92"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".92"
                       ></stop>
                       <stop
                         offset=".18"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".98"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".98"
                       ></stop>
-                      <stop offset=".21" stop-color="#C3D2C3"></stop>
-                      <stop offset=".84" stop-color="#C3D2C3"></stop>
+                      <stop offset=".21" stopColor="#C3D2C3"></stop>
+                      <stop offset=".84" stopColor="#C3D2C3"></stop>
                       <stop
                         offset=".88"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".78"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".78"
                       ></stop>
                       <stop
                         offset=".96"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".23"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".23"
                       ></stop>
                       <stop
                         offset="1"
-                        stop-color="#C3D2C3"
-                        stop-opacity=".01"
+                        stopColor="#C3D2C3"
+                        stopOpacity=".01"
                       ></stop>
                     </linearGradient>
                     <linearGradient
@@ -236,10 +236,10 @@ const VerifyEmailPage = () => {
                       y2="92.34"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop stop-color="#9AAA97"></stop>
-                      <stop offset=".31" stop-color="#8D9D88"></stop>
-                      <stop offset=".9" stop-color="#6B7962"></stop>
-                      <stop offset="1" stop-color="#65735B"></stop>
+                      <stop stopColor="#9AAA97"></stop>
+                      <stop offset=".31" stopColor="#8D9D88"></stop>
+                      <stop offset=".9" stopColor="#6B7962"></stop>
+                      <stop offset="1" stopColor="#65735B"></stop>
                     </linearGradient>
                     <linearGradient
                       id="paint2_linear_11448_56766-uid-3"
@@ -249,13 +249,13 @@ const VerifyEmailPage = () => {
                       y2="35.324"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop stop-color="#9AAA97"></stop>
-                      <stop offset=".02" stop-color="#9EAE9C"></stop>
-                      <stop offset=".19" stop-color="#BDC8BB"></stop>
-                      <stop offset=".37" stop-color="#D4DDD3"></stop>
-                      <stop offset=".56" stop-color="#E5EBE4"></stop>
-                      <stop offset=".76" stop-color="#EFF4EF"></stop>
-                      <stop offset="1" stop-color="#F2F7F2"></stop>
+                      <stop stopColor="#9AAA97"></stop>
+                      <stop offset=".02" stopColor="#9EAE9C"></stop>
+                      <stop offset=".19" stopColor="#BDC8BB"></stop>
+                      <stop offset=".37" stopColor="#D4DDD3"></stop>
+                      <stop offset=".56" stopColor="#E5EBE4"></stop>
+                      <stop offset=".76" stopColor="#EFF4EF"></stop>
+                      <stop offset="1" stopColor="#F2F7F2"></stop>
                     </linearGradient>
                     <linearGradient
                       id="paint3_linear_11448_56766-uid-3"
@@ -265,11 +265,11 @@ const VerifyEmailPage = () => {
                       y2="65.872"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop stop-color="#9AAA97"></stop>
-                      <stop offset=".14" stop-color="#A6B6A4"></stop>
-                      <stop offset=".4" stop-color="#B6C6B5"></stop>
-                      <stop offset=".67" stop-color="#C0CFC0"></stop>
-                      <stop offset="1" stop-color="#C3D2C3"></stop>
+                      <stop stopColor="#9AAA97"></stop>
+                      <stop offset=".14" stopColor="#A6B6A4"></stop>
+                      <stop offset=".4" stopColor="#B6C6B5"></stop>
+                      <stop offset=".67" stopColor="#C0CFC0"></stop>
+                      <stop offset="1" stopColor="#C3D2C3"></stop>
                     </linearGradient>
                     <linearGradient
                       id="paint4_linear_11448_56766-uid-3"
@@ -279,13 +279,13 @@ const VerifyEmailPage = () => {
                       y2="65.857"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop stop-color="#9AAA97"></stop>
-                      <stop offset=".09" stop-color="#B5C2B3"></stop>
-                      <stop offset=".18" stop-color="#CCD5CA"></stop>
-                      <stop offset=".29" stop-color="#DDE5DC"></stop>
-                      <stop offset=".42" stop-color="#E9EFE9"></stop>
-                      <stop offset=".6" stop-color="#F0F5F0"></stop>
-                      <stop offset="1" stop-color="#F2F7F2"></stop>
+                      <stop stopColor="#9AAA97"></stop>
+                      <stop offset=".09" stopColor="#B5C2B3"></stop>
+                      <stop offset=".18" stopColor="#CCD5CA"></stop>
+                      <stop offset=".29" stopColor="#DDE5DC"></stop>
+                      <stop offset=".42" stopColor="#E9EFE9"></stop>
+                      <stop offset=".6" stopColor="#F0F5F0"></stop>
+                      <stop offset="1" stopColor="#F2F7F2"></stop>
                     </linearGradient>
                     <linearGradient
                       id="paint5_linear_11448_56766-uid-3"
@@ -295,12 +295,12 @@ const VerifyEmailPage = () => {
                       y2="35.324"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop stop-color="#9AAA97"></stop>
-                      <stop offset=".04" stop-color="#9FAF9C"></stop>
-                      <stop offset=".32" stop-color="#C3CEC1"></stop>
-                      <stop offset=".58" stop-color="#DDE4DC"></stop>
-                      <stop offset=".82" stop-color="#ECF2EC"></stop>
-                      <stop offset="1" stop-color="#F2F7F2"></stop>
+                      <stop stopColor="#9AAA97"></stop>
+                      <stop offset=".04" stopColor="#9FAF9C"></stop>
+                      <stop offset=".32" stopColor="#C3CEC1"></stop>
+                      <stop offset=".58" stopColor="#DDE4DC"></stop>
+                      <stop offset=".82" stopColor="#ECF2EC"></stop>
+                      <stop offset="1" stopColor="#F2F7F2"></stop>
                     </linearGradient>
                     <radialGradient
                       id="paint6_radial_11448_56766-uid-3"
@@ -310,10 +310,10 @@ const VerifyEmailPage = () => {
                       gradientUnits="userSpaceOnUse"
                       gradientTransform="rotate(34.804 -43.113 203.923) scale(4.8973 8.39264)"
                     >
-                      <stop offset=".78" stop-color="#F66DBC"></stop>
-                      <stop offset=".83" stop-color="#F867A2"></stop>
-                      <stop offset=".92" stop-color="#FC585E"></stop>
-                      <stop offset="1" stop-color="#FF4B25"></stop>
+                      <stop offset=".78" stopColor="#F66DBC"></stop>
+                      <stop offset=".83" stopColor="#F867A2"></stop>
+                      <stop offset=".92" stopColor="#FC585E"></stop>
+                      <stop offset="1" stopColor="#FF4B25"></stop>
                     </radialGradient>
                     <radialGradient
                       id="paint7_radial_11448_56766-uid-3"
@@ -323,10 +323,10 @@ const VerifyEmailPage = () => {
                       gradientUnits="userSpaceOnUse"
                       gradientTransform="matrix(25.58572 37.6679 -67.2682 45.69157 109.578 17.017)"
                     >
-                      <stop offset=".558" stop-color="#F66DBC"></stop>
-                      <stop offset=".749" stop-color="#F867A2"></stop>
-                      <stop offset=".854" stop-color="#FC585E"></stop>
-                      <stop offset="1" stop-color="#FF4B25"></stop>
+                      <stop offset=".558" stopColor="#F66DBC"></stop>
+                      <stop offset=".749" stopColor="#F867A2"></stop>
+                      <stop offset=".854" stopColor="#FC585E"></stop>
+                      <stop offset="1" stopColor="#FF4B25"></stop>
                     </radialGradient>
                     <clipPath id="clip0_11448_56766-uid-3">
                       <rect width="145" height="130" fill="#fff"></rect>
@@ -340,7 +340,9 @@ const VerifyEmailPage = () => {
             </h1>
             <div className="text-center text-muted-foreground text-base">
               We just sent an email to the address:
-              <strong className="block md:inline">gaconght001@gmail.com</strong>
+              <strong className="block md:inline">
+                {(currentUser as CurrentUser)?.email}
+              </strong>
             </div>
             <p className="text-center text-muted-foreground text-base">
               Please check your email and select the link provided to verify
@@ -357,70 +359,12 @@ const VerifyEmailPage = () => {
               >
                 Go to Gmail Inbox
               </Link>
-              <Button
-                variant="outline"
-                className="rounded-full border-2 border-primary !text-primary font-bold"
-              >
-                Send again
-              </Button>
+              <SendAgainBtn />
             </div>
 
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="link">
-                  <span>Didn't receive email?</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-screen-md">
-                <div>
-                  <h4 className="font-medium text-2xl">
-                    Didn't receive email?
-                  </h4>
-                  <p className="text-muted-foreground mb-4">
-                    Here are some tips to help you find it.
-                  </p>
-                  <ol className="list-decimal [&>li]:mt-3 my-2 ml-4">
-                    <li>
-                      <strong>Resend the email</strong>
-                    </li>
-                    <li>
-                      <strong>Search for the email</strong>
-                      <p className="text-muted-foreground">
-                        We'll send the email from "ICH", so you can quickly
-                        search for it. If it isn't in your inbox, check your
-                        folders. If a spam filter or email rule moved the email,
-                        it might be in Spam, Junk, Trash, Deleted Items, or
-                        Archive folder.
-                      </p>
-                    </li>
-                    <li>
-                      <strong>How do I confirm my email?</strong>
-                      <p className="text-muted-foreground">
-                        If you aren't able to click the link, copy the full URL
-                        from the email and paste it into a new web browser
-                        window.
-                      </p>
-                    </li>
-                    <li>
-                      <strong>Change your email</strong>
-                    </li>
-                  </ol>
-                  <form className="flex flex-col sm:flex-row gap-2 mt-4">
-                    <Input
-                      type="email"
-                      placeholder="Email address"
-                      className="sm:max-w-[300px] focus-visible:ring-offset-0 focus-visible:ring-transparent"
-                    />
-                    <Button
-                      variant="outline"
-                      className="rounded-full border-2 border-primary !text-primary font-bold"
-                    >
-                      Update and resend
-                    </Button>
-                  </form>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <ChangeEmailForm
+              currentEmail={(currentUser as CurrentUser).email!}
+            />
           </div>
         </div>
       </div>
