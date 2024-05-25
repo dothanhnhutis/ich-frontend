@@ -12,18 +12,14 @@ export type PasswordResetTokenRes = {
 export async function getUserByPasswordResetToken(token: string) {
   try {
     const res = await http.get<PasswordResetTokenRes>("/users/token/" + token);
-    return res;
+    return res.data;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
-      return error.serialize();
+      console.log(error.serialize());
     } else {
       console.log(error);
-      return {
-        statusCode: 500,
-        headers: error.headers,
-        data: { message: "unknown" },
-      };
     }
+    return undefined;
   }
 }
 
@@ -38,17 +34,16 @@ export async function getCurrentUser() {
       },
       credentials: "include",
     });
-    return res;
+    return res.data;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
-      return error.serialize();
+      console.log(
+        "getCurrentUser() method error: ",
+        error.serialize().data.message
+      );
     } else {
-      console.log(error);
-      return {
-        statusCode: 500,
-        headers: error.headers,
-        data: { message: "unknown" },
-      };
+      console.log("getCurrentUser() method error: ", error);
     }
+    return undefined;
   }
 }

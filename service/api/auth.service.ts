@@ -19,17 +19,35 @@ export type SignUpRes = {
 export async function signUp(data: SignUpData) {
   try {
     const res = await http.post<SignUpRes>("/auth/signup", data);
-    return res;
+    return { success: true, message: res.data.message };
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
-      return error.serialize();
+      console.log(error.serialize());
+      return { success: false, message: error.serialize().data.message };
     } else {
-      console.log(error);
-      return {
-        statusCode: 500,
-        headers: error.headers,
-        data: { message: "unknown" },
-      };
+      console.log("signIn() method error: ", error);
+      return { success: false, message: "unknown" };
+    }
+  }
+}
+
+export async function signOut() {
+  const allCookies = cookies().getAll();
+
+  try {
+    await http.delete<{ message: string }>("/auth/signout", {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+    });
+    cookies().delete("session");
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(error.serialize());
+    } else {
+      console.log("signOut() method error: ", error);
     }
   }
 }
@@ -53,39 +71,14 @@ export async function signIn(data: SignInData) {
       const cookieParser = parseCookie(cookie);
       cookies().set(cookieParser.name, cookieParser.value, { ...cookieParser });
     }
-    return res;
+    return { success: true, ...res.data };
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
-      return error.serialize();
+      console.log(error.serialize());
+      return { success: false, message: error.serialize().data.message };
     } else {
-      console.log(error);
-      return {
-        statusCode: 500,
-        headers: error.headers,
-        data: { message: "unknown" },
-      };
-    }
-  }
-}
-
-export async function signOut() {
-  try {
-    const res = await http.get<any>("/auth/signout");
-    for (const cookie of res.headers.getSetCookie()) {
-      const cookieParser = parseCookie(cookie);
-      cookies().set(cookieParser.name, cookieParser.value, { ...cookieParser });
-    }
-    return res.data;
-  } catch (error: any) {
-    if (error instanceof FetchHttpError) {
-      return error.serialize();
-    } else {
-      console.log(error);
-      return {
-        statusCode: 500,
-        headers: error.headers,
-        data: { message: "unknown" },
-      };
+      console.log("signIn() method error: ", error);
+      return { success: false, message: "unknown" };
     }
   }
 }
@@ -95,17 +88,14 @@ export async function recover(email: string) {
     const res = await http.patch<{ message: string }>("/auth/recover", {
       email,
     });
-    return res;
+    return { success: true, ...res.data };
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
-      return error.serialize();
+      console.log(error.serialize());
+      return { success: false, message: error.serialize().data.message };
     } else {
-      console.log(error);
-      return {
-        statusCode: 500,
-        headers: error.headers,
-        data: { message: "unknown" },
-      };
+      console.log("recover() method error: ", error);
+      return { success: false, message: "unknown" };
     }
   }
 }
@@ -123,17 +113,11 @@ export async function sendEmailVerify() {
         },
       }
     );
-    return res;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
-      return error.serialize();
+      console.log(error.serialize());
     } else {
-      console.log(error);
-      return {
-        statusCode: 500,
-        headers: error.headers,
-        data: { message: "unknown" },
-      };
+      console.log("sendEmailVerify() method error: ", error);
     }
   }
 }
@@ -141,47 +125,37 @@ export async function sendEmailVerify() {
 export async function changeEmail(data: { email: string }) {
   const allCookies = cookies().getAll();
   try {
-    const res = await http.patch<{ message: string }>(
-      "/users/change-email",
-      data,
-      {
-        headers: {
-          Cookie: allCookies
-            .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
-            .join("; "),
-        },
-      }
-    );
+    await http.patch<{ message: string }>("/users/change-email", data, {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+    });
     revalidatePath("/auth/verify-email");
-    return res;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
-      return error.serialize();
+      console.log(error.serialize());
     } else {
-      console.log(error);
-      return {
-        statusCode: 500,
-        headers: error.headers,
-        data: { message: "unknown" },
-      };
+      console.log("changeEmail() method error: ", error);
     }
   }
 }
 
 export async function resetPassword(token: string, data: ResetPasswordData) {
   try {
-    const res = await http.patch<any>("/auth/reset-password/" + token, data);
-    return res.data;
+    const res = await http.patch<{ message: string }>(
+      "/auth/reset-password/" + token,
+      data
+    );
+    return { success: true, ...res.data };
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
-      return error.serialize();
+      console.log(error.serialize());
+      return { success: false, message: error.serialize().data.message };
     } else {
-      console.log(error);
-      return {
-        statusCode: 500,
-        headers: error.headers,
-        data: { message: "unknown" },
-      };
+      console.log("resetPassword() method error: ", error);
+      return { success: false, message: "unknown" };
     }
   }
 }

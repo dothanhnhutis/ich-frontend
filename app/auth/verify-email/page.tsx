@@ -1,30 +1,17 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { LogOutIcon, SettingsIcon } from "lucide-react";
 import LogoImage from "@/images/logos/logo.png";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import AvatarDefault from "@/images/avatars/user-1.jpg";
 import { getCurrentUser } from "@/service/api/user.service";
 import { CurrentUser } from "@/schemas/user";
-import SendAgainForm from "./change-email";
 import SendAgainBtn from "./send-again";
 import ChangeEmailForm from "./change-email";
+import UserMenu from "./user-menu";
 
 const VerifyEmailPage = async () => {
-  const { data: currentUser } = await getCurrentUser();
+  const currentUser = await getCurrentUser();
   return (
     <div className="flex flex-col min-h-screen ">
       <header className="sticky top-0 left-0 right-0">
@@ -39,63 +26,7 @@ const VerifyEmailPage = async () => {
               className="w-full size-auto"
             />
           </Link>
-          <div className="hidden sm:block">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="outline-none">
-                <Avatar>
-                  <AvatarImage
-                    src={
-                      (currentUser as CurrentUser)?.picture ?? AvatarDefault.src
-                    }
-                  />
-                  <AvatarFallback className="bg-transparent">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                avoidCollisions
-                align="end"
-                className="w-[245px]"
-              >
-                <DropdownMenuLabel className="flex flex-col items-center">
-                  <Avatar className="w-24 h-24">
-                    <AvatarImage
-                      src={
-                        (currentUser as CurrentUser)?.picture ??
-                        AvatarDefault.src
-                      }
-                    />
-                    <AvatarFallback className="bg-transparent">
-                      <Skeleton className="w-24 h-24 rounded-full" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <p className="font-medium text-lg">
-                    {(currentUser as CurrentUser)?.username}
-                  </p>
-                  <p className="text-muted-foreground font-sm">
-                    {(currentUser as CurrentUser)?.role}
-                  </p>
-                </DropdownMenuLabel>
-
-                <DropdownMenuItem asChild>
-                  <Link href="" className="cursor-pointer">
-                    <SettingsIcon className="mr-4 h-4 w-4" />
-                    <span>Close Account</span>
-                    {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem asChild>
-                  <Link href="/auth/signout" className="cursor-pointer">
-                    <LogOutIcon className="mr-4 h-4 w-4" />
-                    <span>Log out</span>
-                    {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <UserMenu currentUser={currentUser!} />
         </div>
       </header>
       <div
@@ -340,9 +271,7 @@ const VerifyEmailPage = async () => {
             </h1>
             <div className="text-center text-muted-foreground text-base">
               We just sent an email to the address:
-              <strong className="block md:inline">
-                {(currentUser as CurrentUser)?.email}
-              </strong>
+              <strong className="block md:inline">{currentUser?.email}</strong>
             </div>
             <p className="text-center text-muted-foreground text-base">
               Please check your email and select the link provided to verify

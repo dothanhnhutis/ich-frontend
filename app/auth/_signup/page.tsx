@@ -35,14 +35,14 @@ const SignUpPage = () => {
     e.preventDefault();
     startTransistion(async () => {
       const res = await signUp(form);
-      if (res.statusCode == 201) {
+      if (res.success) {
         setDidFocusName(false);
         setForm({
           username: "",
           email: "",
           password: "",
         });
-        toast.success(res.data.message);
+        toast.success(res.message);
       } else {
         setisExistEmail(true);
       }

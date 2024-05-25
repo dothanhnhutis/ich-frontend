@@ -6,23 +6,34 @@ import {
 } from "@/routes";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { http } from "./service/http";
 import { getCurrentUser } from "./service/api/user.service";
-import { CurrentUser } from "./schemas/user";
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
   const currentUser = await getCurrentUser();
-  if (currentUser.statusCode == 200) {
-    const user = currentUser.data as CurrentUser;
+  if (currentUser) {
     if (
-      !user.emailVerified &&
+      !currentUser.emailVerified &&
       (nextUrl.pathname.startsWith("/manager") ||
         nextUrl.pathname.startsWith("/user"))
     ) {
       return NextResponse.redirect(new URL("/auth/verify-email", nextUrl));
     }
+    if (currentUser.emailVerified && nextUrl.pathname == "/auth/verify-email") {
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+    }
+
+    if (authRoutes.includes(nextUrl.pathname)) {
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+    }
   } else {
+    if (
+      nextUrl.pathname.startsWith("/manager") ||
+      nextUrl.pathname.startsWith("/user") ||
+      nextUrl.pathname == "/auth/verify-email"
+    ) {
+      return NextResponse.redirect(new URL("/auth/signin", nextUrl));
+    }
   }
 
   // const isLoggedIn = !!request.cookies.get("session");

@@ -53,7 +53,7 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
     e.preventDefault();
     startTransistion(async () => {
       const res = await resetPassword(token, form);
-      if (res.statusCode == 200) {
+      if (res.success) {
         setForm({ password: "", confirmPassword: "" });
         toast.success(res.message);
         router.push("/auth/signin");

@@ -33,11 +33,10 @@ const SigninPage = () => {
     e.preventDefault();
     startTransistion(async () => {
       const res = await signIn(form);
-      if (res.statusCode == 200) {
-        toast.success(res.data.message);
+      if (res.success) {
         router.refresh();
       } else {
-        toast.error(res.data.message);
+        toast.error(res.message);
       }
     });
   };

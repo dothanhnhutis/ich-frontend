@@ -35,8 +35,7 @@ const SignInPage = () => {
     e.preventDefault();
     startTransistion(async () => {
       const res = await signIn(form);
-      if (res.statusCode == 200) {
-        toast.success(res.data.message);
+      if (res.success) {
         router.refresh();
       } else {
         setError(true);
@@ -123,12 +122,12 @@ const SignInPage = () => {
                   </div>
                 </div>
                 <div className="flex items-center justify-center">
-                  <Button
-                    variant="outline"
-                    className="rounded-xl border-2 mt-3 mb-6 border-primary text-primary font-bold hover:text-primary"
+                  <Link
+                    href={"/auth/signup"}
+                    className="rounded-xl px-4 py-2 border-2 mt-3 mb-6 border-primary text-primary font-bold "
                   >
                     Sign Up
-                  </Button>
+                  </Link>
                 </div>
               </footer>
             </div>

@@ -3,17 +3,8 @@ import { CurrentUser } from "@/schemas/user";
 import { getCurrentUser } from "@/service/api/user.service";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const initAuth: CurrentUser = {
-  id: "error",
-  email: "error",
-  isBlocked: true,
-  picture: null,
-  role: "CUSTOMER",
-  username: "error",
-};
-
-const authContext = createContext<{ currentUser: CurrentUser }>({
-  currentUser: initAuth,
+const authContext = createContext<{ currentUser: CurrentUser | undefined }>({
+  currentUser: undefined,
 });
 
 export const useAuthContext = () => {
@@ -22,12 +13,12 @@ export const useAuthContext = () => {
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentUser, setCurrentUser] = useState<CurrentUser>(initAuth);
+  const [currentUser, setCurrentUser] = useState<CurrentUser>();
 
   useEffect(() => {
     const fetchUserCurrent = async () => {
-      const res = await getCurrentUser();
-      if (res.statusCode == 200) setCurrentUser(res.data as CurrentUser);
+      const currentUser = await getCurrentUser();
+      setCurrentUser(currentUser);
     };
     fetchUserCurrent();
   }, []);
