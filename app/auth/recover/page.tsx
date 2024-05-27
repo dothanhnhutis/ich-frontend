@@ -3,9 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import LogoImage from "@/images/logos/logo.png";
-import { Input } from "@/components/ui/input";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import RecoverForm from "./recover-form";
 
 const RecoverPage = () => {
   return (
@@ -220,19 +218,7 @@ const RecoverPage = () => {
               Enter your username or email address and select{" "}
               <strong>Send Email</strong>.
             </div>
-            <div>
-              <Label>Username or Email</Label>
-              <Input type="email" placeholder="Email" />
-            </div>
-            <div className="flex justify-end items-center">
-              <Link
-                href="/auth/signin"
-                className={buttonVariants({ variant: "link" })}
-              >
-                Cancel
-              </Link>
-              <Button>Send Email</Button>
-            </div>
+            <RecoverForm />
           </div>
         </div>
       </div>

@@ -270,7 +270,7 @@ const VerifyEmailPage = async () => {
               <span>Verify your email to continue</span>
             </h1>
             <div className="text-center text-muted-foreground text-base">
-              We just sent an email to the address:
+              We just sent an email to the address:{" "}
               <strong className="block md:inline">{currentUser?.email}</strong>
             </div>
             <p className="text-center text-muted-foreground text-base">
@@ -291,9 +291,7 @@ const VerifyEmailPage = async () => {
               <SendAgainBtn />
             </div>
 
-            <ChangeEmailForm
-              currentEmail={(currentUser as CurrentUser).email!}
-            />
+            <ChangeEmailForm currentEmail={currentUser.email} />
           </div>
         </div>
       </div>

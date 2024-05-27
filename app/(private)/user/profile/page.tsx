@@ -1,9 +1,5 @@
-"use client";
 import React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import AvatarDefault from "@/images/avatars/user-1.jpg";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { PencilIcon } from "lucide-react";
 import {
@@ -17,10 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { UploadPhoto } from "./upload-photo";
+import { getCurrentUser } from "@/service/api/user.service";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import AvatarDefault from "@/images/avatars/user-1.jpg";
 
-const ProfilePage = () => {
-  const currentUser = useAuthContext();
-  console.log(currentUser);
+const ProfilePage = async () => {
+  const currentUser = await getCurrentUser();
   return (
     <>
       <h3 className="text-lg font-medium">Profile</h3>
@@ -30,20 +29,27 @@ const ProfilePage = () => {
       <Separator className="my-4" />
       <div className="lg:flex lg:justify-center lg:items-start space-y-4 lg:space-y-0">
         <div className="order-last lg:w-1/4 lg:flex lg:justify-center">
-          <UploadPhoto url={currentUser.picture ?? undefined} />
+          <UploadPhoto url={currentUser?.picture || undefined}>
+            <Avatar className="size-40 cursor-pointer">
+              <AvatarImage src={currentUser?.picture || AvatarDefault.src} />
+              <AvatarFallback className="bg-transparent">
+                <Skeleton className="size-40 rounded-full" />
+              </AvatarFallback>
+            </Avatar>
+          </UploadPhoto>
         </div>
         <div className="relative w-full space-y-4">
           <div>
             <Label>User ID</Label>
-            <p>{currentUser.id}</p>
+            <p>{currentUser?.id}</p>
           </div>
           <div>
             <Label>Username</Label>
-            <p>{currentUser.username}</p>
+            <p>{currentUser?.username}</p>
           </div>
           <div>
             <Label>Email</Label>
-            <p>{currentUser.email}</p>
+            <p>{currentUser?.email}</p>
           </div>
           <div>
             <Label>Phone</Label>
@@ -66,7 +72,7 @@ const ProfilePage = () => {
                   This is how others will see you on the site.
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={() => {}} className="space-y-8">
+              {/* <form onSubmit={() => {}} className="space-y-8">
                 <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
                   <Input type="text" id="username" />
@@ -83,7 +89,7 @@ const ProfilePage = () => {
                   <Label htmlFor="username">Address</Label>
                   <Input type="text" id="username" />
                 </div>
-              </form>
+              </form> */}
             </DialogContent>
           </Dialog>
         </div>

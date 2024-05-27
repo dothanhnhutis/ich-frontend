@@ -47,3 +47,33 @@ export async function getCurrentUser() {
     return undefined;
   }
 }
+
+export async function diableAuthUser() {
+  const allCookies = cookies().getAll();
+  console.log(
+    allCookies.map((c) => `${c.name}=${encodeURIComponent(c.value)}`).join("; ")
+  );
+  try {
+    const res = await http.patch<{ message: string }>("/users/disable", {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+
+    cookies().delete("session");
+    return res.data;
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(
+        "diableAuthUser() method error: ",
+        error.serialize().data.message
+      );
+    } else {
+      console.log("diableAuthUser() method error: ", error);
+    }
+    return undefined;
+  }
+}

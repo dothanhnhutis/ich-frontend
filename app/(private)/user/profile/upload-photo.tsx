@@ -20,11 +20,17 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-export const UploadPhoto = ({ url }: { url: string | undefined }) => {
+export const UploadPhoto = ({
+  url,
+  children,
+}: {
+  url: string | undefined;
+  children: React.ReactNode;
+}) => {
   const cropperRef = useRef<ReactCropperElement>(null);
   const [zoomSlider, setZoomSlider] = useState<number>(0.2);
   const [dataUrl, setDataUrl] = useState<string | undefined>(url);
-  console.log(url);
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -64,14 +70,7 @@ export const UploadPhoto = ({ url }: { url: string | undefined }) => {
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <Avatar className="size-40 cursor-pointer">
-          <AvatarImage src={dataUrl || AvatarDefault.src} />
-          <AvatarFallback className="bg-transparent">
-            <Skeleton className="size-40 rounded-full" />
-          </AvatarFallback>
-        </Avatar>
-      </DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="lg:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>Edit photo</DialogTitle>
@@ -85,7 +84,7 @@ export const UploadPhoto = ({ url }: { url: string | undefined }) => {
               dragMode="move"
               cropBoxMovable={false}
               viewMode={1}
-              src={dataUrl}
+              src={dataUrl || AvatarDefault.src}
               cropBoxResizable={false}
               center={false}
               zoomOnWheel={false}
