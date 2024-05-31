@@ -27,6 +27,8 @@ export const UploadPhoto = ({
   url: string | undefined;
   children: React.ReactNode;
 }) => {
+  const [open, setOpen] = useState<boolean>(false);
+
   const cropperRef = useRef<ReactCropperElement>(null);
   const [zoomSlider, setZoomSlider] = useState<number>(0.2);
   const [dataUrl, setDataUrl] = useState<string | undefined>(url);
@@ -69,7 +71,7 @@ export const UploadPhoto = ({
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="lg:max-w-[700px]">
         <DialogHeader>
@@ -129,9 +131,12 @@ export const UploadPhoto = ({
             </p>
 
             <div className="flex items-center w-full gap-2">
-              <Button variant="link" className="rounded-full w-full" asChild>
-                <Label htmlFor="upload-photo">Change image</Label>
-              </Button>
+              <Label
+                htmlFor="upload-photo"
+                className="w-full text-center cursor-pointer hover:underline text-primary"
+              >
+                Change image
+              </Label>
               <input
                 onChange={handleUpload}
                 type="file"

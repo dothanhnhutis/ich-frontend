@@ -291,7 +291,7 @@ const VerifyEmailPage = async () => {
               <SendAgainBtn />
             </div>
 
-            <ChangeEmailForm currentEmail={currentUser.email} />
+            <ChangeEmailForm currentEmail={currentUser?.email!} />
           </div>
         </div>
       </div>

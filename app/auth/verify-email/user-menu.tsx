@@ -17,7 +17,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
@@ -83,13 +82,18 @@ const UserMenu = ({ currentUser }: { currentUser: CurrentUser }) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
+              This action cannot be undone. This will deactivate your account
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={async () => await diableAuthUser()}>
+            <AlertDialogAction
+              onClick={async () => {
+                if (await diableAuthUser()) {
+                  router.push("/auth/signin");
+                }
+              }}
+            >
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>

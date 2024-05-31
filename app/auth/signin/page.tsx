@@ -6,16 +6,14 @@ import Image from "next/image";
 import LogoImage from "@/images/logos/logo.png";
 import { CircleAlertIcon, LockIcon, UserIcon } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { FcGoogle } from "react-icons/fc";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { SignInData, signInSchema } from "@/schemas/auth";
 import { cn } from "@/lib/utils";
 import { signIn } from "@/service/api/auth.service";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { Input } from "@/components/ui/input";
+import { SignInGoogleBtn } from "./signin-google-btn";
 
 const SignInPage = () => {
   const router = useRouter();
@@ -25,10 +23,10 @@ const SignInPage = () => {
     password: "",
   });
   const [isPending, startTransistion] = useTransition();
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    setError(false);
+    setError("");
   }, [form.password]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,7 +36,7 @@ const SignInPage = () => {
       if (res.success) {
         router.refresh();
       } else {
-        setError(true);
+        setError(res.message);
       }
     });
   };
@@ -101,14 +99,7 @@ const SignInPage = () => {
                     </span>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="relative rounded-lg p-0 "
-                >
-                  <FcGoogle className="size-9 p-1 top-0 left-0 absolute" />
-                  <span>Continue with Google</span>
-                </Button>
+                <SignInGoogleBtn />
               </div>
               <footer className="mt-20">
                 <div className="relative my-2">
@@ -169,7 +160,7 @@ const SignInPage = () => {
               {error && (
                 <p className="text-red-500 text-sm mt-1 flex items-center gap-2 font-medium">
                   <CircleAlertIcon className="size-4" />
-                  <span>Username or password is incorrect.</span>
+                  <span>{error}</span>
                 </p>
               )}
 

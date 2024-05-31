@@ -6,5 +6,9 @@ export type CurrentUser = {
   picture: string | null;
   emailVerified: boolean;
   isBlocked: string;
+  phone: string | null;
+  address: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 export type UserRole = "ADMIN" | "MANAGER" | "SALER" | "WRITER" | "CUSTOMER";

@@ -1,10 +1,7 @@
-"use client";
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { useAuthContext } from "@/components/providers/auth-provider";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -14,9 +11,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { getCurrentUser } from "@/service/api/user.service";
+import { DiableBtn } from "./disable-btn";
 
-const SettingPage = () => {
-  const currentUser = useAuthContext();
+const SettingPage = async () => {
+  const currentUser = await getCurrentUser();
+
   return (
     <div className="space-y-2">
       <Label className="text-red-500">Delete Account</Label>
@@ -35,13 +35,12 @@ const SettingPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Once you delete your account, you will lose access to your
-              account. Please be certain.
+              This action cannot be undone. This will deactivate your account
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Delete</AlertDialogAction>
+            <DiableBtn />
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

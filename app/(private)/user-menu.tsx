@@ -15,9 +15,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
+import { signOut } from "@/service/api/auth.service";
+import { useRouter } from "next/navigation";
 
 export const UserMenu = () => {
   const currentUser = useAuthContext();
+  const router = useRouter();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="outline-none">
@@ -71,12 +74,17 @@ export const UserMenu = () => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/auth/signout" className="cursor-pointer">
-            <LogOutIcon className="mr-2 h-4 w-4" />
-            <span>Log out</span>
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-          </Link>
+        <DropdownMenuItem
+          onClick={() => {
+            signOut();
+            router.refresh();
+          }}
+        >
+          {/* <Link href="/auth/signout" className="cursor-pointer"> */}
+          <LogOutIcon className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+          {/* </Link> */}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

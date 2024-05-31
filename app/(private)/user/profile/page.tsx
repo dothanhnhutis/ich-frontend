@@ -1,25 +1,17 @@
 import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
-import { PencilIcon } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { useAuthContext } from "@/components/providers/auth-provider";
+
 import { UploadPhoto } from "./upload-photo";
 import { getCurrentUser } from "@/service/api/user.service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
+import EditProfileForm from "./edit-profile-form";
 
 const ProfilePage = async () => {
   const currentUser = await getCurrentUser();
+  console.log(currentUser);
   return (
     <>
       <h3 className="text-lg font-medium">Profile</h3>
@@ -51,47 +43,19 @@ const ProfilePage = async () => {
             <Label>Email</Label>
             <p>{currentUser?.email}</p>
           </div>
-          <div>
-            <Label>Phone</Label>
-            <p>asdasd</p>
-          </div>
-          <div>
-            <Label>Address</Label>
-            <p>asdasd</p>
-          </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <div className="absolute top-0 right-0 hover:bg-accent p-2 rounded-full cursor-pointer ">
-                <PencilIcon className="size-5" />
-              </div>
-            </DialogTrigger>
-            <DialogContent className="lg:max-w-[700px]">
-              <DialogHeader>
-                <DialogTitle>Profile</DialogTitle>
-                <DialogDescription>
-                  This is how others will see you on the site.
-                </DialogDescription>
-              </DialogHeader>
-              {/* <form onSubmit={() => {}} className="space-y-8">
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input type="text" id="username" />
-                  <p className="text-[0.8rem] text-muted-foreground">
-                    This is your public display name. It can be your real name
-                    or a pseudonym. You can only change this once every 30 days.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="username">Phone</Label>
-                  <Input type="text" id="username" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="username">Address</Label>
-                  <Input type="text" id="username" />
-                </div>
-              </form> */}
-            </DialogContent>
-          </Dialog>
+          {currentUser?.phone && (
+            <div>
+              <Label>Phone</Label>
+              <p>{currentUser.phone}</p>
+            </div>
+          )}
+          {currentUser?.address && (
+            <div>
+              <Label>Address</Label>
+              <p>{currentUser.address}</p>
+            </div>
+          )}
+          <EditProfileForm currentUser={currentUser} />
         </div>
       </div>
     </>
