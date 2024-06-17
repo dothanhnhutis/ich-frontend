@@ -81,9 +81,6 @@ const SignInPage = () => {
                   <div className="flex items-center justify-end pr-2 col-[3_/_4] row-[1_/_1]"></div>
                 </div>
                 <Button
-                  disabled={
-                    !signInSchema.shape.email.safeParse(form.email).success
-                  }
                   onClick={() => setTab("password")}
                   className="rounded-lg"
                 >
