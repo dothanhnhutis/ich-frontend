@@ -52,7 +52,7 @@ export async function getCurrentUser() {
 export async function diableAuthUser() {
   const allCookies = cookies().getAll();
   try {
-    const res = await http.delete<{ message: string }>("/users/disable", {
+    const res = await http.patch<{ message: string }>("/users/disactivate", {
       headers: {
         Cookie: allCookies
           .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
@@ -60,7 +60,6 @@ export async function diableAuthUser() {
       },
       credentials: "include",
     });
-
     cookies().delete("session");
     return res.data;
   } catch (error: any) {
@@ -72,6 +71,7 @@ export async function diableAuthUser() {
     } else {
       console.log("diableAuthUser() method error: ", error);
     }
+
     return undefined;
   }
 }

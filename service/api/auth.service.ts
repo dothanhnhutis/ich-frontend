@@ -159,3 +159,16 @@ export async function resetPassword(token: string, data: ResetPasswordData) {
     }
   }
 }
+
+export async function verifyEmail(token: string) {
+  try {
+    await http.get<{ message: string }>(`/auth/confirm-email/${token}`);
+    revalidatePath("/auth/confirm-email");
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(error.serialize());
+    } else {
+      console.log("verifyEmail() method error: ", error);
+    }
+  }
+}
