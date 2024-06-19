@@ -53,33 +53,55 @@ export async function signOut() {
 }
 
 export type SignInRes = {
-  message: string;
-  user: {
-    id: string;
-    email: string;
-    username: string;
-    role: UserRole;
-    picture: string;
-    isBlocked: boolean;
-    emailVerified: boolean;
-  };
+  success: 0 | 1;
+  reactivateAccount?: true;
+  model?: "password";
+  message?: string;
 };
 export async function signIn(data: SignInData) {
   try {
-    const res = await http.post<SignInRes>("/auth/signin", data);
-    for (const cookie of res.headers.getSetCookie()) {
-      const cookieParser = parseCookie(cookie);
-      cookies().set(cookieParser.name, cookieParser.value, { ...cookieParser });
-    }
-    return { success: true, ...res.data };
-  } catch (error: any) {
-    if (error instanceof FetchHttpError) {
-      console.log(error.serialize());
-      return { success: false, message: error.serialize().data.message };
+    if (data.password && data.password.length > 0) {
+      const res = await http.post<SignInRes>("/auth/signin", data);
+      for (const cookie of res.headers.getSetCookie()) {
+        const cookieParser = parseCookie(cookie);
+        cookies().set(cookieParser.name, cookieParser.value, {
+          ...cookieParser,
+        });
+      }
+
+      return {
+        success: res.statusCode == 200,
+        model: "password",
+        message: res.data.message,
+      };
     } else {
-      console.log("signIn() method error: ", error);
-      return { success: false, message: "unknown" };
+      const res = await http.post<{ message: string }>(
+        "/auth/check/email",
+        data
+      );
+      console.log(res);
+      if (res.statusCode == 200) {
+        return {
+          success: 0,
+          model: "password",
+        };
+      } else {
+        return {
+          success: 0,
+          model: "password",
+          reactivateAccount: true,
+        };
+      }
     }
+  } catch (error: any) {
+    console.log(error);
+    // if (error instanceof FetchHttpError) {
+    //   console.log(error.serialize());
+    //   return { success: false, message: error.serialize().data.message };
+    // } else {
+    //   console.log("signIn() method error: ", error);
+    //   return { success: false, message: "unknown" };
+    // }
   }
 }
 

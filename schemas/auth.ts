@@ -8,7 +8,8 @@ export const signInSchema = z
         invalid_type_error: "Password must be string",
         required_error: "Password is required",
       })
-      .min(1, "Invalid email or password"),
+      .min(1, "Invalid email or password")
+      .optional(),
   })
   .strict();
 

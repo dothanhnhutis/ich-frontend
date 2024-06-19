@@ -1,14 +1,46 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { LockIcon, UserIcon } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { SignInGoogleBtn } from "./signin-google-btn";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from "next/navigation";
+import { SignInData } from "@/schemas/auth";
+import { signIn } from "@/service/api/auth.service";
 
 const SignInPage = () => {
+  const router = useRouter();
+  const [tab, setTab] = useState<string>("email");
+  const [form, setForm] = useState<SignInData>({
+    email: "",
+  });
+  const [isPending, startTransistion] = useTransition();
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    setError("");
+  }, [form.password]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    startTransistion(async () => {
+      const res = await signIn(form);
+      console.log(res);
+      // if (res.success) {
+      //   router.refresh();
+      // } else {
+      //   setError(res.message);
+      // }
+    });
+  };
   return (
     <div className="p-4 sm:p-8">
-      <div className="flex flex-col gap-6 sm:border sm:rounded-xl sm:max-w-[570px] sm:mx-auto sm:px-12 sm:py-4 transition-all">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-6 sm:border sm:rounded-xl sm:max-w-[570px] sm:mx-auto sm:px-12 sm:py-4 transition-all"
+      >
         <h1 className="text-2xl font-semibold tracking-tight text-center mt-4">
           <span>Log in to ICH</span>
         </h1>
@@ -16,6 +48,10 @@ const SignInPage = () => {
         <div className="flex gap-4 items-center border rounded-lg h-10 px-4">
           <UserIcon className="size-4" />
           <input
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, email: e.target.value }))
+            }
+            value={form.email}
             type="email"
             placeholder="Email"
             className="size-full focus-visible:outline-0"
@@ -52,7 +88,7 @@ const SignInPage = () => {
             </Button>
           </div>
         </footer>
-      </div>
+      </form>
 
       <div className="flex flex-col gap-6 sm:border sm:rounded-xl sm:max-w-[570px] sm:mx-auto sm:px-12 sm:py-4 transition-all">
         <h1 className="text-2xl font-semibold tracking-tight text-center mt-4">

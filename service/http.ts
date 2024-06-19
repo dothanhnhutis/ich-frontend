@@ -70,16 +70,6 @@ async function fetchHttp<ResponseData>(
   };
 }
 
-// export const errorHandler = (error: any): IError => {
-//   if (error instanceof FetchHttpError) {
-//     return error.serialize();
-//   } else {
-//     return {
-//       message: "unknown",
-//     };
-//   }
-// };
-
 export const http = {
   get<ResponseData>(url: string, options?: Omit<FetchHttpOption, "body">) {
     return fetchHttp<ResponseData>("GET", url, options);
