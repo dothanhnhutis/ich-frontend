@@ -1,0 +1,56 @@
+import React from "react";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { getCurrentUser } from "@/service/api/user.service";
+import SendAgainBtn from "./send-again";
+import ChangeEmailForm from "./change-email";
+import EmailSVG from "@/assets/svgs/email";
+
+const VerifyEmailPage = async () => {
+  const currentUser = await getCurrentUser();
+  return (
+    <div
+      className="flex flex-col flex-grow sm:flex-grow-0 sm:grid grid-cols-12 transition-all
+  "
+    >
+      <div className="flex flex-col flex-grow sm:flex-grow-0 sm:col-start-3 sm:col-end-11 mx-auto w-full sm:max-w-[570px] p-4">
+        <div className="flex flex-col flex-grow space-y-6">
+          <div className="mt-10 mb-6 text-center">
+            <div className="inline-flex  w-[145px] h-[130px] min-w-[145px] min-h-[130px]">
+              <EmailSVG />
+            </div>
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight text-center mt-4">
+            <span>Verify your email to continue</span>
+          </h1>
+          <div className="text-center text-muted-foreground text-base">
+            We just sent an email to the address:{" "}
+            <strong className="block md:inline">{currentUser?.email}</strong>
+          </div>
+          <p className="text-center text-muted-foreground text-base">
+            Please check your email and select the link provided to verify your
+            address.
+          </p>
+          <div className="flex flex-col sm:justify-center sm:flex-row gap-2">
+            <Link
+              target="_blank"
+              href="https://gmail.com/"
+              className={cn(
+                buttonVariants({ variant: "default" }),
+                "rounded-full order-last font-bold"
+              )}
+            >
+              Go to Gmail Inbox
+            </Link>
+            <SendAgainBtn />
+          </div>
+
+          <ChangeEmailForm currentEmail={currentUser?.email!} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default VerifyEmailPage;

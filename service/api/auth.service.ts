@@ -74,7 +74,6 @@ export async function signIn(data: SignInData): Promise<SignInRes> {
     }
     resData.success = true;
     resData.message = res.data.message;
-
     return resData;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
@@ -120,17 +119,19 @@ export async function checkActiveAccount(
 }
 
 export async function sendReactivateAccount() {
-  const allCookies = cookies().getAll();
   try {
-    await http.get<{}>("/auth/reactivate", {
-      headers: {
-        Cookie: allCookies
-          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
-          .join("; "),
-      },
-      credentials: "include",
-    });
-    cookies().delete("eid");
+    if (cookies().has("eid")) {
+      const allCookies = cookies().getAll();
+      // await http.get<{}>("/auth/reactivate", {
+      //   headers: {
+      //     Cookie: allCookies
+      //       .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+      //       .join("; "),
+      //   },
+      //   credentials: "include",
+      // });
+      cookies().delete("eid");
+    }
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
       console.log(

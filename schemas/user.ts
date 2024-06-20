@@ -5,7 +5,8 @@ export type CurrentUser = {
   role: UserRole;
   picture: string | null;
   emailVerified: boolean;
-  isBlocked: string;
+  isActive: boolean;
+  isBlocked: boolean;
   phone: string | null;
   address: string | null;
   createdAt: string;

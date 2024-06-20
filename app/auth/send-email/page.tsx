@@ -1,15 +1,20 @@
 import React from "react";
-import { cookies } from "next/headers";
 import EmailSVG1 from "@/assets/svgs/email1";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { sendReactivateAccount } from "@/service/api/auth.service";
-const SendEmailReactivePage = async () => {
-  const token = cookies().get("eid");
 
-  if (!token) notFound();
-  await sendReactivateAccount();
+const SendEmailReactivePage = async () => {
+  // const allCookies = cookies().getAll();
+  // if (!cookies().has("eid")) notFound();
+  // await http.get<{}>("/auth/reactivate", {
+  //   headers: {
+  //     Cookie: allCookies
+  //       .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+  //       .join("; "),
+  //   },
+  //   credentials: "include",
+  // });
+  // cookies().set("eid", "", { maxAge: 0 });
 
   return (
     <div className="p-4 sm:p-8">
