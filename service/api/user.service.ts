@@ -49,30 +49,33 @@ export async function getCurrentUser() {
   }
 }
 
-export async function diableAuthUser() {
+export async function disactivateAccount() {
   const allCookies = cookies().getAll();
+
   try {
-    const res = await http.patch<{ message: string }>("/users/disactivate", {
-      headers: {
-        Cookie: allCookies
-          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
-          .join("; "),
-      },
-      credentials: "include",
-    });
+    await http.patch<{ message: string }>(
+      "/users/disactivate",
+      {},
+      {
+        headers: {
+          Cookie: allCookies
+            .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+            .join("; "),
+        },
+      }
+    );
     cookies().delete("session");
-    return res.data;
+    return true;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
       console.log(
-        "diableAuthUser() method error: ",
+        "disactivateAccount() method error: ",
         error.serialize().data.message
       );
     } else {
-      console.log("diableAuthUser() method error: ", error);
+      console.log("disactivateAccount() method error: ", error);
     }
-
-    return undefined;
+    return false;
   }
 }
 

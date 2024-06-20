@@ -1,5 +1,4 @@
 import {
-  publicRoutes,
   authRoutes,
   DEFAULT_LOGIN_REDIRECT,
   apiAuthPrefix,
@@ -10,6 +9,8 @@ import {
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getCurrentUser } from "./service/api/user.service";
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
@@ -20,8 +21,6 @@ export async function middleware(request: NextRequest) {
   const isBlocked = currentUser?.isBlocked || false;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-  const isAuthRoute = authRoutes.test(nextUrl.pathname);
 
   const isPrivateRoute = privateRegExpRoutes.some((routes) =>
     routes.test(nextUrl.pathname)
@@ -32,16 +31,17 @@ export async function middleware(request: NextRequest) {
       if (nextUrl.pathname == emailVerifyRoute)
         return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
 
-      // if (
-      //   !roleAccessRoutes[currentUser.role].some((routes) =>
-      //     routes.test(nextUrl.pathname)
-      //   )
-      // ) {
-      //   return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
-      // }
+      if (
+        isPrivateRoute &&
+        !roleAccessRoutes[currentUser.role].some((routes) =>
+          routes.test(nextUrl.pathname)
+        )
+      ) {
+        return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      }
     } else {
       if (isPrivateRoute) {
-        return NextResponse.redirect(new URL("/auth/verify-email", nextUrl));
+        return NextResponse.redirect(new URL(emailVerifyRoute, nextUrl));
       }
     }
 
@@ -52,6 +52,9 @@ export async function middleware(request: NextRequest) {
     if (isPrivateRoute || nextUrl.pathname == emailVerifyRoute) {
       return NextResponse.redirect(new URL("/auth/signin", nextUrl));
     }
+    // if (nextUrl.pathname == "/auth/send-email" && !cookies().has("eid")) {
+    //   return NextResponse.redirect(new URL("/not-found", nextUrl));
+    // }
   }
 }
 

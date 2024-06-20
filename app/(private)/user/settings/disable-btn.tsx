@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { AlertDialogAction } from "@/components/ui/alert-dialog";
-import { diableAuthUser } from "@/service/api/user.service";
+import { disactivateAccount } from "@/service/api/user.service";
 import { useRouter } from "next/navigation";
 
 export const DiableBtn = () => {
@@ -9,7 +9,7 @@ export const DiableBtn = () => {
   return (
     <AlertDialogAction
       onClick={async () => {
-        if (await diableAuthUser()) {
+        if (await disactivateAccount()) {
           router.push("/auth/signin");
         }
       }}

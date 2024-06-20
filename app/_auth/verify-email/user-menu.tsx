@@ -25,7 +25,7 @@ import { LogOutIcon, SettingsIcon } from "lucide-react";
 import { CurrentUser } from "@/schemas/user";
 import { signOut } from "@/service/api/auth.service";
 import { useRouter } from "next/navigation";
-import { diableAuthUser } from "@/service/api/user.service";
+import { disactivateAccount } from "@/service/api/user.service";
 
 const UserMenu = ({ currentUser }: { currentUser: CurrentUser }) => {
   const router = useRouter();
@@ -89,7 +89,7 @@ const UserMenu = ({ currentUser }: { currentUser: CurrentUser }) => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
-                if (await diableAuthUser()) {
+                if (await disactivateAccount()) {
                   router.push("/auth/signin");
                 }
               }}

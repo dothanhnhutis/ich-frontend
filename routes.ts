@@ -1,7 +1,5 @@
 import { UserRole } from "./schemas/user";
 
-export const publicRoutes = ["/"];
-
 export const emailVerifyRoute: string = "/auth/verify-email";
 export const apiAuthPrefix: string = "/api/auth";
 export const DEFAULT_LOGIN_REDIRECT: string = "/user/profile";
@@ -17,6 +15,7 @@ export const privateRegExpRoutes = [
   PostRoutes,
   ProductRoutes,
   UsersRoutes,
+  /^\/manager$/,
 ];
 
 export const roleAccessRoutes: Record<UserRole, RegExp[]> = {

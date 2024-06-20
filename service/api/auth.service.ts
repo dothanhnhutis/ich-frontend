@@ -120,18 +120,39 @@ export async function checkActiveAccount(
 
 export async function sendReactivateAccount() {
   try {
-    if (cookies().has("eid")) {
-      const allCookies = cookies().getAll();
-      // await http.get<{}>("/auth/reactivate", {
-      //   headers: {
-      //     Cookie: allCookies
-      //       .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
-      //       .join("; "),
-      //   },
-      //   credentials: "include",
-      // });
-      cookies().delete("eid");
+    const allCookies = cookies().getAll();
+    await http.get("/auth/reactivate", {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    cookies().delete("eid");
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(
+        "sendReactivateAccount() method error: ",
+        error.serialize().data.message
+      );
+    } else {
+      console.log("sendReactivateAccount() method error: ", error);
     }
+  }
+}
+
+export async function activateAccount(token: string) {
+  try {
+    const allCookies = cookies().getAll();
+    await http.get<{}>("/auth/reactivate/" + token, {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
       console.log(

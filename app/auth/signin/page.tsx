@@ -89,7 +89,7 @@ const SignInPage = () => {
                 value={form.email}
                 type="email"
                 placeholder="Email"
-                className="size-full focus-visible:outline-0"
+                className="size-full focus-visible:outline-0 bg-transparent"
               />
             </div>
             <Button disabled={isPending}>
