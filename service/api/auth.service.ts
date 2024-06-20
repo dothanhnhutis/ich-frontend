@@ -53,55 +53,93 @@ export async function signOut() {
 }
 
 export type SignInRes = {
-  success: 0 | 1;
+  success: boolean;
   reactivateAccount?: true;
-  model?: "password";
+  model: "password" | "email";
   message?: string;
 };
-export async function signIn(data: SignInData) {
-  try {
-    if (data.password && data.password.length > 0) {
-      const res = await http.post<SignInRes>("/auth/signin", data);
-      for (const cookie of res.headers.getSetCookie()) {
-        const cookieParser = parseCookie(cookie);
-        cookies().set(cookieParser.name, cookieParser.value, {
-          ...cookieParser,
-        });
-      }
 
-      return {
-        success: res.statusCode == 200,
-        model: "password",
-        message: res.data.message,
-      };
-    } else {
-      const res = await http.post<{ message: string }>(
-        "/auth/check/email",
-        data
-      );
-      console.log(res);
-      if (res.statusCode == 200) {
-        return {
-          success: 0,
-          model: "password",
-        };
-      } else {
-        return {
-          success: 0,
-          model: "password",
-          reactivateAccount: true,
-        };
-      }
+export async function signIn(data: SignInData): Promise<SignInRes> {
+  let resData: SignInRes = {
+    success: false,
+    model: "password",
+  };
+  try {
+    const res = await http.post<SignInRes>("/auth/signin", data);
+    for (const cookie of res.headers.getSetCookie()) {
+      const cookieParser = parseCookie(cookie);
+      cookies().set(cookieParser.name, cookieParser.value, {
+        ...cookieParser,
+      });
     }
+    resData.success = true;
+    resData.message = res.data.message;
+
+    return resData;
   } catch (error: any) {
-    console.log(error);
-    // if (error instanceof FetchHttpError) {
-    //   console.log(error.serialize());
-    //   return { success: false, message: error.serialize().data.message };
-    // } else {
-    //   console.log("signIn() method error: ", error);
-    //   return { success: false, message: "unknown" };
-    // }
+    if (error instanceof FetchHttpError) {
+      resData.message = error.serialize().data.message;
+      return resData;
+    } else {
+      console.log("signIn() method error: ", error);
+      resData.message = "unknown";
+      return resData;
+    }
+  }
+}
+
+export async function checkActiveAccount(
+  data: Pick<SignInData, "email">
+): Promise<SignInRes> {
+  let resData: SignInRes = {
+    success: false,
+    model: "password",
+  };
+  try {
+    const res = await http.post<{ message: string }>("/auth/check/email", {
+      email: data.email,
+    });
+    for (const cookie of res.headers.getSetCookie()) {
+      const cookieParser = parseCookie(cookie);
+      cookies().set(cookieParser.name, cookieParser.value, {
+        ...cookieParser,
+      });
+    }
+    resData.model = "email";
+    resData.reactivateAccount = true;
+    return resData;
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      return resData;
+    } else {
+      console.log("signIn() method error: ", error);
+      resData.message = "unknown";
+      return resData;
+    }
+  }
+}
+
+export async function sendReactivateAccount() {
+  const allCookies = cookies().getAll();
+  try {
+    await http.get<{}>("/auth/reactivate", {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    cookies().delete("eid");
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(
+        "sendReactivateAccount() method error: ",
+        error.serialize().data.message
+      );
+    } else {
+      console.log("sendReactivateAccount() method error: ", error);
+    }
   }
 }
 
