@@ -2,10 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { getCurrentUser } from "@/service/api/user.service";
 import { CheckIcon, Link, LockIcon, MailIcon } from "lucide-react";
 import React from "react";
 
-const PasswordAndSecurityPage = () => {
+const PasswordAndSecurityPage = async () => {
+  const currentUser = await getCurrentUser();
+
   return (
     <>
       <h3 className="text-lg font-medium">Password & security</h3>
@@ -17,7 +20,7 @@ const PasswordAndSecurityPage = () => {
         <div className="flex items-center gap-2">
           <Input
             disabled={true}
-            value={"gaconght@gmail.com"}
+            value={currentUser!.email}
             type="email"
             name="name"
             className="focus-visible:ring-transparent"

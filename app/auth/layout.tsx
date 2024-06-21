@@ -4,10 +4,10 @@ import Image from "next/image";
 import LogoImage from "@/images/logos/logo.png";
 import { getCurrentUser } from "@/service/api/user.service";
 import UserMenu from "./user-menu";
+import NavRight from "./nav-right";
 
 const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
   const currentUser = await getCurrentUser();
-
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 left-0 right-0 backdrop-blur bg-background/60">
@@ -23,6 +23,7 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
             />
           </Link>
           {currentUser && <UserMenu currentUser={currentUser} />}
+          <NavRight />
         </div>
       </header>
       {children}

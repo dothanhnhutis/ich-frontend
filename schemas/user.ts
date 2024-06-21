@@ -1,6 +1,6 @@
 export type CurrentUser = {
   id: string;
-  email: string | null;
+  email: string;
   username: string;
   role: UserRole;
   picture: string | null;

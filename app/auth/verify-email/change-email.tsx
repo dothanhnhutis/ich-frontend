@@ -7,19 +7,29 @@ import { z } from "zod";
 import { changeEmail } from "@/service/api/auth.service";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
   const [optenDialog, setOptenDialog] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
+
   const [isPending, startTransistion] = useTransition();
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     startTransistion(async () => {
-      setOptenDialog(false);
+      setError(false);
       if (currentEmail != email) {
-        await changeEmail({ email });
+        if (await changeEmail({ email })) {
+          setEmail("");
+          toast.success("Updated and resending e-mail...");
+          setOptenDialog(false);
+        } else {
+          setError(true);
+        }
+      } else {
         setEmail("");
-        toast.success("Updated and resending e-mail...");
+        setOptenDialog(false);
       }
     });
   };
@@ -68,13 +78,24 @@ const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
             onSubmit={handleSubmit}
             className="flex flex-col sm:flex-row gap-2 mt-4"
           >
-            <Input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              placeholder="Email address"
-              className="sm:max-w-[300px] focus-visible:ring-offset-0 focus-visible:ring-transparent"
-            />
+            <div className="">
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="Email address"
+                className={cn(
+                  "sm:max-w-[300px] focus-visible:ring-offset-0 focus-visible:ring-transparent",
+                  error ? "border-destructive" : ""
+                )}
+              />
+              {error && (
+                <p className="text-destructive font-light text-sm">
+                  You have signed up for this email
+                </p>
+              )}
+            </div>
+
             <Button
               disabled={
                 isPending ||

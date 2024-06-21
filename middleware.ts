@@ -9,10 +9,34 @@ import {
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getCurrentUser } from "./service/api/user.service";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
+
+function redirect(request: NextRequest, path?: string) {
+  const { nextUrl } = request;
+
+  //add Header
+  const headers = new Headers(request.headers);
+  headers.set("x-current-path", nextUrl.pathname);
+  headers.set("x-current-search-params", nextUrl.searchParams.toString());
+
+  if (path) {
+    return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl), {
+      headers,
+    });
+  } else {
+    return NextResponse.next({
+      request: {
+        headers,
+      },
+    });
+  }
+}
 
 export async function middleware(request: NextRequest) {
+  let url: string | undefined;
+
+  request.nextUrl.searchParams;
+
+  //Protected Route
   const { nextUrl } = request;
   const currentUser = await getCurrentUser();
   const isLoggedIn = !!currentUser;
@@ -28,34 +52,31 @@ export async function middleware(request: NextRequest) {
 
   if (isLoggedIn) {
     if (emailVerified) {
-      if (nextUrl.pathname == emailVerifyRoute)
-        return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
-
       if (
-        isPrivateRoute &&
-        !roleAccessRoutes[currentUser.role].some((routes) =>
-          routes.test(nextUrl.pathname)
-        )
+        nextUrl.pathname == emailVerifyRoute ||
+        (isPrivateRoute &&
+          !roleAccessRoutes[currentUser.role].some((routes) =>
+            routes.test(nextUrl.pathname)
+          ))
       ) {
-        return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+        url = DEFAULT_LOGIN_REDIRECT;
       }
     } else {
       if (isPrivateRoute) {
-        return NextResponse.redirect(new URL(emailVerifyRoute, nextUrl));
+        url = emailVerifyRoute;
       }
     }
 
     if (authRoutes.test(nextUrl.pathname)) {
-      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      url = DEFAULT_LOGIN_REDIRECT;
     }
   } else {
     if (isPrivateRoute || nextUrl.pathname == emailVerifyRoute) {
-      return NextResponse.redirect(new URL("/auth/signin", nextUrl));
+      url = "/auth/signin";
     }
-    // if (nextUrl.pathname == "/auth/send-email" && !cookies().has("eid")) {
-    //   return NextResponse.redirect(new URL("/not-found", nextUrl));
-    // }
   }
+
+  return redirect(request, url);
 }
 
 export const config = {

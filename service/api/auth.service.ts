@@ -215,12 +215,14 @@ export async function changeEmail(data: { email: string }) {
       },
     });
     revalidatePath("/auth/verify-email");
+    return true;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
       console.log(error.serialize());
     } else {
       console.log("changeEmail() method error: ", error);
     }
+    return false;
   }
 }
 

@@ -11,7 +11,6 @@ import EditProfileForm from "./edit-profile-form";
 
 const ProfilePage = async () => {
   const currentUser = await getCurrentUser();
-  console.log(currentUser);
   return (
     <>
       <h3 className="text-lg font-medium">Profile</h3>

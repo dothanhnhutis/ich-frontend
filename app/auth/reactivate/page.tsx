@@ -12,7 +12,6 @@ const ReactivatePage = async ({
     token: string;
   };
 }) => {
-  console.log(searchParams);
   await activateAccount(searchParams.token);
 
   return <div>ReactivatePage</div>;

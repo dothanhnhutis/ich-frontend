@@ -12,7 +12,7 @@ export const SignInGoogleBtn = () => {
     <Button
       type="button"
       variant="outline"
-      className="relative rounded-lg p-0 "
+      className="relative rounded-lg p-0"
       onClick={() =>
         onClick(`${configs.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/google`)
       }

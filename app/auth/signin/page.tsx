@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { LockIcon, OctagonAlertIcon, UserIcon } from "lucide-react";
 import React, { useEffect, useState, useTransition } from "react";
-import { SignInGoogleBtn } from "./signin-google-btn";
+import { SignInGoogleBtn } from "../signin-google-btn";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
@@ -37,6 +37,7 @@ const SignInPage = () => {
       (tab.model == "password" && form.password == "")
     )
       return;
+
     setTab((prev) => ({
       ...prev,
       message: undefined,
@@ -153,7 +154,7 @@ const SignInPage = () => {
                 type="password"
                 autoComplete="off"
                 placeholder="Password"
-                className="size-full focus-visible:outline-0"
+                className="size-full focus-visible:outline-0 bg-transparent"
               />
             </div>
             {tab.message && (
@@ -172,7 +173,9 @@ const SignInPage = () => {
                 </label>
               </div>
               <Button asChild variant="link" className="">
-                <Link href="/auth/recover">Forgot password?</Link>
+                <Link href={`/auth/recover?email=${form.email}`}>
+                  Forgot password?
+                </Link>
               </Button>
             </div>
 
