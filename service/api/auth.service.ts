@@ -3,18 +3,7 @@ import { ResetPasswordData, SignInData, SignUpData } from "@/schemas/auth";
 import { FetchHttpError, http } from "../http";
 import { cookies } from "next/headers";
 import { parseCookie } from "@/lib/cookies-parser";
-import { UserRole } from "@/schemas/user";
 import { revalidatePath } from "next/cache";
-
-export type SignUpRes = {
-  message: string;
-  user: {
-    id: string;
-    email: string;
-    role: UserRole;
-    isBlocked: boolean;
-  };
-};
 
 export async function signUp(data: SignUpData) {
   try {
@@ -173,7 +162,6 @@ export async function recover(email: string) {
     return { success: true, ...res.data };
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
-      console.log(error.serialize());
       return { success: false, message: error.serialize().data.message };
     } else {
       console.log("recover() method error: ", error);
@@ -253,6 +241,42 @@ export async function verifyEmail(token: string) {
       console.log(error.serialize());
     } else {
       console.log("verifyEmail() method error: ", error);
+    }
+  }
+}
+
+type SignUpRes = {
+  success: boolean;
+  message: string;
+};
+
+export async function signup(data: SignUpData): Promise<SignUpRes> {
+  try {
+    const res = await http.post<Pick<SignUpRes, "message">>(
+      "/auth/signup",
+      data
+    );
+    for (const cookie of res.headers.getSetCookie()) {
+      const cookieParser = parseCookie(cookie);
+      cookies().set(cookieParser.name, cookieParser.value, {
+        ...cookieParser,
+      });
+    }
+    return {
+      success: true,
+      message: res.data.message,
+    };
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      return {
+        success: false,
+        message: error.serialize().data.message,
+      };
+    } else {
+      return {
+        success: false,
+        message: "unknown",
+      };
     }
   }
 }

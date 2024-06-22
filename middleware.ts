@@ -19,7 +19,7 @@ function redirect(request: NextRequest, path?: string) {
   headers.set("x-current-search-params", nextUrl.searchParams.toString());
 
   if (path) {
-    return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl), {
+    return NextResponse.redirect(new URL(path, nextUrl), {
       headers,
     });
   } else {

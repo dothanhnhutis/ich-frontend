@@ -7,7 +7,7 @@ const SignUpPage = () => {
     <div className="flex flex-col flex-grow mx-auto w-full sm:max-w-[500px] p-4 transition-all">
       <div className="flex flex-col flex-grow space-y-6">
         <h1 className="text-4xl font-semibold tracking-tight text-center mt-4">
-          <span>Sign up to make Product</span>
+          <span>Sign up to make product</span>
         </h1>
 
         <SignInGoogleBtn />

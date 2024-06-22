@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { getCurrentUser } from "@/service/api/user.service";
 import { CheckIcon, Link, LockIcon, MailIcon } from "lucide-react";
 import React from "react";
+import { PasswordForm } from "./password-form";
 
 const PasswordAndSecurityPage = async () => {
   const currentUser = await getCurrentUser();
@@ -34,9 +35,7 @@ const PasswordAndSecurityPage = async () => {
           <Button>
             <MailIcon className="size-4 mr-2" /> Change Email
           </Button>
-          <Button>
-            <LockIcon className="size-4 mr-2" /> Change Password
-          </Button>
+          <PasswordForm />
         </div>
 
         <div>

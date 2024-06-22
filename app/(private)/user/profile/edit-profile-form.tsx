@@ -23,13 +23,11 @@ const EditProfileForm = ({ currentUser }: { currentUser?: CurrentUser }) => {
 
   const [form, setform] = useState<
     Required<Pick<CurrentUser, "username" | "phone" | "address">>
-  >(
-    currentUser || {
-      username: "",
-      phone: "",
-      address: "",
-    }
-  );
+  >({
+    username: currentUser?.username || "",
+    phone: currentUser?.phone || "",
+    address: currentUser?.address || "",
+  });
 
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setform((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -40,6 +38,7 @@ const EditProfileForm = ({ currentUser }: { currentUser?: CurrentUser }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     startTransistion(async () => {
+      console.log(form);
       const res = await editProfile(form);
       if (res.success) {
         toast.success(res.message);

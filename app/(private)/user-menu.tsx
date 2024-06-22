@@ -77,7 +77,7 @@ export const UserMenu = () => {
         <DropdownMenuItem
           onClick={() => {
             signOut();
-            router.refresh();
+            router.push("/auth/signin");
           }}
         >
           {/* <Link href="/auth/signout" className="cursor-pointer"> */}

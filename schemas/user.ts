@@ -1,3 +1,26 @@
+import { z } from "zod";
+
+export const editPasswordSchema = z
+  .object({
+    oldPassword: z.string(),
+    newPassword: z
+      .string()
+      .min(8, "password_too_small")
+      .max(40, "password_too_big")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/,
+        "password_format_error"
+      ),
+    confirmPassword: z.string(),
+  })
+  .strict()
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "password_do_not_match",
+    path: ["confirmPassword"],
+  });
+
+export type EditPassword = z.infer<typeof editPasswordSchema>;
+
 export type CurrentUser = {
   id: string;
   email: string;

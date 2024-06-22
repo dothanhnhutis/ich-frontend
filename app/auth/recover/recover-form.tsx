@@ -34,7 +34,7 @@ const RecoverForm = (props: { email?: string }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           type="email"
-          placeholder="Email"
+          placeholder="example@gmail.com"
           className="focus-visible:ring-offset-0 focus-visible:ring-transparent"
         />
       </div>
