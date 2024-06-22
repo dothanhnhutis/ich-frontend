@@ -11,14 +11,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { RotateCcwIcon, ZoomInIcon } from "lucide-react";
-import { getDataFile } from "@/lib/utils";
+import { cn, getImageInfo } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { editPicture } from "@/service/api/user.service";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 export const UploadPhoto = ({
   url,
@@ -28,7 +30,6 @@ export const UploadPhoto = ({
   children: React.ReactNode;
 }) => {
   const [open, setOpen] = useState<boolean>(false);
-
   const cropperRef = useRef<ReactCropperElement>(null);
   const [zoomSlider, setZoomSlider] = useState<number>(0.2);
   const [dataUrl, setDataUrl] = useState<string | undefined>(url);
@@ -40,8 +41,8 @@ export const UploadPhoto = ({
       toast.info("Please upload an image!");
       return;
     }
-    const url = await getDataFile(file);
-    setDataUrl(url);
+    const img = await getImageInfo(file);
+    setDataUrl(img.base64);
     e.target.value = "";
     setZoomSlider(0.2);
   };
@@ -64,21 +65,43 @@ export const UploadPhoto = ({
     }
   };
 
-  const handleSave = () => {
-    const cropper = cropperRef.current?.cropper;
-    if (cropper) {
-    }
-  };
+  useEffect(() => {
+    setZoomSlider(0.2);
+    setDataUrl(url);
+  }, [open]);
 
+  const [isPending, startTransistion] = useTransition();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const cropper = cropperRef.current?.cropper;
+    startTransistion(async () => {
+      if (cropper) {
+        const res = await editPicture({
+          pictureType: "base64",
+          pictureData: cropper.getCroppedCanvas().toDataURL(),
+        });
+        if (res.success) {
+          toast.success("Update avatar success");
+          setOpen(false);
+        } else {
+          toast.error("Update avatar fail");
+        }
+      }
+    });
+  };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="lg:max-w-[700px]">
         <DialogHeader>
-          <DialogTitle>Edit photo</DialogTitle>
+          <DialogTitle>Edit avatar</DialogTitle>
         </DialogHeader>
         <ScrollArea>
-          <div className="flex flex-col items-center justify-center gap-3">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col items-center justify-center gap-3"
+          >
             <Cropper
               className="cropper-photo bg-background h-[250px]"
               aspectRatio={1}
@@ -133,20 +156,29 @@ export const UploadPhoto = ({
             <div className="flex items-center w-full gap-2">
               <Label
                 htmlFor="upload-photo"
-                className="w-full text-center cursor-pointer hover:underline text-primary"
+                className={cn(
+                  "w-full text-center cursor-pointer hover:underline text-primary",
+                  isPending ? "opacity-50" : ""
+                )}
               >
                 Change image
               </Label>
               <input
+                disabled={isPending}
                 onChange={handleUpload}
                 type="file"
                 accept="image/png, image/jpeg, image/jpg"
                 className="hidden"
                 id="upload-photo"
               />
-              <Button className="rounded-full w-full">Save photo</Button>
+              <Button disabled={isPending} className="rounded-full w-full">
+                {isPending && (
+                  <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+                )}
+                Save photo
+              </Button>
             </div>
-          </div>
+          </form>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </DialogContent>

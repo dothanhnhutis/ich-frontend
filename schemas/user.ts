@@ -11,12 +11,12 @@ export const editPasswordSchema = z
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/,
         "password_format_error"
       ),
-    confirmPassword: z.string(),
+    confirmNewPassword: z.string(),
   })
   .strict()
-  .refine((data) => data.newPassword === data.confirmPassword, {
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
     message: "password_do_not_match",
-    path: ["confirmPassword"],
+    path: ["confirmNewPassword"],
   });
 
 export type EditPassword = z.infer<typeof editPasswordSchema>;

@@ -59,7 +59,7 @@ const SignInPage = () => {
     <div className="p-4 sm:p-8">
       {tab.reactivateAccount && (
         <div className="flex items-center gap-3 rounded-lg bg-destructive/20 sm:rounded-xl sm:max-w-[570px] sm:mx-auto mb-10 p-4">
-          <OctagonAlertIcon className="size-6 text-destructive" />
+          <OctagonAlertIcon className="size-6 text-red-500" />
           <p className="text-sm">
             Your account is currently closed. If you would like to re-activate
             your account, click{" "}
@@ -142,7 +142,7 @@ const SignInPage = () => {
             <div
               className={cn(
                 "flex gap-4 items-center border rounded-lg h-10 px-4",
-                tab.message ? "border-destructive" : ""
+                tab.message ? "border-red-500" : ""
               )}
             >
               <LockIcon className="size-4" />
@@ -158,9 +158,7 @@ const SignInPage = () => {
               />
             </div>
             {tab.message && (
-              <p className="text-destructive text-xs font-light -mt-4">
-                {tab.message}
-              </p>
+              <p className="text-red-500 text-xs -mt-4">{tab.message}</p>
             )}
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">

@@ -1,5 +1,5 @@
 "use server";
-import { CurrentUser } from "@/schemas/user";
+import { CurrentUser, EditPassword } from "@/schemas/user";
 import { FetchHttpError, http } from "../http";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -100,6 +100,57 @@ export async function editProfile(data: Partial<CurrentUser>) {
       return { success: false, message: error.serialize().data.message };
     } else {
       console.log("editProfile() method error: ", error);
+      return { success: false, message: "unknown" };
+    }
+  }
+}
+
+export async function editPassword(data: EditPassword) {
+  const allCookies = cookies().getAll();
+  try {
+    const res = await http.post<{ message: string }>("/users/password", data, {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    revalidatePath("/user/profile");
+    return { success: true, message: res.data.message };
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(error.serialize());
+      return { success: false, message: error.serialize().data.message };
+    } else {
+      console.log("editPassword() method error: ", error);
+      return { success: false, message: "unknown" };
+    }
+  }
+}
+
+export async function editPicture(data: {
+  pictureType: "url" | "base64";
+  pictureData: string;
+}) {
+  const allCookies = cookies().getAll();
+  try {
+    const res = await http.post<{ message: string }>("/users/picture", data, {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    revalidatePath("/user/profile");
+    return { success: true, message: res.data.message };
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(error.serialize());
+      return { success: false, message: error.serialize().data.message };
+    } else {
+      console.log("editPicture() method error: ", error);
       return { success: false, message: "unknown" };
     }
   }

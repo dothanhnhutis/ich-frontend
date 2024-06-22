@@ -35,7 +35,7 @@ const PasswordAndSecurityPage = async () => {
           <Button>
             <MailIcon className="size-4 mr-2" /> Change Email
           </Button>
-          <PasswordForm />
+          <PasswordForm email={currentUser?.email || ""} />
         </div>
 
         <div>

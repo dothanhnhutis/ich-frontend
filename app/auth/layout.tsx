@@ -22,8 +22,8 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
               className="w-full size-auto"
             />
           </Link>
-          {currentUser && <UserMenu currentUser={currentUser} />}
-          <NavRight />
+
+          <NavRight currentUser={currentUser} />
         </div>
       </header>
       {children}

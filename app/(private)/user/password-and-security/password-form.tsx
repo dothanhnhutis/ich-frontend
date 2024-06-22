@@ -1,5 +1,5 @@
 "use client";
-import React, { useTransition, useState, useCallback } from "react";
+import React, { useTransition, useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -25,17 +25,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { editPassword } from "@/service/api/user.service";
+import { toast } from "sonner";
+import { recover } from "@/service/api/auth.service";
 
-export const PasswordForm = () => {
-  const [optenDialog, setOptenDialog] = useState<boolean>(false);
+export const PasswordForm = ({ email }: { email: string }) => {
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [isPending, startTransistion] = useTransition();
   const [isHiddenPassword, setIsHiddenPassword] = useState<boolean>(true);
+  const [isError, setIsError] = useState<boolean>(true);
   const [focusingField, setOnFocusAt] = useState<string | undefined>();
 
   const [form, setForm] = useState<EditPassword>({
     oldPassword: "",
     newPassword: "",
-    confirmPassword: "",
+    confirmNewPassword: "",
   });
   const handleOnChangFocus = (
     e: React.FocusEvent<HTMLInputElement, Element>
@@ -66,12 +70,49 @@ export const PasswordForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsError(false);
+    startTransistion(async () => {
+      const res = await editPassword(form);
+      if (res.success) {
+        toast.success(res.message);
+        setOpenDialog(false);
+      } else {
+        setIsError(true);
+      }
+    });
   };
+
+  useEffect(() => {
+    setForm({
+      oldPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    });
+    setIsError(false);
+    setIsHiddenPassword(true);
+  }, [openDialog]);
+  const [isPendingSendEmail, startTransistionSendEmail] = useTransition();
+  const handleSendEmailForgotPassword = async () => {
+    startTransistionSendEmail(async () => {
+      const res = await recover(email);
+      if (res.success) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    });
+  };
+
   return (
-    <Dialog open={optenDialog} onOpenChange={setOptenDialog}>
+    <Dialog
+      open={openDialog}
+      onOpenChange={(open) => {
+        if (!isPendingSendEmail) setOpenDialog(open);
+      }}
+    >
       <Button
         onClick={() => {
-          setOptenDialog(true);
+          setOpenDialog(true);
         }}
       >
         <LockIcon className="size-4 mr-2" /> Change Password
@@ -104,6 +145,7 @@ export const PasswordForm = () => {
                 id="old-password"
                 name="old-password"
                 autoComplete="off"
+                spellCheck="false"
                 placeholder="********"
               />
               <button
@@ -120,6 +162,22 @@ export const PasswordForm = () => {
                 )}
               </button>
             </div>
+            {isError && (
+              <p className="text-red-500 font-medium text-xs">
+                Current password is incorrect.{" "}
+                <button
+                  disabled={isPendingSendEmail}
+                  type="button"
+                  onClick={handleSendEmailForgotPassword}
+                  className="text-primary disabled:opacity-50"
+                >
+                  Forgot password?
+                </button>
+                {isPendingSendEmail && (
+                  <AiOutlineLoading3Quarters className="text-primary inline size-4 animate-spin flex-shrink-0 ml-1" />
+                )}
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-password">New password</Label>
@@ -142,6 +200,7 @@ export const PasswordForm = () => {
                 id="new-password"
                 name="new-password"
                 autoComplete="off"
+                spellCheck="false"
                 placeholder="********"
               />
               <button
@@ -204,11 +263,11 @@ export const PasswordForm = () => {
               )}
             >
               <input
-                value={form.confirmPassword}
+                value={form.confirmNewPassword}
                 onChange={(e) =>
                   setForm((prev) => ({
                     ...prev,
-                    confirmPassword: e.target.value,
+                    confirmNewPassword: e.target.value,
                   }))
                 }
                 onFocus={handleOnChangFocus}
@@ -219,6 +278,7 @@ export const PasswordForm = () => {
                 id="confirm-password"
                 name="confirm-password"
                 autoComplete="off"
+                spellCheck="false"
                 placeholder="********"
               />
               <button
@@ -245,10 +305,11 @@ export const PasswordForm = () => {
           <div className="flex gap-4 flex-col sm:flex-row justify-end">
             <Button
               disabled={
+                isPendingSendEmail ||
                 isPending ||
                 form.oldPassword.length == 0 ||
                 form.newPassword.length == 0 ||
-                form.confirmPassword.length == 0 ||
+                form.confirmNewPassword.length == 0 ||
                 (!focusingField && !editPasswordSchema.safeParse(form).success)
               }
               className="sm:order-last"
@@ -258,7 +319,14 @@ export const PasswordForm = () => {
               )}
               Save
             </Button>
-            <Button disabled={isPending} variant="outline">
+            <Button
+              type="button"
+              onClick={() => {
+                setOpenDialog(false);
+              }}
+              disabled={isPending}
+              variant="outline"
+            >
               Cancel
             </Button>
           </div>

@@ -4,7 +4,8 @@ export const emailVerifyRoute: string = "/auth/verify-email";
 export const apiAuthPrefix: string = "/api/auth";
 export const DEFAULT_LOGIN_REDIRECT: string = "/user/profile";
 
-export const authRoutes: RegExp = /^\/auth\/(signin|signup|send-email)?$/;
+export const authRoutes: RegExp =
+  /^\/auth\/(signin|signup|send-email|recover)?$/;
 const BaseRoutes: RegExp = /^\/user\/(profile|settings|password-and-security)$/;
 const PostRoutes: RegExp = /^\/manager\/posts(\/create|.+\/edit)?$/;
 const ProductRoutes: RegExp = /^\/manager\/products(\/create|.+\/edit)?$/;

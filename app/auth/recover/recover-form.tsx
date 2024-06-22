@@ -29,9 +29,10 @@ const RecoverForm = (props: { email?: string }) => {
   return (
     <form onSubmit={handleSubmit}>
       <div className="space-y-2">
-        <Label>Email</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
           value={email}
+          id="email"
           onChange={(e) => setEmail(e.target.value)}
           type="email"
           placeholder="example@gmail.com"
