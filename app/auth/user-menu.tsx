@@ -73,14 +73,6 @@ const UserMenu = ({ currentUser }: { currentUser: CurrentUser }) => {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {currentUser?.role == "ADMIN" && (
-            <DropdownMenuItem asChild>
-              <Link href="/manager" className="cursor-pointer">
-                <span>Manager</span>
-              </Link>
-            </DropdownMenuItem>
-          )}
-
           <DropdownMenuItem asChild>
             <Link href="/account/profile" className="cursor-pointer">
               <span>Profile</span>

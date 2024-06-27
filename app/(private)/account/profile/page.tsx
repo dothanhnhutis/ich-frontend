@@ -31,10 +31,6 @@ const ProfilePage = async () => {
         </div>
         <div className="relative w-full space-y-4">
           <div>
-            <Label>User ID</Label>
-            <p>{currentUser?.id}</p>
-          </div>
-          <div>
             <Label>Username</Label>
             <p>{currentUser?.username}</p>
           </div>

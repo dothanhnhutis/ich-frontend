@@ -155,3 +155,28 @@ export async function editPicture(data: {
     }
   }
 }
+
+export async function getAllUser() {
+  const allCookies = cookies().getAll();
+  try {
+    const res = await http.get<any>("/users", {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    return res.data;
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(
+        "getAllUser() method error: ",
+        error.serialize().data.message
+      );
+    } else {
+      console.log("getAllUser() method error: ", error);
+    }
+    return [];
+  }
+}

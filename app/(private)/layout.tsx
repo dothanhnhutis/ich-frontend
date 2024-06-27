@@ -1,23 +1,24 @@
 import React from "react";
-import { AuthProvider } from "@/components/providers/auth-provider";
-import HeaderPrivate from "./header";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { getCurrentUser } from "@/service/api/user.service";
+import UserHeader from "./header";
+import { TankStackProvider } from "@/components/providers/TankStackProvider";
 
-const PrivateLayout = ({ children }: { children: React.ReactNode }) => {
+const PrivateLayout = async ({ children }: { children: React.ReactNode }) => {
+  const currentUser = await getCurrentUser();
+
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <AuthProvider>
-        <div className="bg-muted/40 min-h-screen">
-          <HeaderPrivate />
-          {children}
-        </div>
-      </AuthProvider>
-    </ThemeProvider>
+    <TankStackProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <UserHeader currentUser={currentUser} />
+        {children}
+      </ThemeProvider>
+    </TankStackProvider>
   );
 };
 

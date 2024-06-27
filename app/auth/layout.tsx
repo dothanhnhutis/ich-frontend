@@ -3,7 +3,6 @@ import React from "react";
 import Image from "next/image";
 import LogoImage from "@/images/logos/logo.png";
 import { getCurrentUser } from "@/service/api/user.service";
-import UserMenu from "./user-menu";
 import NavRight from "./nav-right";
 
 const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
