@@ -1,10 +1,11 @@
-import { getAllUser } from "@/service/api/user.service";
+import { getAllUser, getCurrentUser } from "@/service/api/user.service";
 import React from "react";
 import { DataTable } from "./data-table";
 
 const UserManagerPage = async () => {
-  const users = await getAllUser();
-  return <DataTable />;
+  const currentUser = await getCurrentUser();
+
+  return <DataTable currentUser={currentUser} />;
 };
 
 export default UserManagerPage;

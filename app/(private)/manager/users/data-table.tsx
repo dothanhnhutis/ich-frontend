@@ -25,8 +25,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getAllUser } from "@/service/api/user.service";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { DataTableToolbar } from "./data-table-toolbar";
+import { CurrentUser } from "@/schemas/user";
 
-export const DataTable = () => {
+export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
   const columns = useMemo(() => {
     const columnHelper = createColumnHelper<any>();
     return [
@@ -91,6 +94,22 @@ export const DataTable = () => {
           return value.includes(row.getValue(id));
         },
       }),
+      columnHelper.accessor("isBlocked", {
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Blocked" />
+        ),
+        size: 100,
+        cell: ({ row }) => {
+          return (
+            <p className="max-w-full truncate font-medium">
+              {row.getValue("isBlocked") ? "True" : "False"}
+            </p>
+          );
+        },
+        filterFn: (row, id, value) => {
+          return value.includes(row.getValue(id));
+        },
+      }),
       columnHelper.display({
         id: "actions",
         size: 100,
@@ -136,45 +155,56 @@ export const DataTable = () => {
   if (error) return "An error has occurred: " + error.message;
 
   return (
-    <Table className="w-full table-fixed bg-background">
-      <TableHeader>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map((header) => {
-              return (
-                <TableHead
-                  style={{ width: `${header.getSize()}px` }}
-                  key={header.id}
+    <div className="space-y-2 relative">
+      <DataTableToolbar table={table} role={currentUser!.role} />
+      <ScrollArea className="border rounded-lg bg-background">
+        <Table className="w-full table-fixed bg-background">
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      style={{ width: `${header.getSize()}px` }}
+                      key={header.id}
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-14 text-center"
                 >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                </TableHead>
-              );
-            })}
-          </TableRow>
-        ))}
-      </TableHeader>
-      <TableBody>
-        {table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  No results.
                 </TableCell>
-              ))}
-            </TableRow>
-          ))
-        ) : (
-          <TableRow>
-            <TableCell colSpan={columns.length} className="h-14 text-center">
-              No results.
-            </TableCell>
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </ScrollArea>
+    </div>
   );
 };
