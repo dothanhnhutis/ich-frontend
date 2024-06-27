@@ -7,13 +7,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User } from "@/schemas/user";
+import { CurrentUser } from "@/schemas/user";
 import { Table } from "@tanstack/react-table";
 import { PlusIcon, SlidersHorizontalIcon } from "lucide-react";
 import Link from "next/link";
 
 interface DataTableViewOptionsProps {
-  table: Table<User>;
+  table: Table<CurrentUser>;
 }
 
 export function DataTableViewOptions({ table }: DataTableViewOptionsProps) {

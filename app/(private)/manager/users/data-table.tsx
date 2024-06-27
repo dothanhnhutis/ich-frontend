@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-// import { DataTableRowActions } from "./data-table-row-actions";
+import { DataTableRowActions } from "./data-table-row-actions";
 import { DataTableColumnHeader } from "./data-table-header";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -28,6 +28,7 @@ import { getAllUser } from "@/service/api/user.service";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { CurrentUser } from "@/schemas/user";
+import { DataTablePagination } from "./data-table-pagination";
 
 export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
   const columns = useMemo(() => {
@@ -115,13 +116,12 @@ export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
         size: 100,
         enableResizing: false,
         cell: ({ row, getValue, column, table }) => (
-          <div>DataTableRowActions</div>
-          //   <DataTableRowActions
-          //     row={row}
-          //     getValue={getValue}
-          //     column={column}
-          //     table={table}
-          //   />
+          <DataTableRowActions
+            row={row}
+            getValue={getValue}
+            column={column}
+            table={table}
+          />
         ),
       }),
     ];
@@ -137,6 +137,8 @@ export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
   const table = useReactTable({
     data,
     columns,
+    pageCount: 20,
+
     state: {
       columnFilters,
     },
@@ -149,6 +151,7 @@ export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+  console.log(table.getState().pagination);
 
   if (isPending) return "Loading...";
 
@@ -205,6 +208,7 @@ export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
           </TableBody>
         </Table>
       </ScrollArea>
+      <DataTablePagination table={table} />
     </div>
   );
 };
