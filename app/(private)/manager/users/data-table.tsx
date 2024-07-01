@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllUser } from "@/service/api/user.service";
+import { getAllUser, getUsersTest } from "@/service/api/user.service";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { CurrentUser } from "@/schemas/user";
@@ -129,15 +129,16 @@ export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
 
   const { isPending, error, data } = useQuery({
     queryKey: ["users"],
-    queryFn: async () => await getAllUser(),
+    queryFn: async () => await getUsersTest({ page: 1, take: 10 }),
   });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  console.log(data);
   const table = useReactTable({
-    data,
+    data: data.users,
     columns,
-    pageCount: 20,
+    pageCount: 10,
 
     state: {
       columnFilters,
