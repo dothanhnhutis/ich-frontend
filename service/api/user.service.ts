@@ -178,3 +178,34 @@ export async function getAllUser() {
     return [];
   }
 }
+
+export async function getUsersTest(props: { page?: number; take?: number }) {
+  const allCookies = cookies().getAll();
+  console.log(props);
+  console.log(
+    Object.keys(props)
+      .map((key) => key + "=" + props[key as keyof typeof props])
+      .join("&")
+  );
+  try {
+    const res = await http.get<any>("/users/test", {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    return res.data;
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(
+        "getAllUser() method error: ",
+        error.serialize().data.message
+      );
+    } else {
+      console.log("getAllUser() method error: ", error);
+    }
+    return [];
+  }
+}

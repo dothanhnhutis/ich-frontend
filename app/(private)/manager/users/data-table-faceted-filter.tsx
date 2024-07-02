@@ -19,10 +19,10 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { User } from "@/schemas/user";
+import { CurrentUser } from "@/schemas/user";
 
 interface DataTableFacetedFilterProps {
-  column?: Column<User>;
+  column?: Column<CurrentUser>;
   title?: string;
   options: {
     label: string;

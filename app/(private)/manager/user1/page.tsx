@@ -1,7 +1,5 @@
-import { getAllUser, getCurrentUser } from "@/service/api/user.service";
+import { getCurrentUser } from "@/service/api/user.service";
 import React from "react";
-import { DataTable } from "./data-table";
-import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,8 +8,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import Link from "next/link";
+import { DataTable } from "./table";
 
-const UserManagerPage = async () => {
+const User1Page = async () => {
   const currentUser = await getCurrentUser();
 
   return (
@@ -37,4 +37,4 @@ const UserManagerPage = async () => {
   );
 };
 
-export default UserManagerPage;
+export default User1Page;
