@@ -13,9 +13,9 @@ export const revalidate = 0;
 const ComfirmEmail = async ({
   searchParams,
 }: {
-  searchParams: { v_token: string };
+  searchParams: { token: string };
 }) => {
-  await verifyEmail(searchParams.v_token);
+  await verifyEmail(searchParams.token);
   return (
     <div className="flex flex-col min-h-screen ">
       <header className="sticky top-0 left-0 right-0">

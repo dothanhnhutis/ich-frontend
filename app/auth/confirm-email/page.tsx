@@ -7,10 +7,10 @@ const ConfirmEmailPage = async ({
   searchParams,
 }: {
   searchParams: {
-    v_token: string;
+    token: string;
   };
 }) => {
-  await verifyEmail(searchParams.v_token);
+  await verifyEmail(searchParams.token);
   return <div>ConfirmEmail</div>;
 };
 

@@ -12,9 +12,7 @@ export type PasswordResetTokenRes = {
 
 export async function getUserByPasswordResetToken(token: string) {
   try {
-    const res = await http.get<PasswordResetTokenRes>(
-      "/users?tokenType=recover-password&token=" + token
-    );
+    const res = await http.get<PasswordResetTokenRes>("/users/" + token);
     return res.data;
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
