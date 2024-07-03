@@ -7,7 +7,6 @@ import { FcGoogle } from "react-icons/fc";
 export const SignInGoogleBtn = ({ redir }: { redir: string }) => {
   const onClick = () => {
     document.location.href = `${configs.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/google?redir=${redir}`;
-    // document.location.href = url;
   };
   return (
     <Button

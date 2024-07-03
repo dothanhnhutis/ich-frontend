@@ -12,7 +12,8 @@ import { getCurrentUser } from "./service/api/user.service";
 
 function redirect(request: NextRequest, path?: string) {
   const { nextUrl } = request;
-
+  console.log(nextUrl.pathname);
+  console.log(nextUrl.searchParams.toString());
   //add Header
   const headers = new Headers(request.headers);
   headers.set("x-current-path", nextUrl.pathname);
@@ -33,8 +34,6 @@ function redirect(request: NextRequest, path?: string) {
 
 export async function middleware(request: NextRequest) {
   let url: string | undefined;
-
-  request.nextUrl.searchParams;
 
   //Protected Route
   const { nextUrl } = request;

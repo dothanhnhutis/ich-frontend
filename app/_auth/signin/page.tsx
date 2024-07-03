@@ -36,7 +36,7 @@ const SignInPage = () => {
       if (res.success) {
         router.refresh();
       } else {
-        setError(res.message);
+        setError(res.message || "123");
       }
     });
   };
@@ -57,6 +57,7 @@ const SignInPage = () => {
           </Link>
         </div>
       </header>
+
       <Tabs defaultValue={tab} onValueChange={(v) => setTab(v)} value={tab}>
         <div className="flex flex-col flex-grow sm:flex-grow-0 sm:grid grid-cols-12 transition-all sm:p-8">
           <TabsContent value="email" asChild>
@@ -65,6 +66,7 @@ const SignInPage = () => {
                 <h1 className="text-2xl font-semibold tracking-tight text-center mt-4">
                   <span>Log in to ICH</span>
                 </h1>
+
                 <div className="grid grid-flow-col grid-cols-[48px_auto_16px] w-full">
                   <div className="relative flex items-center pl-4 col-[1_/_1] row-[1_/_1]">
                     <UserIcon className="size-4" />

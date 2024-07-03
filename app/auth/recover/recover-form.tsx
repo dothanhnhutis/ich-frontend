@@ -14,6 +14,7 @@ const RecoverForm = (props: { email?: string }) => {
   const [email, setEmail] = useState(() => props.email || "");
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (email == "") return;
     startTransistion(async () => {
       if (email != "") {
         const res = await recover(email);
