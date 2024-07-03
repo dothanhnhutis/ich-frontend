@@ -9,7 +9,7 @@ const SignUpPage = () => {
         <h1 className="text-4xl font-semibold tracking-tight text-center mt-4">
           <span>Sign up to make product</span>
         </h1>
-        <SignInGoogleBtn />
+        <SignInGoogleBtn redir="/auth/signup" />
         <div className="relative my-2 py-2">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t"></span>

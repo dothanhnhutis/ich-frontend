@@ -109,7 +109,7 @@ const SignInPage = () => {
                 </span>
               </div>
             </div>
-            <SignInGoogleBtn />
+            <SignInGoogleBtn redir={"/auth/signin"} />
             <footer className="mt-20">
               <div className="relative my-2">
                 <div className="absolute inset-0 flex items-center">
