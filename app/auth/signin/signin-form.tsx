@@ -4,7 +4,6 @@ import { LockIcon, OctagonAlertIcon, UserIcon } from "lucide-react";
 import React, { useEffect, useState, useTransition } from "react";
 import { SignInGoogleBtn } from "../signin-google-btn";
 import Link from "next/link";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
 import { SignInData } from "@/schemas/auth";
 import {
@@ -15,6 +14,7 @@ import {
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { cn } from "@/lib/utils";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import Cookies from "js-cookie";
 
 export const SignInForm = ({
   email,
@@ -33,6 +33,13 @@ export const SignInForm = ({
     email,
     password: "",
   });
+
+  useEffect(() => {
+    Cookies.remove("oauth2", {
+      path: "/auth",
+      expires: 0,
+    });
+  }, []);
 
   const [isPending, startTransistion] = useTransition();
 
@@ -183,7 +190,7 @@ export const SignInForm = ({
               <p className="text-red-500 text-xs -mt-4">{tab.message}</p>
             )}
 
-            <Button disabled={isPending || form.password == ""}>
+            <Button disabled={isPending}>
               {isPending && (
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
               )}{" "}

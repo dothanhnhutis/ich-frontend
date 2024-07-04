@@ -22,7 +22,6 @@ export async function signUp(data: SignUpData) {
 
 export async function signOut() {
   const allCookies = cookies().getAll();
-
   try {
     await http.delete<{ message: string }>("/auth/signout", {
       headers: {
