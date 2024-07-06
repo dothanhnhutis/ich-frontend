@@ -178,3 +178,37 @@ export async function getAllUser() {
     return [];
   }
 }
+
+export async function searchUser() {
+  const allCookies = cookies().getAll();
+  try {
+    const res = await http.get<{
+      users: { email: string }[];
+      metadata: { hasNextPage: boolean; totalPage: number };
+    }>("/users/_search", {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    return res.data;
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(
+        "getAllUser() method error: ",
+        error.serialize().data.message
+      );
+    } else {
+      console.log("getAllUser() method error: ", error);
+    }
+    return {
+      users: [],
+      metadata: {
+        hasNextPage: false,
+        totalPage: 1,
+      },
+    };
+  }
+}
