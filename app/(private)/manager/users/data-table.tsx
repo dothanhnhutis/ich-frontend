@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ColumnFiltersState,
   createColumnHelper,
@@ -126,28 +126,35 @@ export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
       }),
     ];
   }, []);
-
+  const [pagination, setPagination] = useState({
+    pageIndex: 1,
+    pageSize: 10,
+  });
   const { isPending, error, data } = useQuery({
     queryKey: ["users"],
     queryFn: async () => await getAllUser(),
   });
+
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+
   const table = useReactTable({
     data: data,
     columns,
-    pageCount: 10,
-
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount: 20,
     state: {
       columnFilters,
+      pagination,
     },
     enableRowSelection: true,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    // getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });

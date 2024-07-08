@@ -12,7 +12,12 @@ import { CurrentUser } from "@/schemas/user";
 import { searchUser } from "@/service/api/user.service";
 import { useQuery } from "@tanstack/react-query";
 import React, { useMemo } from "react";
-
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
   const columns = useMemo(() => {
     return [
@@ -21,9 +26,85 @@ export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
         header: () => <TableHead>Email</TableHead>,
         cell: (d: any) => {
           return (
-            <div className="flex space-x-2">
-              <span className="max-w-full truncate font-medium">{d.email}</span>
-            </div>
+            <TableCell>
+              <div className="flex space-x-2">
+                <span className="max-w-full truncate font-medium">
+                  {d.email}
+                </span>
+              </div>
+            </TableCell>
+          );
+        },
+        filterFn: () => {
+          return true;
+        },
+      },
+      {
+        enableHiding: false,
+        header: () => <TableHead>Name</TableHead>,
+        cell: (d: any) => {
+          return (
+            <TableCell>
+              <div className="flex space-x-2">
+                <span className="max-w-full truncate font-medium">
+                  {d.username}
+                </span>
+              </div>
+            </TableCell>
+          );
+        },
+        filterFn: () => {
+          return true;
+        },
+      },
+      {
+        enableHiding: false,
+        header: () => <TableHead>Role</TableHead>,
+        cell: (d: any) => {
+          return (
+            <TableCell>
+              <div className="flex space-x-2">
+                <span className="max-w-full truncate font-medium">
+                  {d.username}
+                </span>
+              </div>
+            </TableCell>
+          );
+        },
+        filterFn: () => {
+          return true;
+        },
+      },
+      {
+        enableHiding: false,
+        header: () => <TableHead>Active</TableHead>,
+        cell: (d: any) => {
+          return (
+            <TableCell>
+              <div className="flex space-x-2">
+                <span className="max-w-full truncate font-medium">
+                  {d.username}
+                </span>
+              </div>
+            </TableCell>
+          );
+        },
+        filterFn: () => {
+          return true;
+        },
+      },
+      {
+        enableHiding: false,
+        header: () => <TableHead>Blocked</TableHead>,
+        cell: (d: any) => {
+          return (
+            <TableCell>
+              <div className="flex space-x-2">
+                <span className="max-w-full truncate font-medium">
+                  {d.username}
+                </span>
+              </div>
+            </TableCell>
           );
         },
         filterFn: () => {
@@ -55,11 +136,23 @@ export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
           <TableBody>
             {data &&
               data.users.length > 0 &&
-              data.users.map((d) => (
-                <TableRow>{columns.map((c) => c.cell(d))}</TableRow>
+              data.users.map((d, index) => (
+                <ContextMenu>
+                  <ContextMenuTrigger>
+                    <TableRow>{columns.map((c) => c.cell(d))}</TableRow>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem>Profile</ContextMenuItem>
+                    <ContextMenuItem>Billing</ContextMenuItem>
+                    <ContextMenuItem>Team</ContextMenuItem>
+                    <ContextMenuItem>Subscription</ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               ))}
             <TableRow>
-              <TableCell className="h-14 text-center">No results.</TableCell>
+              <TableCell colSpan={columns.length} className="h-14 text-center">
+                No results.
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>

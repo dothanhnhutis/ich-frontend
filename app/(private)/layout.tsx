@@ -15,8 +15,10 @@ const PrivateLayout = async ({ children }: { children: React.ReactNode }) => {
         enableSystem
         disableTransitionOnChange
       >
-        <UserHeader currentUser={currentUser} />
-        {children}
+        <div className="bg-accent">
+          <UserHeader currentUser={currentUser} />
+          {children}
+        </div>
       </ThemeProvider>
     </TankStackProvider>
   );
