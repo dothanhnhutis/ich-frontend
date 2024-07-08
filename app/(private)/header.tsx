@@ -13,7 +13,7 @@ const UserHeader = ({
   currentUser: CurrentUser | undefined;
 }) => {
   return (
-    <header className="sticky top-0 left-0 right-0 z-50 border-b bg-white">
+    <header className="sticky top-0 left-0 right-0 z-50 border-b backdrop-saturate-[1.8] backdrop-blur bg-background/50">
       <nav className="flex justify-between items-center p-3 h-[72px]">
         <Logo className="hidden md:block" />
         <div className="hidden md:flex items-center space-x-6 ml-6 text-sm font-medium">

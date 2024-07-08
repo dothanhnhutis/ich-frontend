@@ -1,18 +1,11 @@
 import React from "react";
-import { getAllUser, getCurrentUser } from "@/service/api/user.service";
-import { DataTable } from "./data-table";
+import { getCurrentUser } from "@/service/api/user.service";
+
 import Link from "next/link";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { FilterUser } from "./filter";
+import { DataTable } from "./data-table";
 
 const UserManagerPage = async ({
   searchParams,
@@ -23,19 +16,6 @@ const UserManagerPage = async ({
   console.log(searchParams);
   return (
     <div className="w-full xl:max-w-screen-xl xl:mx-auto p-4 overflow-hidden">
-      {/* <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/manager">Home</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Users</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb> */}
       <div className="flex items-center justify-between gap-2 my-2">
         <h2 className="lg:text-3xl font-bold text-2xl">Manager User</h2>
         <Button asChild size="sm">
@@ -46,6 +26,7 @@ const UserManagerPage = async ({
         </Button>
       </div>
       <FilterUser />
+
       <DataTable currentUser={currentUser} />
     </div>
   );
