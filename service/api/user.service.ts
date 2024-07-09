@@ -1,5 +1,5 @@
 "use server";
-import { CurrentUser, EditPassword } from "@/schemas/user";
+import { CurrentUser, EditPassword, UserRole } from "@/schemas/user";
 import { FetchHttpError, http } from "../http";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -179,13 +179,66 @@ export async function getAllUser() {
   }
 }
 
-export async function searchUser() {
+export type SearchUserRes = {
+  id: string;
+  email: string;
+  emailVerified: boolean;
+  role: UserRole;
+  inActive: boolean;
+  username: string;
+  suspended: boolean;
+  phone: string | null;
+  picture: string | null;
+  address: string | null;
+  createdAt: string;
+  updatedAt: string;
+  linkProvider: {
+    provider: "google" | "credential";
+  }[];
+};
+
+export type SearchUserInput = {
+  emails?: string[] | undefined;
+  roles?: UserRole[] | undefined;
+  emailVerified?: boolean | undefined;
+  inActive?: boolean | undefined;
+  suspended?: boolean | undefined;
+  orderBy?:
+    | (
+        | "email.asc"
+        | "email.desc"
+        | "role.asc"
+        | "role.desc"
+        | "emailVerified.asc"
+        | "emailVerified.desc"
+      )[]
+    | undefined;
+  page?: number | undefined;
+  take?: number | undefined;
+};
+
+export async function searchUser(props?: SearchUserInput) {
   const allCookies = cookies().getAll();
+  let searchParams = "";
+  if (props) {
+    searchParams =
+      "?" +
+      Object.entries(props)
+        .map(([key, value]) => {
+          if (Array.isArray(value)) {
+            return `${key}=${value.join(",")}`;
+          } else {
+            return `${key}=${value}`;
+          }
+        })
+        .join("&");
+  }
+  console.log(searchParams);
   try {
     const res = await http.get<{
-      users: { email: string }[];
-      metadata: { hasNextPage: boolean; totalPage: number };
-    }>("/users/_search", {
+      users: SearchUserRes[];
+      metadata: { hasNextPage: boolean; totalPage: number; totalItem: number };
+    }>(`/users/_search${searchParams}`, {
       headers: {
         Cookie: allCookies
           .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
@@ -197,11 +250,11 @@ export async function searchUser() {
   } catch (error: any) {
     if (error instanceof FetchHttpError) {
       console.log(
-        "getAllUser() method error: ",
+        "searchUser() method error: ",
         error.serialize().data.message
       );
     } else {
-      console.log("getAllUser() method error: ", error);
+      console.log("searchUser() method error: ", error);
     }
     return {
       users: [],

@@ -16,33 +16,71 @@ import React, { useState } from "react";
 import ListView from "./list";
 import { cn } from "@/lib/utils";
 import { CardView } from "./card";
+import { useQuery } from "@tanstack/react-query";
+import { searchUser, SearchUserInput } from "@/service/api/user.service";
 
-export const FilterUser = () => {
+export const FilterUser = ({
+  searchParams,
+}: {
+  searchParams?: { [index: string]: string | string[] | undefined };
+}) => {
   const [viewMode, setViewMode] = useState<"card" | "list">("card");
+
+  const [filter, setFilter] = useState<SearchUserInput>(() => {
+    const result: SearchUserInput = {
+      page: 1,
+      take: 100,
+    };
+    if (searchParams?.tab == "inActive") {
+      result.inActive = true;
+    }
+    if (searchParams?.tab == "suspended") {
+      result.suspended = true;
+    }
+  });
+
+  const { data, isPending } = useQuery({
+    queryKey: ["users", searchParams?.tab],
+    queryFn: async () => {
+      return await searchUser(filter);
+    },
+  });
+
   return (
     <>
       <div
         className={cn(
-          "bg-card p-2 space-y-2",
+          "bg-card text-card-foreground border p-2 space-y-2",
           viewMode == "list" ? "rounded-tl-lg rounded-tr-lg" : "rounded-lg"
         )}
       >
         <div className="flex items-center flex-grow border-b">
           <Link
-            href="/manager/users?orderBy=email.asc"
-            className="font-semibold p-2 border-b-2 border-primary"
+            href="/manager/users?tab=active"
+            className={cn(
+              "font-semibold p-2",
+              searchParams?.tab == "active" ? "border-b-2 border-primary" : ""
+            )}
           >
             Active
           </Link>
           <Link
-            href="/manager/users?orderBy=email.asc&inactive=1"
-            className="font-semibold p-2"
+            href="/manager/users?tab=inactive"
+            className={cn(
+              "font-semibold p-2",
+              searchParams?.tab == "inactive" ? "border-b-2 border-primary" : ""
+            )}
           >
             InActive
           </Link>
           <Link
-            href="/manager/users?orderBy=email.asc&suspended=1"
-            className="font-semibold p-2"
+            href="/manager/users?tab=suspended"
+            className={cn(
+              "font-semibold p-2",
+              searchParams?.tab == "suspended"
+                ? "border-b-2 border-primary"
+                : ""
+            )}
           >
             Suspended
           </Link>
@@ -88,7 +126,11 @@ export const FilterUser = () => {
           </div>
         </div>
       </div>
-      {viewMode == "list" ? <ListView /> : <CardView />}
+      {viewMode == "list" ? (
+        <ListView data={data?.users} />
+      ) : (
+        <CardView data={data?.users} />
+      )}
     </>
   );
 };

@@ -6,14 +6,20 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { FilterUser } from "./filter";
 import { DataTable } from "./data-table";
+import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+export const revalidate = 0;
 const UserManagerPage = async ({
   searchParams,
 }: {
-  searchParams: { [index: string]: string | string[] | undefined };
+  searchParams?: { [index: string]: string | string[] | undefined };
 }) => {
   const currentUser = await getCurrentUser();
-  console.log(searchParams);
+  if (Object.entries(searchParams || {}).length == 0) {
+    redirect("/manager/users?tab=active");
+  }
   return (
     <div className="w-full xl:max-w-screen-xl xl:mx-auto p-4 overflow-hidden">
       <div className="flex items-center justify-between gap-2 my-2">
@@ -25,7 +31,7 @@ const UserManagerPage = async ({
           </Link>
         </Button>
       </div>
-      <FilterUser />
+      <FilterUser searchParams={searchParams} />
 
       <DataTable currentUser={currentUser} />
     </div>

@@ -69,7 +69,7 @@ export const ManagerSiderBar = ({
   if (!currentUser) return null;
 
   return (
-    <div className="sticky top-[73px] h-[calc(100vh-73px)] z-50 transition-all backdrop-saturate-[1.8] backdrop-blur bg-background/50">
+    <div className="sticky top-[73px] h-[calc(100vh-73px)] z-50 transition-all bg-background">
       <ScrollArea className="flex flex-shrink-0 lg:w-[200px] h-full border-r">
         <div className="flex flex-col gap-2 text-popover-foreground p-2">
           <TooltipProvider delayDuration={100} disableHoverableContent={true}>
