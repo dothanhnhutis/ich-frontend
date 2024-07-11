@@ -1,4 +1,4 @@
-import { UserRole } from "./schemas/user";
+import { Role } from "./schemas/user";
 
 export const emailVerifyRoute: string = "/auth/verify-email";
 export const apiAuthPrefix: string = "/api/auth";
@@ -20,7 +20,7 @@ export const privateRegExpRoutes = [
   /^\/manager$/,
 ];
 
-export const roleAccessRoutes: Record<UserRole, RegExp[]> = {
+export const roleAccessRoutes: Record<Role, RegExp[]> = {
   CUSTOMER: [BaseRoutes],
   WRITER: [BaseRoutes, PostRoutes],
   SALER: [],

@@ -6,11 +6,11 @@ import { DataTableViewOptions } from "./data-table-view-options";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { CurrentUser, UserRole } from "@/schemas/user";
+import { CurrentUser, Role } from "@/schemas/user";
 
 interface DataTableToolbarProps {
   table: Table<CurrentUser>;
-  role: UserRole;
+  role: Role;
 }
 
 export const activeOptions: { label: string; value: boolean }[] = [
@@ -18,7 +18,7 @@ export const activeOptions: { label: string; value: boolean }[] = [
   { label: "False", value: false },
 ];
 
-export const roleOptions: { label: string; value: UserRole }[] = [
+export const roleOptions: { label: string; value: Role }[] = [
   { label: "CUSTOMER", value: "CUSTOMER" },
   { label: "WRITER", value: "WRITER" },
   { label: "MANAGER", value: "MANAGER" },

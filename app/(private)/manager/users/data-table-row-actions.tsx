@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { CurrentUser, UserRole } from "@/schemas/user";
+import { CurrentUser, Role } from "@/schemas/user";
 import { activeOptions } from "./data-table-toolbar";
 
 interface DataTableRowActionsProps {
@@ -26,7 +26,7 @@ interface DataTableRowActionsProps {
   column: Column<CurrentUser, unknown>;
   table: Table<CurrentUser>;
 }
-const roles: UserRole[] = ["CUSTOMER", "MANAGER", "WRITER"];
+const roles: Role[] = ["CUSTOMER", "MANAGER", "WRITER"];
 
 export function DataTableRowActions({
   row,

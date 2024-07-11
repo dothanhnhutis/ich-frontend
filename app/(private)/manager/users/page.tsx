@@ -41,7 +41,7 @@ const UserManagerPage = async ({
         <FilterUser searchParams={searchParams} />
       </UserProvider>
 
-      {/* <DataTable currentUser={currentUser} /> */}
+      <DataTable currentUser={currentUser} />
     </div>
   );
 };

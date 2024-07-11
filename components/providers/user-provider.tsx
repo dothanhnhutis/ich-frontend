@@ -1,11 +1,11 @@
 "use client";
-import { UserRole } from "@/schemas/user";
+import { Role } from "@/schemas/user";
 import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-interface UserConextFilterType {
+export interface UserConextFilterType {
   emails?: string[];
-  roles?: UserRole[];
+  roles?: Role[];
   verified?: boolean;
   orderBy?: {
     email?: "asc" | "desc";
@@ -27,7 +27,7 @@ export interface UserConextType {
 
 const initUserContext: UserConextType = {
   filter: {
-    emails: ["asdas"],
+    roles: ["CUSTOMER", "MANAGER"],
     limit: 10,
     page: 1,
   },

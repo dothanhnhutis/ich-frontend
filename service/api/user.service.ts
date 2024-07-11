@@ -1,5 +1,5 @@
 "use server";
-import { CurrentUser, EditPassword, UserRole } from "@/schemas/user";
+import { CurrentUser, EditPassword, Role } from "@/schemas/user";
 import { FetchHttpError, http } from "../http";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -183,7 +183,7 @@ export type SearchUserRes = {
   id: string;
   email: string;
   emailVerified: boolean;
-  role: UserRole;
+  role: Role;
   inActive: boolean;
   username: string;
   suspended: boolean;
@@ -199,7 +199,7 @@ export type SearchUserRes = {
 
 export type SearchUserInput = {
   emails?: string[] | undefined;
-  roles?: UserRole[] | undefined;
+  roles?: Role[] | undefined;
   emailVerified?: boolean | undefined;
   inActive?: boolean | undefined;
   suspended?: boolean | undefined;

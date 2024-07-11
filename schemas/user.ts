@@ -25,7 +25,7 @@ export type CurrentUser = {
   id: string;
   email: string;
   username: string;
-  role: UserRole;
+  role: Role;
   picture: string | null;
   emailVerified: boolean;
   isActive: boolean;
@@ -35,4 +35,5 @@ export type CurrentUser = {
   createdAt: string;
   updatedAt: string;
 };
-export type UserRole = "ADMIN" | "MANAGER" | "SALER" | "WRITER" | "CUSTOMER";
+export type Role = "ADMIN" | "MANAGER" | "SALER" | "WRITER" | "CUSTOMER";
+export const roles: Role[] = ["MANAGER", "SALER", "WRITER", "CUSTOMER"];
