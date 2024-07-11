@@ -6,7 +6,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 export interface UserConextFilterType {
   emails?: string[];
   roles?: Role[];
-  verified?: boolean;
+  emailVerified?: boolean;
   orderBy?: {
     email?: "asc" | "desc";
     role?: "asc" | "desc";
