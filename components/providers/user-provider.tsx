@@ -1,6 +1,7 @@
 "use client";
 import { Role } from "@/schemas/user";
 import { useQuery } from "@tanstack/react-query";
+import { omit } from "lodash";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export interface UserConextFilterType {
@@ -23,7 +24,11 @@ export interface UserConextType {
   filter?: UserConextFilterType | undefined;
   viewMode?: ViewModeType;
   setViewMode: (viewMode: ViewModeType) => void;
-  setFilter: (filter: UserConextFilterType) => void;
+  setFilter(
+    data?: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">
+  ): void;
+  setSortBy(data?: Pick<UserConextFilterType, "orderBy">): void;
+  setPagination(data?: Pick<UserConextFilterType, "page" | "limit">): void;
   clearFilter: () => void;
 }
 
@@ -34,7 +39,11 @@ const initUserContext: UserConextType = {
   },
   viewMode: "card",
   setViewMode: (viewMode: ViewModeType) => {},
-  setFilter: (filter: UserConextFilterType) => {},
+  setFilter: (
+    data?: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">
+  ) => {},
+  setSortBy: (data?: Pick<UserConextFilterType, "orderBy">) => {},
+  setPagination: (data?: Pick<UserConextFilterType, "page" | "limit">) => {},
   clearFilter: () => {},
 };
 
@@ -49,8 +58,31 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setData((prev) => ({ ...prev, viewMode }));
   }
 
-  function setFilter(filter: UserConextFilterType) {
-    setData((prev) => ({ ...prev, filter }));
+  function setFilter(
+    data?: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">
+  ) {
+    setData((prev) => ({
+      ...prev,
+      filter: data
+        ? { ...prev.filter, ...data }
+        : omit(prev.filter, ["emails", "roles", "emailVerified"]),
+    }));
+  }
+
+  function setSortBy(data?: Pick<UserConextFilterType, "orderBy">) {
+    setData((prev) => ({
+      ...prev,
+      filter: data
+        ? { ...prev.filter, ...data }
+        : omit(prev.filter, ["orderBy"]),
+    }));
+  }
+
+  function setPagination(data?: Pick<UserConextFilterType, "page" | "limit">) {
+    setData((prev) => ({
+      ...prev,
+      filter: { ...prev.filter, page: 1, limit: 10, ...data },
+    }));
   }
 
   function clearFilter() {
@@ -65,7 +97,14 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <userContext.Provider
-      value={{ ...data, setViewMode, setFilter, clearFilter }}
+      value={{
+        ...data,
+        setViewMode,
+        setFilter,
+        clearFilter,
+        setSortBy,
+        setPagination,
+      }}
     >
       {children}
     </userContext.Provider>

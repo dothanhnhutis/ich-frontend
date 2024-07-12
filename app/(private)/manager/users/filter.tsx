@@ -4,10 +4,15 @@ import { Separator } from "@/components/ui/separator";
 import {
   ArrowUpDownIcon,
   CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
   FilterIcon,
   Grid3X3Icon,
   LayoutPanelTopIcon,
   ListIcon,
+  MoreHorizontalIcon,
   PlusCircleIcon,
   PlusIcon,
   SearchIcon,
@@ -38,6 +43,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Popover,
@@ -59,17 +71,22 @@ import {
   UserOrderBy,
   useUserData,
 } from "@/components/providers/user-provider";
-import { omit } from "lodash";
+import { omit, pick } from "lodash";
 import { Badge } from "@/components/ui/badge";
 import { Role } from "@/schemas/user";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const roleOption: Role[] = ["MANAGER", "SALER", "WRITER", "CUSTOMER"];
 
-const UserFilterSheet = (filter: UserConextFilterType) => {
+const UserFilterSheet = (
+  init: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">
+) => {
   const [isOpenFilter, setOpenFilter] = useState<boolean>(false);
   const { setFilter } = useUserData();
-  const [data, setData] = useState<UserConextFilterType>(filter);
+  const [data, setData] =
+    useState<Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">>(
+      init
+    );
 
   const handleAddEmail = (email: string) => {
     setData((prev) => ({
@@ -93,11 +110,10 @@ const UserFilterSheet = (filter: UserConextFilterType) => {
   };
 
   useEffect(() => {
-    if (isOpenFilter) setData(filter);
+    if (isOpenFilter) setData(init);
   }, [isOpenFilter]);
 
   const handleSave = () => {
-    console.log(data);
     setFilter(data);
     setOpenFilter(false);
   };
@@ -341,16 +357,16 @@ const SortBy = ({
 const UserSortBy = ({ init }: { init?: UserOrderBy[] }) => {
   const [isOpen, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<UserOrderBy[] | undefined>(init);
-  const { setFilter, filter } = useUserData();
+  const { setSortBy, filter } = useUserData();
 
   const handleClose = () => {
     setOpen(false);
   };
   const handleSubmit = () => {
     if (!data) {
-      setFilter(omit(filter, ["orderBy"]));
+      setSortBy();
     } else {
-      setFilter({ ...filter, orderBy: data });
+      setSortBy({ ...filter, orderBy: data });
     }
     setOpen(false);
   };
@@ -395,7 +411,7 @@ const UserSortBy = ({ init }: { init?: UserOrderBy[] }) => {
   };
 
   useEffect(() => {
-    if (!isOpen) setData(init);
+    if (isOpen) setData(init);
   }, [isOpen, init]);
 
   return (
@@ -491,29 +507,116 @@ const InputFilter = ({
   );
 };
 
+const ViewModeBtn = () => {
+  const { setViewMode, viewMode } = useUserData();
+
+  return (
+    <Button
+      onClick={() => {
+        setViewMode(viewMode == "card" ? "list" : "card");
+      }}
+      size="icon"
+      variant="outline"
+    >
+      {viewMode == "list" ? (
+        <TableIcon className="size-4" />
+      ) : (
+        <LayoutPanelTopIcon className="size-4" />
+      )}
+    </Button>
+  );
+};
+
 const UserFilterToolBar = () => {
-  const { setViewMode, viewMode, filter } = useUserData();
+  const { filter } = useUserData();
 
   return (
     <div className="flex gap-4">
       <div className="inline-flex items-center flex-wrap gap-2 w-full">
-        <UserFilterSheet />
+        <UserFilterSheet
+          {...pick(filter, ["emails", "roles", "emailVerifyed"])}
+        />
       </div>
       <div className="flex gap-2">
         <UserSortBy init={filter?.orderBy} />
-        <Button
-          onClick={() => {
-            setViewMode(viewMode == "card" ? "list" : "card");
+        <ViewModeBtn />
+      </div>
+    </div>
+  );
+};
+
+const neighbourhood = 1;
+const size = 5;
+
+function caculatorPageShow(totalPage: number, currentPage: number) {
+  if (totalPage <= 6) {
+    return Array.from({ length: totalPage }, (_, id) =>
+      currentPage == id + 1 ? "?" : `${id + 1}`
+    );
+  } else {
+    return [];
+
+    // if(currentPage - 1 < totalPage - currentPage){
+    //   return []
+    // }else if(currentPage - 1 < totalPage - currentPage){
+
+    // }else {
+
+    // }
+  }
+}
+
+const UserPagination = () => {
+  const { filter, setPagination } = useUserData();
+
+  console.log(caculatorPageShow(6, 6));
+  // console.log(Array.from({ length: 100 }, (_, id) => id + 1));
+  return (
+    <div className="flex items-center justify-between px-2">
+      <div className="flex items-center justify-center text-sm font-medium">
+        Page {filter?.page} of {10}
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" className="h-8 w-8 p-0">
+            <span className="sr-only">Go to previous page</span>
+            <ChevronLeftIcon className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" className="h-8 w-8 p-0">
+            <span>1</span>
+          </Button>
+          {}
+          <Button variant="outline" className="h-8 w-8 p-0">
+            <span>{20}</span>
+          </Button>
+          <Button variant="outline" className="h-8 w-8 p-0">
+            <span className="sr-only">Go to next page</span>
+            <ChevronRightIcon className="h-4 w-4" />
+          </Button>
+
+          <Button variant="outline" className="h-8 w-8 p-0 cursor-not-allowed">
+            <span className="sr-only">More pages</span>
+            <MoreHorizontalIcon className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <Select
+          value={`${filter?.limit || 10}`}
+          onValueChange={(v) => {
+            setPagination({ limit: parseInt(v) });
           }}
-          size="icon"
-          variant="outline"
         >
-          {viewMode == "list" ? (
-            <TableIcon className="size-4" />
-          ) : (
-            <LayoutPanelTopIcon className="size-4" />
-          )}
-        </Button>
+          <SelectTrigger className="h-8">
+            <SelectValue placeholder={"10 / page"} />
+          </SelectTrigger>
+          <SelectContent side="top">
+            {[10, 20, 30, 40, 50].map((pageSize) => (
+              <SelectItem key={pageSize} value={`${pageSize}`}>
+                {pageSize} / page
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
@@ -524,8 +627,7 @@ export const FilterUser = ({
 }: {
   searchParams?: { [index: string]: string | string[] | undefined };
 }) => {
-  const { viewMode, filter } = useUserData();
-  console.log();
+  const { viewMode, filter, setPagination } = useUserData();
 
   const { data, isPending } = useQuery({
     queryKey: ["users", searchParams?.tab, filter],
@@ -534,6 +636,7 @@ export const FilterUser = ({
       return await searchUser({
         limit: 2,
         page: 2,
+        roles: filter?.roles,
         orderBy: filter?.orderBy?.map(
           (a) => Object.entries(a).map((a) => a.join("."))[0] as any
         ),
@@ -587,35 +690,7 @@ export const FilterUser = ({
       ) : (
         <CardView data={data?.users} />
       )}
-      <div className="flex items-center justify-between px-2">
-        <div className="flex items-center justify-center text-sm font-medium">
-          Page {filter?.page} of {data?.metadata.totalPage}
-        </div>
-        <Pagination className="w-auto mx-0 mt-2">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#" isActive>
-                2
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">3</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+      <UserPagination />
     </>
   );
 };
