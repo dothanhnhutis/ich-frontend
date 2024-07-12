@@ -15,7 +15,14 @@ import {
   XIcon,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ListView from "./list";
 import { cn } from "@/lib/utils";
 import { CardView } from "./card";
@@ -49,6 +56,7 @@ import {
 import { Label } from "@/components/ui/label";
 import {
   UserConextFilterType,
+  UserOrderBy,
   useUserData,
 } from "@/components/providers/user-provider";
 import { omit } from "lodash";
@@ -109,18 +117,20 @@ const UserFilterSheet = (filter: UserConextFilterType) => {
           <FilterIcon className="size-4 sm:ml-2" />
         </Button>
       </SheetTrigger>
-      <SheetContent className="p-0 w-full">
-        <div className="flex flex-col overflow-y-scroll">
-          <div className="flex justify-between items-center p-4">
-            <h3 className="text-card-foreground font-semibold text-lg">
-              Filter
-            </h3>
-            <Button size="icon" variant="ghost" onClick={handleCancel}>
-              <XIcon className="size-5" />
-            </Button>
+      <SheetContent showXBtn={false} className="p-0 w-full">
+        <div className="flex flex-col flex-grow h-screen relative">
+          <div className="sticky top-0 left-0 right-0 bg-background z-50">
+            <div className="flex justify-between items-center px-4 mt-4">
+              <h3 className="text-card-foreground font-semibold text-lg">
+                Filter
+              </h3>
+              <Button size="icon" variant="ghost" onClick={handleCancel}>
+                <XIcon className="size-5" />
+              </Button>
+            </div>
           </div>
-          <div className="relative">
-            <div className="flex flex-col gap-4 p-4">
+          <div className="w-full p-4 pb-[72px] overflow-y-auto">
+            <div className="flex flex-col gap-4">
               <Label>Email</Label>
               <div className="flex gap-2 flex-col items-start justify-center">
                 {data.emails &&
@@ -261,32 +271,175 @@ const UserFilterSheet = (filter: UserConextFilterType) => {
                 }
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="1" id="r1" />
+                  <RadioGroupItem value="1" id="r1" className="size-5" />
                   <Label htmlFor="r1">True</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="0" id="r2" />
+                  <RadioGroupItem value="0" id="r2" className="size-5" />
                   <Label htmlFor="r2">False</Label>
                 </div>
               </RadioGroup>
             </div>
-            <div className="fixed bottom-0 left-[-10px] right-0 bg-red-500 z-10 ">
-              <div className="flex justify-between items-center p-4">
-                <Button variant="link" onClick={handleClear}>
-                  Clear
+          </div>
+          <div className="absolute bottom-0 right-4 left-4 bg-transparent z-50">
+            <div className="flex justify-between items-center py-4 bg-background">
+              <Button variant="link" onClick={handleClear} className="p-2">
+                Clear
+              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="secondary" onClick={handleCancel}>
+                  Cancel
                 </Button>
-                <div className="flex items-center gap-2">
-                  <Button variant="secondary" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSave}>Save</Button>
-                </div>
+                <Button onClick={handleSave}>Save</Button>
               </div>
             </div>
           </div>
         </div>
       </SheetContent>
     </Sheet>
+  );
+};
+
+const SortBy = ({
+  title,
+  field,
+  handleChangeData,
+  defaultValue = "all",
+}: {
+  title: string;
+  field: keyof UserOrderBy;
+  defaultValue?: "all" | "desc" | "asc";
+  handleChangeData: (v: "all" | "desc" | "asc", key: keyof UserOrderBy) => void;
+}) => {
+  return (
+    <>
+      <Label className="text-lg">{title}</Label>
+      <RadioGroup
+        defaultValue={defaultValue}
+        onValueChange={(v: "all" | "desc" | "asc") =>
+          handleChangeData(v, field)
+        }
+        className="flex gap-2 items-center justify-between"
+      >
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="all" id={`${field}-1`} className="size-5" />
+          <Label htmlFor={`${field}-1`}>All</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="asc" id={`${field}-2`} className="size-5" />
+          <Label htmlFor={`${field}-2`}>Asc</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="desc" id={`${field}-3`} className="size-5" />
+          <Label htmlFor={`${field}-3`}>Desc</Label>
+        </div>
+      </RadioGroup>
+    </>
+  );
+};
+
+const UserSortBy = ({ init }: { init?: UserOrderBy[] }) => {
+  const [isOpen, setOpen] = useState<boolean>(false);
+  const [data, setData] = useState<UserOrderBy[] | undefined>(init);
+  const { setFilter, filter } = useUserData();
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleSubmit = () => {
+    if (!data) {
+      setFilter(omit(filter, ["orderBy"]));
+    } else {
+      setFilter({ ...filter, orderBy: data });
+    }
+    setOpen(false);
+  };
+
+  const mergateOrderBy = useMemo(() => {
+    return data?.reduce((prev, curr) => {
+      const tmp = {
+        ...prev,
+        ...curr,
+      };
+
+      return tmp;
+    }, {});
+  }, [data]);
+
+  const handleChangeData = (
+    v: "all" | "desc" | "asc",
+    key: keyof UserOrderBy
+  ) => {
+    if (v == "all") {
+      setData((prev) => {
+        if (prev) {
+          const tmp = prev.filter((s) => !(key in s));
+          return tmp.length > 0 ? tmp : undefined;
+        } else {
+          return prev;
+        }
+      });
+    } else {
+      setData((prev) => {
+        if (prev) {
+          if (prev.some((s) => key in s)) {
+            return prev.map((s) => (key in s ? { [key]: v } : s));
+          } else {
+            return [...prev, { [key]: v }];
+          }
+        } else {
+          return [{ [key]: v }];
+        }
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) setData(init);
+  }, [isOpen, init]);
+
+  return (
+    <Popover onOpenChange={setOpen} open={isOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline">
+          <span className="hidden sm:inline">Sort by</span>
+          <ArrowUpDownIcon className="size-4 sm:ml-2" />
+          {filter?.orderBy && (
+            <span className="ml-1">({filter.orderBy.length})</span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 max-h-[400px] space-y-2" align="end">
+        <Label className="text-xl">Sort by</Label>
+        <div className="flex flex-col justify-center gap-4">
+          <SortBy
+            title="Email"
+            field="email"
+            defaultValue={mergateOrderBy?.email || "all"}
+            handleChangeData={handleChangeData}
+          />
+          <SortBy
+            title="Role"
+            field="role"
+            defaultValue={mergateOrderBy?.role || "all"}
+            handleChangeData={handleChangeData}
+          />
+          <SortBy
+            title="Emai verify"
+            field="emailVerified"
+            defaultValue={mergateOrderBy?.emailVerified || "all"}
+            handleChangeData={handleChangeData}
+          />
+          <Label className="text-lg">Role</Label>
+        </div>
+        <div className="flex items-center justify-end py-4 gap-2">
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit}>Submit</Button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };
 
@@ -339,7 +492,7 @@ const InputFilter = ({
 };
 
 const UserFilterToolBar = () => {
-  const { setViewMode, viewMode } = useUserData();
+  const { setViewMode, viewMode, filter } = useUserData();
 
   return (
     <div className="flex gap-4">
@@ -347,10 +500,7 @@ const UserFilterToolBar = () => {
         <UserFilterSheet />
       </div>
       <div className="flex gap-2">
-        <Button variant="outline">
-          <span className="hidden sm:inline">Sort by</span>
-          <ArrowUpDownIcon className="size-4 sm:ml-2" />
-        </Button>
+        <UserSortBy init={filter?.orderBy} />
         <Button
           onClick={() => {
             setViewMode(viewMode == "card" ? "list" : "card");
@@ -374,12 +524,20 @@ export const FilterUser = ({
 }: {
   searchParams?: { [index: string]: string | string[] | undefined };
 }) => {
-  const userData = useUserData();
+  const { viewMode, filter } = useUserData();
+  console.log();
 
   const { data, isPending } = useQuery({
-    queryKey: ["users", searchParams?.tab],
+    queryKey: ["users", searchParams?.tab, filter],
+    retry: 2,
     queryFn: async () => {
-      return await searchUser();
+      return await searchUser({
+        limit: 2,
+        page: 2,
+        orderBy: filter?.orderBy?.map(
+          (a) => Object.entries(a).map((a) => a.join("."))[0] as any
+        ),
+      });
     },
   });
 
@@ -388,9 +546,7 @@ export const FilterUser = ({
       <div
         className={cn(
           "bg-card text-card-foreground border p-2 space-y-2",
-          userData.viewMode == "list"
-            ? "rounded-tl-lg rounded-tr-lg"
-            : "rounded-lg"
+          viewMode == "list" ? "rounded-tl-lg rounded-tr-lg" : "rounded-lg"
         )}
       >
         <div className="flex items-center flex-grow border-b">
@@ -426,14 +582,14 @@ export const FilterUser = ({
         </div>
         <UserFilterToolBar />
       </div>
-      {userData.viewMode == "list" ? (
+      {viewMode == "list" ? (
         <ListView data={data?.users} />
       ) : (
         <CardView data={data?.users} />
       )}
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center justify-center text-sm font-medium">
-          Page 1 of 10
+          Page {filter?.page} of {data?.metadata.totalPage}
         </div>
         <Pagination className="w-auto mx-0 mt-2">
           <PaginationContent>

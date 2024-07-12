@@ -7,13 +7,15 @@ export interface UserConextFilterType {
   emails?: string[];
   roles?: Role[];
   emailVerified?: boolean;
-  orderBy?: {
-    email?: "asc" | "desc";
-    role?: "asc" | "desc";
-    emailVerified?: "asc" | "desc";
-  }[];
+  orderBy?: UserOrderBy[];
   page?: number;
   limit?: number;
+}
+
+export interface UserOrderBy {
+  email?: "asc" | "desc";
+  role?: "asc" | "desc";
+  emailVerified?: "asc" | "desc";
 }
 type ViewModeType = "card" | "list";
 
@@ -27,7 +29,6 @@ export interface UserConextType {
 
 const initUserContext: UserConextType = {
   filter: {
-    roles: ["CUSTOMER", "MANAGER"],
     limit: 10,
     page: 1,
   },
