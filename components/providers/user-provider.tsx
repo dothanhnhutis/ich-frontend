@@ -61,6 +61,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   function setFilter(
     data?: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">
   ) {
+    console.log(data);
     setData((prev) => ({
       ...prev,
       filter: data

@@ -32,17 +32,8 @@ import ListView from "./list";
 import { cn } from "@/lib/utils";
 import { CardView } from "./card";
 import { useQuery } from "@tanstack/react-query";
-import { searchUser, SearchUserInput } from "@/service/api/user.service";
+import { searchUser } from "@/service/api/user.service";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import {
   Select,
   SelectContent,
@@ -58,9 +49,7 @@ import {
 } from "@/components/ui/popover";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
@@ -75,6 +64,7 @@ import { omit, pick } from "lodash";
 import { Badge } from "@/components/ui/badge";
 import { Role } from "@/schemas/user";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { number } from "zod";
 
 const roleOption: Role[] = ["MANAGER", "SALER", "WRITER", "CUSTOMER"];
 
@@ -87,14 +77,12 @@ const UserFilterSheet = (
     useState<Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">>(
       init
     );
-
   const handleAddEmail = (email: string) => {
     setData((prev) => ({
       ...prev,
       emails: prev.emails ? [...prev.emails, email] : [email],
     }));
   };
-
   const handleRemoveEmail = (index: number) => {
     if (data.emails) {
       if (data.emails.length == 1) {
@@ -108,7 +96,6 @@ const UserFilterSheet = (
       }
     }
   };
-
   useEffect(() => {
     if (isOpenFilter) setData(init);
   }, [isOpenFilter]);
@@ -534,7 +521,7 @@ const UserFilterToolBar = () => {
     <div className="flex gap-4">
       <div className="inline-flex items-center flex-wrap gap-2 w-full">
         <UserFilterSheet
-          {...pick(filter, ["emails", "roles", "emailVerifyed"])}
+          {...pick(filter, ["emails", "roles", "emailVerified"])}
         />
       </div>
       <div className="flex gap-2">
@@ -545,32 +532,57 @@ const UserFilterToolBar = () => {
   );
 };
 
-const neighbourhood = 1;
-const size = 5;
-
-function caculatorPageShow(totalPage: number, currentPage: number) {
-  if (totalPage <= 6) {
-    return Array.from({ length: totalPage }, (_, id) =>
-      currentPage == id + 1 ? "?" : `${id + 1}`
-    );
-  } else {
-    return [];
-
-    // if(currentPage - 1 < totalPage - currentPage){
-    //   return []
-    // }else if(currentPage - 1 < totalPage - currentPage){
-
-    // }else {
-
-    // }
+function caculatorPageShow({
+  totalPage,
+  currentPage,
+  centerItem = 1,
+  firstLastItem = 5,
+}: {
+  totalPage: number;
+  currentPage: number;
+  centerItem?: number;
+  firstLastItem?: number;
+}) {
+  if (firstLastItem + (centerItem * 2 + 1) >= totalPage) {
+    return Array.from({ length: totalPage }, (_, ix) => ix + 1);
   }
+
+  const firstList: number[] = Array.from(
+    { length: firstLastItem },
+    (_, ix) => ix + 1
+  );
+  const lastList: number[] = Array.from(
+    { length: firstLastItem },
+    (_, ix) => totalPage - firstLastItem + ix + 1
+  );
+  const centerList: number[] = Array.from(
+    { length: centerItem * 2 + 1 },
+    (_, ix) => currentPage - Math.floor((centerItem * 2 + 1) / 2) + ix
+  );
+  let result: number[] = [];
+  if (firstList.includes(currentPage)) {
+    result = [...firstList, ...centerList, -1, totalPage];
+  } else if (lastList.includes(currentPage)) {
+    result = [1, -1, ...centerList, ...lastList];
+  } else {
+    result = [1, -1, ...centerList, -1, totalPage];
+  }
+  return result.filter((v, ix, arr) => v == -1 || arr.indexOf(v) === ix);
 }
 
 const UserPagination = () => {
   const { filter, setPagination } = useUserData();
-
-  console.log(caculatorPageShow(6, 6));
+  // [1,2,3,4,5,6,7,8,9]
+  console.log(
+    caculatorPageShow({
+      totalPage: 11,
+      currentPage: 5,
+      centerItem: 1,
+      firstLastItem: 7,
+    })
+  );
   // console.log(Array.from({ length: 100 }, (_, id) => id + 1));
+
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex items-center justify-center text-sm font-medium">

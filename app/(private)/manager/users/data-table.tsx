@@ -158,7 +158,6 @@ export const DataTable = ({ currentUser }: { currentUser?: CurrentUser }) => {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
-  console.log(table.getState().pagination);
 
   if (isPending) return "Loading...";
 
