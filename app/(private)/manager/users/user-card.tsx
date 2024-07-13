@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { SearchUserRes } from "@/service/api/user.service";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-export const CardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
+
+export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
   if (!data || data.length == 0) return <p>nodata</p>;
   return (
     <div className="flex flex-col gap-4">

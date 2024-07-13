@@ -4,12 +4,9 @@ import { getCurrentUser } from "@/service/api/user.service";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { FilterUser } from "./filter";
-import { DataTable } from "./data-table";
 import { redirect } from "next/navigation";
-import UserProvider, {
-  UserConextType,
-} from "@/components/providers/user-provider";
+import UserProvider from "@/components/providers/user-provider";
+import UserData from "./user-data";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -38,10 +35,8 @@ const UserManagerPage = async ({
       </div>
 
       <UserProvider>
-        <FilterUser searchParams={searchParams} />
+        <UserData searchParams={searchParams} />
       </UserProvider>
-
-      <DataTable currentUser={currentUser} />
     </div>
   );
 };

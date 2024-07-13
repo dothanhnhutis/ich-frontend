@@ -198,8 +198,8 @@ export type SearchUserRes = {
 };
 
 export type SearchUserInput = {
-  emails?: string[] | undefined;
-  roles?: Role[] | undefined;
+  email?: string[] | undefined;
+  role?: Role[] | undefined;
   emailVerified?: boolean | undefined;
   inActive?: boolean | undefined;
   suspended?: boolean | undefined;
@@ -214,12 +214,13 @@ export type SearchUserInput = {
       )[]
     | undefined;
   page?: number | undefined;
-  take?: number | undefined;
+  limit?: number | undefined;
 };
 
 export async function searchUser(props?: SearchUserInput) {
   const allCookies = cookies().getAll();
   let searchParams = "";
+  console.log(props);
   if (props) {
     searchParams =
       "?" +

@@ -15,7 +15,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { SearchUserRes } from "@/service/api/user.service";
-const ListView = ({ data = [] }: { data?: SearchUserRes[] }) => {
+const UserTableView = ({ data = [] }: { data?: SearchUserRes[] }) => {
   return (
     <div className="bg-card text-card-foreground border rounded-bl-lg rounded-br-lg border-t-0">
       <Table className="w-full table-fixed ">
@@ -84,4 +84,4 @@ const ListView = ({ data = [] }: { data?: SearchUserRes[] }) => {
   );
 };
 
-export default ListView;
+export default UserTableView;
