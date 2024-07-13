@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { SearchUserRes } from "@/service/api/user.service";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import CardEmpty from "@/assets/svgs/card-empty";
 
 export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
-  if (!data || data.length == 0) return <p>nodata</p>;
+  if (!data || data.length == 0) return <CardEmpty />;
   return (
     <div className="flex flex-col gap-4">
       {data.map((user) => (
