@@ -3,14 +3,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import UserMenu from "./user-menu";
-import { CurrentUser } from "@/schemas/user";
+import { User } from "@/schemas/user";
 const goToSignInRoute: RegExp = /^\/auth\/(signup|recover|reset-password)$/;
 
-const NavRight = ({
-  currentUser,
-}: {
-  currentUser?: CurrentUser | undefined;
-}) => {
+const NavRight = ({ currentUser }: { currentUser?: User | undefined }) => {
   const pathName = usePathname();
 
   return (

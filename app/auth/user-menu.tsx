@@ -24,13 +24,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LogOutIcon, MailIcon, SettingsIcon } from "lucide-react";
-import { CurrentUser } from "@/schemas/user";
+import { User } from "@/schemas/user";
 import { signOut } from "@/service/api/auth.service";
 import { useRouter, usePathname } from "next/navigation";
 import { disactivateAccount } from "@/service/api/user.service";
 import { privateRegExpRoutes } from "@/routes";
 
-const UserMenu = ({ currentUser }: { currentUser: CurrentUser }) => {
+const UserMenu = ({ currentUser }: { currentUser: User }) => {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState<boolean>(false);

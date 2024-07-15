@@ -10,12 +10,22 @@ import {
 } from "@/components/ui/table";
 import {
   ContextMenu,
+  ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { SearchUserRes } from "@/service/api/user.service";
+import { toast } from "sonner";
+import Link from "next/link";
 const UserTableView = ({ data = [] }: { data?: SearchUserRes[] }) => {
+  const copyToClipboard = (id: string) => {
+    navigator.clipboard.writeText(id);
+    toast.success("Copy ID success");
+  };
   return (
     <div className="bg-card text-card-foreground border rounded-bl-lg rounded-br-lg border-t-0">
       <Table className="w-full table-fixed ">
@@ -64,10 +74,21 @@ const UserTableView = ({ data = [] }: { data?: SearchUserRes[] }) => {
                   </TableRow>
                 </ContextMenuTrigger>
                 <ContextMenuContent>
-                  <ContextMenuItem>Profile</ContextMenuItem>
-                  <ContextMenuItem>Billing</ContextMenuItem>
-                  <ContextMenuItem>Team</ContextMenuItem>
-                  <ContextMenuItem>Subscription</ContextMenuItem>
+                  <ContextMenuItem onClick={() => copyToClipboard(user.id)}>
+                    Copy ID
+                  </ContextMenuItem>
+                  <Link href={`/manager/users/${user.id}/edit`}>
+                    <ContextMenuItem>Edit</ContextMenuItem>
+                  </Link>
+                  <ContextMenuSub>
+                    <ContextMenuSubTrigger>Suspended</ContextMenuSubTrigger>
+                    <ContextMenuSubContent>
+                      <ContextMenuCheckboxItem checked>
+                        True
+                      </ContextMenuCheckboxItem>
+                      <ContextMenuCheckboxItem>False</ContextMenuCheckboxItem>
+                    </ContextMenuSubContent>
+                  </ContextMenuSub>
                 </ContextMenuContent>
               </ContextMenu>
             ))

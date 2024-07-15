@@ -5,7 +5,6 @@ import LogoImage from "@/images/logos/logo.png";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getCurrentUser } from "@/service/api/user.service";
-import { CurrentUser } from "@/schemas/user";
 import SendAgainBtn from "./send-again";
 import ChangeEmailForm from "./change-email";
 import UserMenu from "./user-menu";

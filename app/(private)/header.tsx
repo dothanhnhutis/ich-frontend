@@ -4,14 +4,10 @@ import { Logo } from "@/components/logo";
 import { SwitchTheme } from "@/components/switch-theme";
 import { Button } from "@/components/ui/button";
 import { BellIcon, MenuIcon } from "lucide-react";
-import { CurrentUser } from "@/schemas/user";
+import { User } from "@/schemas/user";
 import UserMenu from "../auth/user-menu";
 
-const UserHeader = ({
-  currentUser,
-}: {
-  currentUser: CurrentUser | undefined;
-}) => {
+const UserHeader = ({ currentUser }: { currentUser: User | undefined }) => {
   return (
     <header className="sticky top-0 left-0 right-0 z-50 border-b bg-background">
       <nav className="flex justify-between items-center p-3 h-[72px]">

@@ -1,5 +1,11 @@
 "use server";
-import { CurrentUser, EditPassword, Role } from "@/schemas/user";
+import {
+  CreateUserType,
+  User,
+  EditPassword,
+  Role,
+  EditUserType,
+} from "@/schemas/user";
 import { FetchHttpError, http } from "../http";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -27,7 +33,7 @@ export async function getUserByPasswordResetToken(token: string) {
 export async function getCurrentUser() {
   const allCookies = cookies().getAll();
   try {
-    const res = await http.get<CurrentUser>("/users/me", {
+    const res = await http.get<User>("/users/me", {
       headers: {
         Cookie: allCookies
           .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
@@ -79,7 +85,7 @@ export async function disactivateAccount() {
   }
 }
 
-export async function editProfile(data: Partial<CurrentUser>) {
+export async function editProfile(data: Partial<User>) {
   const allCookies = cookies().getAll();
   try {
     const res = await http.patch<{ message: string }>("/users", data, {
@@ -220,7 +226,6 @@ export type SearchUserInput = {
 export async function searchUser(props?: SearchUserInput) {
   const allCookies = cookies().getAll();
   let searchParams = "";
-  console.log(props);
   if (props) {
     searchParams =
       "?" +
@@ -234,7 +239,6 @@ export async function searchUser(props?: SearchUserInput) {
         })
         .join("&");
   }
-  console.log(searchParams);
   try {
     const res = await http.get<{
       users: SearchUserRes[];
@@ -264,5 +268,77 @@ export async function searchUser(props?: SearchUserInput) {
         totalPage: 1,
       },
     };
+  }
+}
+
+export const createUser = async (data: CreateUserType) => {
+  try {
+    const allCookies = cookies().getAll();
+    const res = await http.post<{ message: string }>("/users", data, {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    revalidatePath("/manager/users");
+    return { success: true, message: res.data.message };
+  } catch (error: any) {
+    const result = { success: false, message: "unknown" };
+    if (error instanceof FetchHttpError) {
+      return { success: false, message: error.serialize().data.message };
+    }
+    console.log("createUser() method error: ", result.message);
+    return result;
+  }
+};
+
+export async function getUserById(id: string) {
+  const allCookies = cookies().getAll();
+  try {
+    const res = await http.get<User>("/users/" + id, {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    return res.data;
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(
+        "getUserById() method error: ",
+        error.serialize().data.message
+      );
+    } else {
+      console.log("getUserById() method error: ", error);
+    }
+    return undefined;
+  }
+}
+
+export async function editUserById(data: EditUserType) {
+  const allCookies = cookies().getAll();
+  try {
+    const res = await http.post<{ message: string }>("/users/", data, {
+      headers: {
+        Cookie: allCookies
+          .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+          .join("; "),
+      },
+      credentials: "include",
+    });
+    revalidatePath("/user/profile");
+    return { success: true, message: res.data.message };
+  } catch (error: any) {
+    if (error instanceof FetchHttpError) {
+      console.log(error.serialize());
+      return { success: false, message: error.serialize().data.message };
+    } else {
+      console.log("editPassword() method error: ", error);
+      return { success: false, message: "unknown" };
+    }
   }
 }

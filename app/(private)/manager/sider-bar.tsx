@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Link from "next/link";
-import { CurrentUser } from "@/schemas/user";
+import { User } from "@/schemas/user";
 
 const permissions: {
   [index: string]: {
@@ -62,7 +62,7 @@ const permissions: {
 export const ManagerSiderBar = ({
   currentUser,
 }: {
-  currentUser?: CurrentUser | undefined;
+  currentUser?: User | undefined;
 }) => {
   const pathName = usePathname();
 

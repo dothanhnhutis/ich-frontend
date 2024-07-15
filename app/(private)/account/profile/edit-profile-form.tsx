@@ -12,17 +12,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CurrentUser } from "@/schemas/user";
+import { User } from "@/schemas/user";
 import { Button } from "@/components/ui/button";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { editProfile } from "@/service/api/user.service";
 import { toast } from "sonner";
 
-const EditProfileForm = ({ currentUser }: { currentUser?: CurrentUser }) => {
+const EditProfileForm = ({ currentUser }: { currentUser?: User }) => {
   const [open, setOpen] = useState<boolean>(false);
 
   const [form, setform] = useState<
-    Required<Pick<CurrentUser, "username" | "phone" | "address">>
+    Required<Pick<User, "username" | "phone" | "address">>
   >({
     username: currentUser?.username || "",
     phone: currentUser?.phone || "",
