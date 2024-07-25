@@ -3,10 +3,11 @@ import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
+import { EditUserForm } from "./edit-user-form";
 
 const EditUserPage = async ({ params: { id } }: { params: { id: string } }) => {
   const user = await getUserById(id);
-  if (!user) notFound();
+  if (!user || user.role == "ADMIN") notFound();
 
   return (
     <>
@@ -18,6 +19,7 @@ const EditUserPage = async ({ params: { id } }: { params: { id: string } }) => {
         <p className="text-xs font-light">Back</p>
       </Link>
       <h2 className="lg:text-3xl font-bold text-2xl mb-3">Edit Use</h2>
+      <EditUserForm user={user}/>
     </>
   );
 };
