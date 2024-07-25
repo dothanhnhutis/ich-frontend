@@ -45,10 +45,9 @@ export class FetchHttp {
     const baseUrl =
       options?.baseUrl || configs.NEXT_PUBLIC_SERVER_URL + this._path;
 
-    const fullUrl =
-      url == "" || url.startsWith("/")
-        ? `${baseUrl}${url}`
-        : `${baseUrl}/${url}`;
+    const fullUrl = url.startsWith("/")
+      ? `${baseUrl}${url}`
+      : `${baseUrl}/${url}`;
 
     const res = await fetch(fullUrl, {
       ...options,
@@ -116,7 +115,7 @@ export class AuthService extends FetchHttp {
   }
 
   async signIn(data: { email: string; password: string }) {
-    return await this.post<any>("", data);
+    return await this.post<{ message: string }>("/signin", data);
   }
 
   async signInWithProvider(provider: Provider) {}
