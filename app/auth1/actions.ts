@@ -23,10 +23,10 @@ const signInSchema = z.object({
     .max(40, "invalid email or password")
     .optional(),
 });
-
+export type SignInInput = z.infer<typeof signInSchema>;
 export const signIn = baseProcedure
   .createServerAction()
-  .input(signInSchema, { type: "formData" })
+  .input(signInSchema, { type: "json" })
   .handler(async ({ input, ctx }) => {
     const { authService } = ctx;
     const { data, headers } = await authService.signIn(input);
