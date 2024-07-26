@@ -29,19 +29,19 @@ export const signIn = baseProcedure
   .input(signInSchema, { type: "formData" })
   .handler(async ({ input, ctx }) => {
     const { authService } = ctx;
-
     const { data, headers } = await authService.signIn(input);
-
-    // // console.log(headers.getSetCookie());
-    // for (const cookie of headers.getSetCookie()) {
-    //   const parser = cookieParser(cookie);
-    //   if (!parser) continue;
-    //   const { name, value, ...opt } = parser;
-    //   cookies().set(name, value, opt);
-    // }
-    // console.log(data);
-    // revalidatePath("/auth1/signin");
-    return "qweqwe";
+    if (input.password) {
+      for (const cookie of headers.getSetCookie()) {
+        const parser = cookieParser(cookie);
+        if (!parser) continue;
+        const { name, value, ...opt } = parser;
+        cookies().set(name, value, opt);
+      }
+      revalidatePath("/auth1/signin");
+      redirect("/account/profile");
+    } else {
+      return data;
+    }
   });
 
 export const reActivateAccount = baseProcedure

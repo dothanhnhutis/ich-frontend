@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SignInGoogleBtn } from "@/app/auth/signin-google-btn";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useEffect } from "react";
 
 export const SignInForm = () => {
   const { isPending, isSuccess, data, error, isError, executeFormAction } =
@@ -15,7 +15,13 @@ export const SignInForm = () => {
   const { execute } = useServerAction(reActivateAccount);
   const [tab, setTab] = React.useState<"email" | "password">("email");
 
-  console.log(error);
+  console.log(isPending, isSuccess, data, error, isError);
+  useEffect(() => {
+    if (!isSuccess) return;
+    if (tab == "email") {
+      setTab("password");
+    }
+  }, [isSuccess, tab]);
 
   return (
     <div className="p-4 sm:p-8">
