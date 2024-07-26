@@ -15,7 +15,7 @@ export const Send = () => {
           <EmailSVG1 />
         </div>
         <h2 className="font-bold text-5xl text-center">Email sent</h2>
-        <p className="">
+        <p>
           We’ve sent an email to your email address. Follow the steps provided
           in the email to reactivate your account.
         </p>

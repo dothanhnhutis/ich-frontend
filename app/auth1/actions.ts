@@ -5,15 +5,23 @@ import { cookieParser } from "@/lib/cookies-parser";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { createServerAction } from "zsa";
 
 const signInSchema = z.object({
-  email: z.string().email("Invalid email or password"),
+  email: z
+    .string({
+      required_error: "email field is required",
+      invalid_type_error: "email field must be string",
+    })
+    .email("invalid email or password"),
   password: z
     .string({
-      invalid_type_error: "Password must be string",
-      required_error: "Password is required",
+      required_error: "password field is required",
+      invalid_type_error: "password field must be string",
     })
-    .min(1, "Invalid email or password"),
+    .min(8, "invalid email or password")
+    .max(40, "invalid email or password")
+    .optional(),
 });
 
 export const signIn = baseProcedure
@@ -21,14 +29,31 @@ export const signIn = baseProcedure
   .input(signInSchema, { type: "formData" })
   .handler(async ({ input, ctx }) => {
     const { authService } = ctx;
-    const { headers, data } = await authService.signIn(input);
-    for (const cookie of headers.getSetCookie()) {
-      const parser = cookieParser(cookie);
-      if (!parser) continue;
-      const { name, value, ...opt } = parser;
-      cookies().set(name, value, {
-        ...opt,
-      });
-    }
-    revalidatePath("/auth1/signin");
+
+    const { data, headers } = await authService.signIn(input);
+
+    // // console.log(headers.getSetCookie());
+    // for (const cookie of headers.getSetCookie()) {
+    //   const parser = cookieParser(cookie);
+    //   if (!parser) continue;
+    //   const { name, value, ...opt } = parser;
+    //   cookies().set(name, value, opt);
+    // }
+    // console.log(data);
+    // revalidatePath("/auth1/signin");
+    return "qweqwe";
   });
+
+export const reActivateAccount = baseProcedure
+  .createServerAction()
+  .input(signInSchema.pick({ email: true }), { type: "json" })
+  .handler(async ({ input, ctx }) => {
+    const { authService } = ctx;
+    await authService.reActivateAccount(input.email);
+    cookies().set("send-email", "true");
+    redirect("/auth1/send-email");
+  });
+
+export const clearSendEmail = createServerAction().handler(async () => {
+  cookies().delete("send-email");
+});
