@@ -1,12 +1,13 @@
-import React from "react";
-
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { Send } from "./send";
+import React from "react";
+import Send from "./send";
 
-const SendEmailReactivePage = async () => {
-  if (!cookies().has("eid")) notFound();
-  return <Send />;
+const SendEmail = async () => {
+  if (cookies().get("send-email")) return <Send />;
+  else {
+    return notFound();
+  }
 };
 
-export default SendEmailReactivePage;
+export default SendEmail;

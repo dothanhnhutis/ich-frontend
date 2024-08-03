@@ -20,10 +20,19 @@ const signInSchema = z.object({
       invalid_type_error: "password field must be string",
     })
     .min(8, "invalid email or password")
-    .max(40, "invalid email or password")
-    .optional(),
+    .max(40, "invalid email or password"),
 });
 export type SignInInput = z.infer<typeof signInSchema>;
+
+export const emailCheck = baseProcedure
+  .createServerAction()
+  .input(signInSchema.pick({ email: true }), { type: "json" })
+  .handler(async ({ input, ctx }) => {
+    const { authService } = ctx;
+    const { data } = await authService.signIn(input);
+    return data;
+  });
+
 export const signIn = baseProcedure
   .createServerAction()
   .input(signInSchema, { type: "json" })

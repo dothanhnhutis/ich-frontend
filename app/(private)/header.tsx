@@ -5,7 +5,7 @@ import { SwitchTheme } from "@/components/switch-theme";
 import { Button } from "@/components/ui/button";
 import { BellIcon, MenuIcon } from "lucide-react";
 import { User } from "@/schemas/user";
-import UserMenu from "../auth/user-menu";
+import UserMenu from "../_auth2/user-menu";
 
 const UserHeader = ({ currentUser }: { currentUser: User | undefined }) => {
   return (

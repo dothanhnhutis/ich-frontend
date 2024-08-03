@@ -1,10 +1,10 @@
 "use client";
 import { LockIcon, OctagonAlertIcon, UserIcon } from "lucide-react";
-import { reActivateAccount, signIn, SignInInput } from "../actions";
+import { emailCheck, reActivateAccount, signIn, SignInInput } from "../actions";
 import { useServerAction } from "zsa-react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
-import { SignInGoogleBtn } from "@/app/auth/signin-google-btn";
+import { SignInGoogleBtn } from "@/app/_auth2/signin-google-btn";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import React, { useEffect } from "react";
@@ -18,10 +18,17 @@ export const SignInForm = () => {
     isError,
     execute: executeSubmit,
   } = useServerAction(signIn);
+  const {
+    isPending: EmailCheckIsPending,
+    isSuccess: EmailCheckIsSuccess,
+    isError: EmailCheckIsError,
+    execute: EmailCheckExecute,
+  } = useServerAction(emailCheck);
   const { execute } = useServerAction(reActivateAccount);
   const [tab, setTab] = React.useState<"email" | "password">("email");
-  const [dataForm, setDataForm] = React.useState<SignInInput>({
+  const [dataForm, setDataForm] = React.useState<Required<SignInInput>>({
     email: "",
+    password: "",
   });
 
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,20 +37,20 @@ export const SignInForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(1);
-    executeSubmit(dataForm);
+    if (tab == "email") {
+      EmailCheckExecute({ email: dataForm.email });
+    } else {
+      executeSubmit(dataForm);
+    }
   };
 
   useEffect(() => {
-    if (!isSuccess) return;
-    if (tab == "email") {
-      setTab("password");
-    }
-  }, [isSuccess, tab]);
+    setTab("password");
+  }, [EmailCheckIsSuccess]);
 
   return (
     <div className="p-4 sm:p-8">
-      {tab == "email" && isError && (
+      {EmailCheckIsError && (
         <div className="flex items-center gap-3 rounded-lg bg-destructive/20 sm:rounded-xl sm:max-w-[570px] sm:mx-auto mb-10 p-4">
           <OctagonAlertIcon className="size-6 text-red-500" />
           <p className="text-sm">
@@ -71,11 +78,11 @@ export const SignInForm = () => {
             <h1 className="text-2xl font-semibold tracking-tight text-center mt-4">
               <span>Log in to ICH</span>
             </h1>
-            <div className="text-orange-400 text-sm">
+            {/* <div className="text-orange-400 text-sm">
               We've found an existing ICH account with this email address.
               Please continue to log in with your account email and password
               below.
-            </div>
+            </div> */}
 
             <div className="flex gap-4 items-center border rounded-lg h-10 px-4">
               <UserIcon className="size-4" />
@@ -90,7 +97,7 @@ export const SignInForm = () => {
               />
             </div>
             <Button disabled={isPending}>
-              {isPending ? (
+              {EmailCheckIsPending ? (
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
               ) : (
                 <span>Continue</span>
