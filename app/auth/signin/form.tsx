@@ -12,17 +12,16 @@ import React, { useEffect } from "react";
 export const SignInForm = () => {
   const {
     isPending,
-    isSuccess,
-    data,
-    error,
-    isError,
     execute: executeSubmit,
+    isError,
+    reset,
   } = useServerAction(signIn);
   const {
-    isPending: EmailCheckIsPending,
-    isSuccess: EmailCheckIsSuccess,
-    isError: EmailCheckIsError,
-    execute: EmailCheckExecute,
+    isPending: emailCheckIsPending,
+    isSuccess: emailCheckIsSuccess,
+    isError: emailCheckIsError,
+    execute: emailCheckExecute,
+    reset: emailCheckReset,
   } = useServerAction(emailCheck);
   const { execute } = useServerAction(reActivateAccount);
   const [tab, setTab] = React.useState<"email" | "password">("email");
@@ -30,29 +29,44 @@ export const SignInForm = () => {
     email: "",
     password: "",
   });
+  const [reActivateEmail, setReActivateEmail] = React.useState<string>("");
 
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDataForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (tab == "email") {
-      EmailCheckExecute({ email: dataForm.email });
+      emailCheckExecute({ email: dataForm.email });
     } else {
       executeSubmit(dataForm);
     }
   };
 
-  const handleBack = () => {};
+  const handleBack = () => {
+    setTab("email");
+    setDataForm({
+      email: "",
+      password: "",
+    });
+    emailCheckReset();
+  };
 
   useEffect(() => {
-    setTab("password");
-  }, [EmailCheckIsSuccess]);
+    if (emailCheckIsSuccess) {
+      setTab("password");
+    }
+    if (emailCheckIsError)
+      setDataForm({
+        email: "",
+        password: "",
+      });
+  }, [emailCheckIsSuccess, emailCheckIsError]);
 
   return (
     <div className="p-4 sm:p-8">
-      {EmailCheckIsError && (
+      {emailCheckIsError && (
         <div className="flex items-center gap-3 rounded-lg bg-destructive/20 sm:rounded-xl sm:max-w-[570px] sm:mx-auto mb-10 p-4">
           <OctagonAlertIcon className="size-6 text-red-500" />
           <p className="text-sm">
@@ -60,7 +74,8 @@ export const SignInForm = () => {
             your account, click{" "}
             <button
               onClick={() => {
-                execute({ email: "gaconght001@gmail.com" });
+                execute({ email: reActivateEmail });
+                setReActivateEmail("");
               }}
               className="underline"
             >
@@ -88,6 +103,7 @@ export const SignInForm = () => {
 
             <div className="flex gap-4 items-center border rounded-lg h-10 px-4">
               <UserIcon className="size-4" />
+
               <input
                 onChange={handleOnchange}
                 value={dataForm.email}
@@ -99,7 +115,7 @@ export const SignInForm = () => {
               />
             </div>
             <Button disabled={isPending}>
-              {EmailCheckIsPending ? (
+              {emailCheckIsPending ? (
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
               ) : (
                 <span>Continue</span>
@@ -144,11 +160,11 @@ export const SignInForm = () => {
               <span>Welcome</span>
             </h1>
             <p className="text-center">{dataForm.email}</p>
-            <div className="text-orange-400 text-sm">
+            {/* <div className="text-orange-400 text-sm">
               That Google account isn't currently associated with an ICH
               account. Log in using your ICH login first, then link your Google
               account for future use.
-            </div>
+            </div> */}
             <div
               className={cn(
                 "flex gap-4 items-center border rounded-lg h-10 px-4",
@@ -180,13 +196,7 @@ export const SignInForm = () => {
               )}
             </Button>
             <div className="flex flex-col sm:flex-row sm:justify-between items-center">
-              <Button
-                variant="link"
-                type="button"
-                onClick={() => {
-                  setTab("email");
-                }}
-              >
+              <Button variant="link" type="button" onClick={handleBack}>
                 <span>Not you?</span>
               </Button>
               <Button asChild variant="link" className="">

@@ -106,6 +106,7 @@ export const SignInForm = ({
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, email: e.target.value }))
                 }
+                name="email"
                 value={form.email}
                 type="email"
                 placeholder="Email"

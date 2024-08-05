@@ -13,7 +13,7 @@ export class AuthService extends FetchHttp {
   async signInWithProvider(provider: Provider) {}
 
   async reActivateAccount(email: string) {
-    console.log("send: " + email);
+    await this.post<{ message: string }>("/reactivate", { email });
     return true;
   }
 }

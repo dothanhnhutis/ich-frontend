@@ -39,18 +39,17 @@ export const signIn = baseProcedure
   .handler(async ({ input, ctx }) => {
     const { authService } = ctx;
     const { data, headers } = await authService.signIn(input);
-    if (input.password) {
-      for (const cookie of headers.getSetCookie()) {
-        const parser = cookieParser(cookie);
-        if (!parser) continue;
+
+    for (const cookie of headers.getSetCookie()) {
+      const parser = cookieParser(cookie);
+      if (parser) {
+        console.log(parser);
         const { name, value, ...opt } = parser;
         cookies().set(name, value, opt);
       }
-      revalidatePath("/auth1/signin");
-      redirect("/account/profile");
-    } else {
-      return data;
     }
+    revalidatePath("/auth/signin");
+    redirect("/account/profile");
   });
 
 export const reActivateAccount = baseProcedure
