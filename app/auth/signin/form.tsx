@@ -1,15 +1,16 @@
 "use client";
 import { LockIcon, OctagonAlertIcon, UserIcon } from "lucide-react";
-import { emailCheck, reActivateAccount, signIn, SignInInput } from "../actions";
+import { emailCheck, reActivateAccount, signIn } from "../actions";
 import { useServerAction } from "zsa-react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
-import { SignInGoogleBtn } from "@/app/_auth2/signin-google-btn";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import React, { useEffect } from "react";
+import { SignInGoogleBtn } from "../signin-google-btn";
+import { SignInInput } from "@/schemas/auth";
 
-export const SignInForm = () => {
+export const SignInForm = ({ registered }: { registered?: string }) => {
   const {
     isPending,
     execute: executeSubmit,
@@ -24,11 +25,14 @@ export const SignInForm = () => {
     reset: emailCheckReset,
   } = useServerAction(emailCheck);
   const { execute } = useServerAction(reActivateAccount);
-  const [tab, setTab] = React.useState<"email" | "password">("email");
+  const [tab, setTab] = React.useState<"email" | "password">(
+    registered ? "password" : "email"
+  );
   const [dataForm, setDataForm] = React.useState<Required<SignInInput>>({
-    email: "",
+    email: registered || "",
     password: "",
   });
+
   const [reActivateEmail, setReActivateEmail] = React.useState<string>("");
 
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,17 +55,20 @@ export const SignInForm = () => {
       password: "",
     });
     emailCheckReset();
+    reset();
   };
 
   useEffect(() => {
     if (emailCheckIsSuccess) {
       setTab("password");
     }
-    if (emailCheckIsError)
+    if (emailCheckIsError) {
+      setReActivateEmail(dataForm.email);
       setDataForm({
         email: "",
         password: "",
       });
+    }
   }, [emailCheckIsSuccess, emailCheckIsError]);
 
   return (
@@ -95,11 +102,13 @@ export const SignInForm = () => {
             <h1 className="text-2xl font-semibold tracking-tight text-center mt-4">
               <span>Log in to ICH</span>
             </h1>
-            {/* <div className="text-orange-400 text-sm">
-              We've found an existing ICH account with this email address.
-              Please continue to log in with your account email and password
-              below.
-            </div> */}
+            {registered && (
+              <div className="text-orange-400 text-sm">
+                We've found an existing ICH account with this email address.
+                Please continue to log in with your account email and password
+                below.
+              </div>
+            )}
 
             <div className="flex gap-4 items-center border rounded-lg h-10 px-4">
               <UserIcon className="size-4" />
@@ -160,11 +169,13 @@ export const SignInForm = () => {
               <span>Welcome</span>
             </h1>
             <p className="text-center">{dataForm.email}</p>
-            {/* <div className="text-orange-400 text-sm">
-              That Google account isn't currently associated with an ICH
-              account. Log in using your ICH login first, then link your Google
-              account for future use.
-            </div> */}
+            {registered && (
+              <div className="text-orange-400 text-sm">
+                That Google account isn't currently associated with an ICH
+                account. Log in using your ICH login first, then link your
+                Google account for future use.
+              </div>
+            )}
             <div
               className={cn(
                 "flex gap-4 items-center border rounded-lg h-10 px-4",

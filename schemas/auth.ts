@@ -1,18 +1,22 @@
 import { z } from "zod";
 
-export const signInSchema = z
-  .object({
-    email: z.string().email("Invalid email or password"),
-    password: z
-      .string({
-        invalid_type_error: "Password must be string",
-        required_error: "Password is required",
-      })
-      .min(1, "Invalid email or password"),
-  })
-  .strict();
+export const signInSchema = z.object({
+  email: z
+    .string({
+      required_error: "email field is required",
+      invalid_type_error: "email field must be string",
+    })
+    .email("invalid email or password"),
+  password: z
+    .string({
+      required_error: "password field is required",
+      invalid_type_error: "password field must be string",
+    })
+    .min(8, "invalid email or password")
+    .max(40, "invalid email or password"),
+});
 
-export const signupSchema = z
+export const signUpSchema = z
   .object({
     username: z
       .string({
@@ -61,6 +65,6 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export type SignInData = z.infer<typeof signInSchema>;
-export type SignUpData = z.infer<typeof signupSchema>;
-export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
+export type SignInInput = z.infer<typeof signInSchema>;
+export type SignUpInput = z.infer<typeof signUpSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

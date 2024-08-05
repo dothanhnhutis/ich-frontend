@@ -1,4 +1,6 @@
+import { SignInInput, SignUpInput } from "@/schemas/auth";
 import { FetchHttp } from "./http";
+import { cookies } from "next/headers";
 type Provider = "google" | "github";
 
 export class AuthService extends FetchHttp {
@@ -6,7 +8,7 @@ export class AuthService extends FetchHttp {
     super("/api/v1/auth");
   }
 
-  async signIn(data: { email: string; password?: string }) {
+  async signIn(data: SignInInput | Pick<SignInInput, "email">) {
     return await this.post<{ message: string }>("/signin", data);
   }
 
@@ -15,5 +17,9 @@ export class AuthService extends FetchHttp {
   async reActivateAccount(email: string) {
     await this.post<{ message: string }>("/reactivate", { email });
     return true;
+  }
+
+  async signUp(data: SignUpInput) {
+    return await this.post<{ message: string }>("/signup", data);
   }
 }

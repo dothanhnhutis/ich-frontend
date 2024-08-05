@@ -1,11 +1,11 @@
 "use server";
-import { ResetPasswordData, SignInData, SignUpData } from "@/schemas/auth";
 import { FetchHttpError, http } from "../http";
 import { cookies } from "next/headers";
 import { parseCookie } from "@/lib/cookies-parser";
 import { revalidatePath } from "next/cache";
+import { ResetPasswordInput, SignInInput, SignUpInput } from "@/schemas/auth";
 
-export async function signUp(data: SignUpData) {
+export async function signUp(data: SignUpInput) {
   try {
     const res = await http.post<SignUpRes>("/auth/signup", data);
     return { success: true, message: res.data.message };
@@ -47,7 +47,7 @@ export type SignInRes = {
   message?: string;
 };
 
-export async function signIn(data: SignInData): Promise<SignInRes> {
+export async function signIn(data: SignInInput): Promise<SignInRes> {
   let resData: SignInRes = {
     success: false,
     model: "password",
@@ -76,7 +76,7 @@ export async function signIn(data: SignInData): Promise<SignInRes> {
 }
 
 export async function checkActiveAccount(
-  data: Pick<SignInData, "email">
+  data: Pick<SignInInput, "email">
 ): Promise<SignInRes> {
   let resData: SignInRes = {
     success: false,
@@ -213,7 +213,7 @@ export async function changeEmail(data: { email: string }) {
   }
 }
 
-export async function resetPassword(token: string, data: ResetPasswordData) {
+export async function resetPassword(token: string, data: ResetPasswordInput) {
   try {
     const res = await http.patch<{ message: string }>(
       "/auth/reset-password/" + token,
@@ -249,7 +249,7 @@ type SignUpRes = {
   message: string;
 };
 
-export async function signup(data: SignUpData): Promise<SignUpRes> {
+export async function signup(data: SignUpInput): Promise<SignUpRes> {
   try {
     const res = await http.post<Pick<SignUpRes, "message">>(
       "/auth/signup",
