@@ -16,7 +16,6 @@ const UserData = ({
   };
 }) => {
   const { filter, viewMode } = useUserData();
-  console.log(filter);
   const { isPending, data, isError } = useQuery({
     queryKey: ["user", searchParams?.tab, JSON.stringify(filter)],
     queryFn: async () => {

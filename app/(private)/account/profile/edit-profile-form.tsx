@@ -12,18 +12,16 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User } from "@/schemas/user";
+import { EditProfileInput, User } from "@/schemas/user";
 import { Button } from "@/components/ui/button";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { editProfile } from "@/service/api/user.service";
 import { toast } from "sonner";
+import { editProfile } from "../actions";
 
 const EditProfileForm = ({ currentUser }: { currentUser?: User }) => {
   const [open, setOpen] = useState<boolean>(false);
 
-  const [form, setform] = useState<
-    Required<Pick<User, "username" | "phone" | "address">>
-  >({
+  const [form, setform] = useState<EditProfileInput>({
     username: currentUser?.username || "",
     phone: currentUser?.phone || "",
     address: currentUser?.address || "",
@@ -38,7 +36,6 @@ const EditProfileForm = ({ currentUser }: { currentUser?: User }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     startTransistion(async () => {
-      console.log(form);
       const res = await editProfile(form);
       if (res.success) {
         toast.success(res.message);

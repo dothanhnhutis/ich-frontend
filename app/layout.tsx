@@ -5,6 +5,7 @@ import { baseOpenGraph } from "./shared-metadata";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { getCurrentUser } from "./actions";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,10 +24,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const currentUser = await getCurrentUser();
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {children}
+        <AuthProvider initUser={currentUser}>{children}</AuthProvider>
         <Toaster visibleToasts={5} richColors />
       </body>
     </html>

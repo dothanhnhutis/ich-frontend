@@ -1,7 +1,7 @@
 "use server";
 import userApi from "@/service/collections/user-collections";
 import authApi from "@/service/collections/auth.collection";
-import { SignInInput, SignUpInput } from "@/schemas/auth";
+import { ResetPasswordInput, SignInInput, SignUpInput } from "@/schemas/auth";
 import { cookieParser } from "@/lib/cookies-parser";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -9,17 +9,17 @@ import { redirect } from "next/navigation";
 
 export async function emailCheck(input: Pick<SignInInput, "email">) {
   const { success, data } = await authApi.signIn(input);
-  console.log(data);
   return success;
 }
 
 export async function signIn(input: SignInInput | Pick<SignInInput, "email">) {
   const res = await authApi.signIn(input);
   if (res.success) {
+    cookies().delete("registered");
+
     for (const cookie of res.headers.getSetCookie()) {
       const parser = cookieParser(cookie);
       if (parser) {
-        console.log(parser);
         const { name, value, ...opt } = parser;
         cookies().set(name, value, opt);
       }
@@ -32,6 +32,10 @@ export async function signIn(input: SignInInput | Pick<SignInInput, "email">) {
 
 export async function clearSendEmail() {
   cookies().delete("send-email");
+}
+
+export async function clearEmailRegistered() {
+  cookies().delete("registered");
 }
 
 export async function reActivateAccount(email: string) {
@@ -60,4 +64,18 @@ export async function changeEmail(email: string) {
     .join("; ");
   const { data, success } = await userApi.changeEmail(cookie, { email });
   return { message: data.message, success };
+}
+
+export async function resetPassword(token: string, input: ResetPasswordInput) {
+  const { success, data } = await authApi.resetPassword(token, input);
+  return { success, message: data.message };
+}
+
+export async function activateAccount(token: string) {
+  await authApi.activateAccount(token);
+}
+
+export async function verifyEmail(token: string) {
+  await authApi.verifyEmail(token);
+  revalidatePath("/auth/confirm-email");
 }

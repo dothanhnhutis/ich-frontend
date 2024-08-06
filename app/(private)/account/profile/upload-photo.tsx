@@ -8,9 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { RotateCcwIcon, ZoomInIcon } from "lucide-react";
 import { cn, getImageInfo } from "@/lib/utils";
@@ -19,8 +17,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { editPicture } from "@/service/api/user.service";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { editPicture } from "../actions";
 
 export const UploadPhoto = ({
   url,
@@ -78,8 +76,8 @@ export const UploadPhoto = ({
     startTransistion(async () => {
       if (cropper) {
         const res = await editPicture({
-          pictureType: "base64",
-          pictureData: cropper.getCroppedCanvas().toDataURL(),
+          type: "base64",
+          data: cropper.getCroppedCanvas().toDataURL(),
         });
         if (res.success) {
           toast.success("Update avatar success");

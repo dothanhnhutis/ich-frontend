@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { ResetPasswordInput, resetPasswordSchema } from "@/schemas/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import authApi from "@/service/collections/auth.collection";
+import { resetPassword } from "../actions";
 
 const ResetPasswordForm = ({ token }: { token: string }) => {
   const router = useRouter();
@@ -51,13 +51,13 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     startTransistion(async () => {
-      const res = await authApi.resetPassword(token, form);
+      const res = await resetPassword(token, form);
       if (res.success) {
         setForm({ password: "", confirmPassword: "" });
-        toast.success(res.data.message);
+        toast.success(res.message);
         router.push("/auth/signin");
       } else {
-        toast.error(res.data.message);
+        toast.error(res.message);
       }
     });
   };

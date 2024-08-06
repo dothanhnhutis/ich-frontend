@@ -7,7 +7,6 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import userApi from "@/service/collections/user-collections";
 import { changeEmail } from "../actions";
 
 const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {

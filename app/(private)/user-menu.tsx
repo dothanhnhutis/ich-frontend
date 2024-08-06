@@ -19,7 +19,7 @@ import { signOut } from "@/service/api/auth.service";
 import { useRouter } from "next/navigation";
 
 export const UserMenu = () => {
-  const currentUser = useAuthContext();
+  const { currentUser } = useAuthContext();
   const router = useRouter();
   return (
     <DropdownMenu>
@@ -39,6 +39,7 @@ export const UserMenu = () => {
               <Skeleton className="w-24 h-24 rounded-full" />
             </AvatarFallback>
           </Avatar>
+
           <div className="w-full overflow-hidden">
             <p className="font-medium text-lg">
               {currentUser?.username ?? "error"}
@@ -80,11 +81,9 @@ export const UserMenu = () => {
             router.push("/auth/signin");
           }}
         >
-          {/* <Link href="/auth/signout" className="cursor-pointer"> */}
           <LogOutIcon className="mr-2 h-4 w-4" />
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-          {/* </Link> */}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -4,10 +4,15 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { SignInGoogleBtn } from "../signin-google-btn";
 import { SignInInput } from "@/schemas/auth";
-import { emailCheck, reActivateAccount, signIn } from "../actions";
+import {
+  clearEmailRegistered,
+  emailCheck,
+  reActivateAccount,
+  signIn,
+} from "../actions";
 
 export const SignInForm = ({ registered }: { registered?: string }) => {
   const [emailCheckIsError, setEmailCheckIsError] = useState<boolean>(false);
@@ -53,7 +58,8 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
     });
   };
 
-  const handleBack = () => {
+  const handleBack = async () => {
+    await clearEmailRegistered();
     setTab("email");
     setDataForm({
       email: "",

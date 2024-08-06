@@ -73,7 +73,6 @@ export function caculatorPagination({
     { length: centerItem * 2 + 1 },
     (_, ix) => currentPage - Math.floor((centerItem * 2 + 1) / 2) + ix
   ).filter((v) => v >= 1 && v <= totalPage);
-  console.log(firstList, centerList, lastList);
   let result: number[] = [];
   if (firstList.includes(currentPage)) {
     result = [...firstList, ...centerList, -1, totalPage];

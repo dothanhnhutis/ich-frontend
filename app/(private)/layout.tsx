@@ -5,8 +5,6 @@ import UserHeader from "./header";
 import { TankStackProvider } from "@/components/providers/TankStackProvider";
 
 const PrivateLayout = async ({ children }: { children: React.ReactNode }) => {
-  const currentUser = await getCurrentUser();
-
   return (
     <TankStackProvider>
       <ThemeProvider
@@ -16,7 +14,7 @@ const PrivateLayout = async ({ children }: { children: React.ReactNode }) => {
         disableTransitionOnChange
       >
         <div className="bg-muted/40 relative">
-          <UserHeader currentUser={currentUser} />
+          <UserHeader />
           {children}
         </div>
       </ThemeProvider>

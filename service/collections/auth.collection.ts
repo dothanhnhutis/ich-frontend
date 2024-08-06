@@ -1,10 +1,5 @@
 import { ResetPasswordInput, SignInInput, SignUpInput } from "@/schemas/auth";
 import { FetchHttp, FetchHttpError, IError, ISuccess } from "./http";
-import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-
-type Provider = "google" | "github";
 
 class AuthService extends FetchHttp {
   constructor() {
@@ -65,10 +60,6 @@ class AuthService extends FetchHttp {
         } as IError;
       }
     }
-  }
-
-  async clearSendEmail(): Promise<void> {
-    cookies().delete("send-email");
   }
 
   async resetPassword(
@@ -134,7 +125,7 @@ class AuthService extends FetchHttp {
       if (error instanceof FetchHttpError) {
         return error.serialize();
       } else {
-        console.log("AuthService recover() method error: ", error);
+        console.log("AuthService activateAccount() method error: ", error);
         return {
           success: false,
           data: { message: error.message },
@@ -146,12 +137,11 @@ class AuthService extends FetchHttp {
   async verifyEmail(token: string): Promise<void | IError> {
     try {
       await this.get<{ message: string }>(`/auth/confirm-email/${token}`);
-      revalidatePath("/auth/confirm-email");
     } catch (error: any) {
       if (error instanceof FetchHttpError) {
         return error.serialize();
       } else {
-        console.log("AuthService recover() method error: ", error);
+        console.log("AuthService verifyEmail() method error: ", error);
         return {
           success: false,
           data: { message: error.message },

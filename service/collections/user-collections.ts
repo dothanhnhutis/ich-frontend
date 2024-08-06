@@ -1,13 +1,75 @@
-"use server";
-
-import { cookies } from "next/headers";
 import { FetchHttp, FetchHttpError, IError, ISuccess } from "./http";
 import { ResetPasswordInput, SignInInput } from "@/schemas/auth";
-import { User } from "@/schemas/user";
+import {
+  EditPassword,
+  EditPictureInput,
+  EditProfileInput,
+  User,
+} from "@/schemas/user";
 
 class UserService extends FetchHttp {
   constructor() {
     super("/api/v1/users");
+  }
+
+  async editProfile(cookie: string, input: EditProfileInput) {
+    try {
+      return await this.patch<{ message: string }>("", input, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService editProfile() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+
+  async editPicture(cookie: string, input: EditPictureInput) {
+    try {
+      return await this.post<{ message: string }>("/picture", input, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService editProfile() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+
+  async currentUser(cookie: string) {
+    try {
+      return await this.get<User>("/me", {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService currentUser() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
   }
 
   async sendEmailVerify(cookie: string) {
@@ -21,7 +83,7 @@ class UserService extends FetchHttp {
       if (error instanceof FetchHttpError) {
         return error.serialize();
       } else {
-        console.log("AuthService signUp() method error: ", error);
+        console.log("UserService sendEmailVerify() method error: ", error);
         return {
           success: false,
           data: { message: error.message },
@@ -41,7 +103,7 @@ class UserService extends FetchHttp {
       if (error instanceof FetchHttpError) {
         return error.serialize();
       } else {
-        console.log("AuthService changeEmail() method error: ", error);
+        console.log("UserService changeEmail() method error: ", error);
         return {
           success: false,
           data: { message: error.message },
@@ -68,7 +130,7 @@ class UserService extends FetchHttp {
       if (error instanceof FetchHttpError) {
         return error.serialize();
       } else {
-        console.log("AuthService resetPassword() method error: ", error);
+        console.log("UserService resetPassword() method error: ", error);
         return {
           success: false,
           data: { message: error.message },
@@ -77,9 +139,7 @@ class UserService extends FetchHttp {
     }
   }
 
-  async getUserByPasswordResetToken(
-    token: string
-  ): Promise<ISuccess<User> | IError> {
+  async getUserByPasswordResetToken(token: string) {
     try {
       return await this.get<User>("/users/" + token);
     } catch (error: any) {
@@ -90,6 +150,49 @@ class UserService extends FetchHttp {
           "AuthService getUserByPasswordResetToken() method error: ",
           error
         );
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+
+  async disactivateAccount(cookie: string) {
+    try {
+      return await this.patch<{ message: string }>(
+        "/disactivate",
+        {},
+        {
+          headers: {
+            Cookie: cookie,
+          },
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService disactivateAccount() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+  async editPassword(cookie: string, input: EditPassword) {
+    try {
+      return await this.post<{ message: string }>("/change-password", input, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService editPassword() method error: ", error);
         return {
           success: false,
           data: { message: error.message },

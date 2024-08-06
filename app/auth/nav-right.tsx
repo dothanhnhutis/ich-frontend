@@ -3,12 +3,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import UserMenu from "./user-menu";
-import { User } from "@/schemas/user";
+import { useAuthContext } from "@/components/providers/auth-provider";
 const goToSignInRoute: RegExp = /^\/auth\/(signup|recover|reset-password)$/;
 
-const NavRight = ({ currentUser }: { currentUser?: User | undefined }) => {
+const NavRight = () => {
   const pathName = usePathname();
-
+  const { currentUser } = useAuthContext();
   return (
     <div className="flex items-center gap-2">
       {currentUser ? (
@@ -20,7 +20,7 @@ const NavRight = ({ currentUser }: { currentUser?: User | undefined }) => {
             Go to Profile
           </Link>
         ) : (
-          <UserMenu currentUser={currentUser} />
+          <UserMenu />
         )
       ) : goToSignInRoute.test(pathName) ? (
         <div className="hidden sm:block">

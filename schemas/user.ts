@@ -41,6 +41,20 @@ export const createUserSchema = z.object({
   }),
 });
 
+export const editProfileSchema = z
+  .object({
+    username: z.string(),
+    phone: z.string(),
+    address: z.string(),
+  })
+  .strip()
+  .partial();
+
+export const editPictureSchema = z.object({
+  type: z.enum(["url", "base64"]),
+  data: z.string(),
+});
+
 export const editUserSchema = createUserSchema
   .omit({ email: true, password: true })
   .extend({
@@ -70,20 +84,29 @@ export const editUserSchema = createUserSchema
 export type EditPassword = z.infer<typeof editPasswordSchema>;
 export type CreateUserType = z.infer<typeof createUserSchema>;
 export type EditUserType = z.infer<typeof editUserSchema>;
+export type EditProfileInput = z.infer<typeof editProfileSchema>;
+export type EditPictureInput = z.infer<typeof editPictureSchema>;
 
 export type Role = "ADMIN" | CreateUserType["role"];
 
 export type User = {
   id: string;
   email: string;
-  username: string;
-  role: Role;
-  picture: string | null;
   emailVerified: boolean;
-  inActive: boolean;
+  emailVerificationExpires?: Date | null;
+  emailVerificationToken?: string | null;
+  username: string;
+  picture: string | null;
+  hasPassword: boolean;
+  passwordResetToken?: string | null;
+  passwordResetExpires?: Date | null;
+  role: Role;
   suspended: boolean;
-  phone: string | null;
-  address: string | null;
-  createdAt: string;
-  updatedAt: string;
+  inActive: boolean;
+  reActiveToken?: string | null;
+  reActiveExpires?: Date | null;
+  phone?: string | null;
+  address?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };

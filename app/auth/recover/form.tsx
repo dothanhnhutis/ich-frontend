@@ -6,7 +6,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import authApi from "@/service/collections/auth.collection";
+import { recover } from "@/app/actions";
 
 const RecoverForm = (props: { email?: string }) => {
   const [isPending, startTransistion] = useTransition();
@@ -16,12 +16,12 @@ const RecoverForm = (props: { email?: string }) => {
     if (email == "") return;
     startTransistion(async () => {
       if (email != "") {
-        const { success, data } = await authApi.recover(email);
+        const { success, message } = await recover(email);
         setEmail("");
         if (success) {
-          toast.success(data.message);
+          toast.success(message);
         } else {
-          toast.error(data.message);
+          toast.error(message);
         }
       }
     });

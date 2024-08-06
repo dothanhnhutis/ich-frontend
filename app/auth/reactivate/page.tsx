@@ -1,5 +1,5 @@
 import React from "react";
-import authApi from "@/service/collections/auth.collection";
+import { activateAccount } from "../actions";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -12,8 +12,7 @@ const ReactivatePage = async ({
     token: string;
   };
 }) => {
-  await authApi.activateAccount(searchParams.token);
-
+  await activateAccount(searchParams.token);
   return <div>ReactivatePage</div>;
 };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import authApi from "@/service/collections/auth.collection";
+import { verifyEmail } from "../actions";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -11,7 +11,7 @@ const ConfirmEmailPage = async ({
     token: string;
   };
 }) => {
-  await authApi.verifyEmail(searchParams.token);
+  await verifyEmail(searchParams.token);
   return <div>ConfirmEmail</div>;
 };
 

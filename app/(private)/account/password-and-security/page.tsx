@@ -32,10 +32,16 @@ const PasswordAndSecurityPage = async () => {
           This email will be your login information
         </p>
         <div className="flex gap-4 flex-wrap">
-          <Button>
-            <MailIcon className="size-4 mr-2" /> Change Email
+          <Button disabled>
+            <MailIcon className="size-4 mr-2" /> Change email
           </Button>
-          <PasswordForm email={currentUser?.email || ""} />
+          {!currentUser!.hasPassword ? (
+            <Button>
+              <LockIcon className="size-4 mr-2" /> Set password
+            </Button>
+          ) : (
+            <PasswordForm email={currentUser?.email || ""} />
+          )}
         </div>
 
         <div>

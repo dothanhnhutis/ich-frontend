@@ -1,20 +1,9 @@
 "use client";
 import React, { useTransition, useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+
 import { LockIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { EditPassword, editPasswordSchema } from "@/schemas/user";
@@ -25,9 +14,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { editPassword } from "@/service/api/user.service";
 import { toast } from "sonner";
-import { recover } from "@/service/api/auth.service";
+import { editPassword } from "../actions";
+import { recover } from "@/app/actions";
 
 export const PasswordForm = ({ email }: { email: string }) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -94,11 +83,11 @@ export const PasswordForm = ({ email }: { email: string }) => {
   const [isPendingSendEmail, startTransistionSendEmail] = useTransition();
   const handleSendEmailForgotPassword = async () => {
     startTransistionSendEmail(async () => {
-      const res = await recover(email);
-      if (res.success) {
-        toast.success(res.message);
+      const { success, message } = await recover(email);
+      if (success) {
+        toast.success(message);
       } else {
-        toast.error(res.message);
+        toast.error(message);
       }
     });
   };
@@ -115,7 +104,7 @@ export const PasswordForm = ({ email }: { email: string }) => {
           setOpenDialog(true);
         }}
       >
-        <LockIcon className="size-4 mr-2" /> Change Password
+        <LockIcon className="size-4 mr-2" /> Change password
       </Button>
 
       <DialogContent className="sm:max-w-screen-sm">

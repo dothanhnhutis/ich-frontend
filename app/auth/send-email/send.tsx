@@ -5,7 +5,7 @@ import { clearSendEmail } from "../actions";
 const Send = () => {
   useEffect(() => {
     const handleClearSendEmail = async () => {
-      clearSendEmail();
+      await clearSendEmail();
     };
     handleClearSendEmail();
   }, []);
