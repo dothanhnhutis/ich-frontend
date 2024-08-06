@@ -200,5 +200,28 @@ class UserService extends FetchHttp {
       }
     }
   }
+
+  async createPassword(
+    cookie: string,
+    input: Omit<EditPassword, "oldPassword">
+  ) {
+    try {
+      return await this.post<{ message: string }>("/password", input, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService createPassword() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
 }
 export default new UserService();

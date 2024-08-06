@@ -16,17 +16,17 @@ const cookieServer = cookies()
 
 export async function editProfile(input: EditProfileInput) {
   const { success, data } = await userApi.editProfile(cookieServer, input);
-  if (success) {
-    revalidatePath("/user/profile");
-  }
+  // if (success) {
+  //   revalidatePath("/account/profile");
+  // }
   return { success, message: data.message };
 }
 
 export async function editPicture(input: EditPictureInput) {
   const { success, data } = await userApi.editPicture(cookieServer, input);
-  if (success) {
-    revalidatePath("/user/profile");
-  }
+  // if (success) {
+  //   revalidatePath("/account/profile");
+  // }
   return { success, message: data.message };
 }
 
@@ -41,9 +41,15 @@ export async function disactivateAccount() {
 export async function editPassword(input: EditPassword) {
   const { success, data } = await userApi.editPassword(cookieServer, input);
   if (success) {
-    revalidatePath("/user/profile");
+    revalidatePath("/account/password-and-security");
   }
-  console.log(input);
-  console.log(data);
+  return { success, message: data.message };
+}
+
+export async function createPassword(input: Omit<EditPassword, "oldPassword">) {
+  const { success, data } = await userApi.createPassword(cookieServer, input);
+  if (success) {
+    revalidatePath("/account/password-and-security");
+  }
   return { success, message: data.message };
 }

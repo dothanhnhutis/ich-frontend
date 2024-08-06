@@ -1,15 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { getCurrentUser } from "@/service/api/user.service";
-import { CheckIcon, Link, LockIcon, MailIcon } from "lucide-react";
+import { CheckIcon, MailIcon } from "lucide-react";
 import React from "react";
-import { PasswordForm } from "./password-form";
+import { PasswordForm } from "./form";
 
 const PasswordAndSecurityPage = async () => {
-  const currentUser = await getCurrentUser();
-
   return (
     <>
       <h3 className="text-lg font-medium">Password & security</h3>
@@ -21,7 +17,7 @@ const PasswordAndSecurityPage = async () => {
         <div className="flex items-center gap-2">
           <Input
             disabled={true}
-            value={currentUser!.email}
+            value={"currentUser!.email"}
             type="email"
             name="name"
             className="focus-visible:ring-transparent"
@@ -35,13 +31,7 @@ const PasswordAndSecurityPage = async () => {
           <Button disabled>
             <MailIcon className="size-4 mr-2" /> Change email
           </Button>
-          {!currentUser!.hasPassword ? (
-            <Button>
-              <LockIcon className="size-4 mr-2" /> Set password
-            </Button>
-          ) : (
-            <PasswordForm email={currentUser?.email || ""} />
-          )}
+          <PasswordForm />
         </div>
 
         <div>
