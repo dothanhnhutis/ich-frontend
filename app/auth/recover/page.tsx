@@ -1,5 +1,5 @@
 import React from "react";
-import RecoverForm from "./recover-form";
+import RecoverForm from "./form";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;

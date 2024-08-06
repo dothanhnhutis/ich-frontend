@@ -3,20 +3,24 @@ import React, { useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { useServerAction } from "zsa-react";
 import { sendEmailVerify } from "../actions";
 
 const SendAgainBtn = () => {
-  const { isPending, execute } = useServerAction(sendEmailVerify);
+  const [isPending, startTransistion] = useTransition();
+
+  const handleSend = () => {
+    startTransistion(async () => {
+      await sendEmailVerify();
+      toast.success(
+        "New verification email is successfully sent. Please, check your email..."
+      );
+    });
+  };
+
   return (
     <Button
       disabled={isPending}
-      onClick={async (e) => {
-        await execute();
-        toast.success(
-          "New verification email is successfully sent. Please, check your email..."
-        );
-      }}
+      onClick={handleSend}
       variant="outline"
       className="rounded-full border-2 border-primary !text-primary font-bold"
     >

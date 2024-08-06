@@ -3,11 +3,10 @@ import Link from "next/link";
 import { toast } from "sonner";
 import React, { useState, useTransition } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { recover } from "@/service/api/auth.service";
+import authApi from "@/service/collections/auth.collection";
 
 const RecoverForm = (props: { email?: string }) => {
   const [isPending, startTransistion] = useTransition();
@@ -17,12 +16,12 @@ const RecoverForm = (props: { email?: string }) => {
     if (email == "") return;
     startTransistion(async () => {
       if (email != "") {
-        const res = await recover(email);
+        const { success, data } = await authApi.recover(email);
         setEmail("");
-        if (res.success) {
-          toast.success(res.message);
+        if (success) {
+          toast.success(data.message);
         } else {
-          toast.error(res.message);
+          toast.error(data.message);
         }
       }
     });

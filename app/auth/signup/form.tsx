@@ -5,10 +5,10 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { SignUpInput, signUpSchema } from "@/schemas/auth";
 import Link from "next/link";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState, useTransition } from "react";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "sonner";
-import { useServerAction } from "zsa-react";
+import authApi from "@/service/collections/auth.collection";
 import { signUp } from "../actions";
 
 export const SignUpForm = () => {
@@ -57,28 +57,25 @@ export const SignUpForm = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const { isPending, isSuccess, isError, data, execute } =
-    useServerAction(signUp);
+  const [isPending, startTransistion] = useTransition();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setisExistEmail(false);
-    await execute(form);
+    startTransistion(async () => {
+      setisExistEmail(false);
+      const { success, message } = await signUp(form);
+      if (success) {
+        toast.success(message);
+        setForm({
+          username: "",
+          email: "",
+          password: "",
+        });
+      } else {
+        setisExistEmail(true);
+      }
+    });
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      toast.success(data.message);
-      setForm({
-        username: "",
-        email: "",
-        password: "",
-      });
-    }
-    if (isError) {
-      setisExistEmail(true);
-    }
-  }, [isSuccess, isError]);
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">

@@ -1,51 +1,56 @@
 "use client";
 import { LockIcon, OctagonAlertIcon, UserIcon } from "lucide-react";
-import { emailCheck, reActivateAccount, signIn } from "../actions";
-import { useServerAction } from "zsa-react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import React, { useEffect } from "react";
+import React, { useState, useTransition } from "react";
 import { SignInGoogleBtn } from "../signin-google-btn";
 import { SignInInput } from "@/schemas/auth";
+import { emailCheck, reActivateAccount, signIn } from "../actions";
 
 export const SignInForm = ({ registered }: { registered?: string }) => {
-  const {
-    isPending,
-    execute: executeSubmit,
-    isError,
-    reset,
-  } = useServerAction(signIn);
-  const {
-    isPending: emailCheckIsPending,
-    isSuccess: emailCheckIsSuccess,
-    isError: emailCheckIsError,
-    execute: emailCheckExecute,
-    reset: emailCheckReset,
-  } = useServerAction(emailCheck);
-  const { execute } = useServerAction(reActivateAccount);
+  const [emailCheckIsError, setEmailCheckIsError] = useState<boolean>(false);
+  const [signInError, setSignInError] = useState<boolean>(false);
+
   const [tab, setTab] = React.useState<"email" | "password">(
     registered ? "password" : "email"
   );
+
   const [dataForm, setDataForm] = React.useState<Required<SignInInput>>({
     email: registered || "",
     password: "",
   });
 
-  const [reActivateEmail, setReActivateEmail] = React.useState<string>("");
-
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDataForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const [isPending, startTransistion] = useTransition();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (tab == "email") {
-      emailCheckExecute({ email: dataForm.email });
-    } else {
-      executeSubmit(dataForm);
-    }
+    if (tab == "email" && dataForm.email == "") return;
+    if (tab == "password" && dataForm.password == "") return;
+    startTransistion(async () => {
+      if (tab == "email") {
+        if (await emailCheck({ email: dataForm.email })) {
+          setEmailCheckIsError(false);
+          setTab("password");
+        } else {
+          setEmailCheckIsError(true);
+          setDataForm({
+            email: "",
+            password: "",
+          });
+        }
+      } else {
+        const { success } = await signIn(dataForm);
+        if (!success) {
+          setSignInError(true);
+        }
+      }
+    });
   };
 
   const handleBack = () => {
@@ -54,22 +59,16 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
       email: "",
       password: "",
     });
-    emailCheckReset();
-    reset();
+    setSignInError(false);
   };
 
-  useEffect(() => {
-    if (emailCheckIsSuccess) {
-      setTab("password");
-    }
-    if (emailCheckIsError) {
-      setReActivateEmail(dataForm.email);
-      setDataForm({
-        email: "",
-        password: "",
-      });
-    }
-  }, [emailCheckIsSuccess, emailCheckIsError]);
+  const handleReActivate = async () => {
+    await reActivateAccount(dataForm.email);
+    setDataForm({
+      email: "",
+      password: "",
+    });
+  };
 
   return (
     <div className="p-4 sm:p-8">
@@ -79,13 +78,7 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
           <p className="text-sm">
             Your account is currently closed. If you would like to re-activate
             your account, click{" "}
-            <button
-              onClick={() => {
-                execute({ email: reActivateEmail });
-                setReActivateEmail("");
-              }}
-              className="underline"
-            >
+            <button onClick={handleReActivate} className="underline">
               here
             </button>
             .
@@ -124,7 +117,7 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
               />
             </div>
             <Button disabled={isPending}>
-              {emailCheckIsPending ? (
+              {tab == "email" && isPending ? (
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
               ) : (
                 <span>Continue</span>
@@ -179,7 +172,7 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
             <div
               className={cn(
                 "flex gap-4 items-center border rounded-lg h-10 px-4",
-                tab == "password" && isError ? "border-red-500" : ""
+                tab == "password" && signInError ? "border-red-500" : ""
               )}
             >
               <LockIcon className="size-4" />
@@ -193,7 +186,7 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
                 className="size-full focus-visible:outline-0 bg-transparent"
               />
             </div>
-            {tab == "password" && isError && (
+            {tab == "password" && signInError && (
               <p className="text-red-500 text-xs -mt-4">
                 Invalid email or password
               </p>

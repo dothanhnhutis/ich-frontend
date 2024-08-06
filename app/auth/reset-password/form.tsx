@@ -5,10 +5,10 @@ import { Label } from "@/components/ui/label";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import { ResetPasswordData, resetPasswordSchema } from "@/schemas/auth";
-import { resetPassword } from "@/service/api/auth.service";
+import { ResetPasswordInput, resetPasswordSchema } from "@/schemas/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import authApi from "@/service/collections/auth.collection";
 
 const ResetPasswordForm = ({ token }: { token: string }) => {
   const router = useRouter();
@@ -16,7 +16,7 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
   const [isHiddenPassword, setIsHiddenPassword] = React.useState<boolean>(true);
   const [focusingField, setOnFocusAt] = useState<string | undefined>();
 
-  const [form, setForm] = useState<ResetPasswordData>({
+  const [form, setForm] = useState<ResetPasswordInput>({
     password: "",
     confirmPassword: "",
   });
@@ -51,16 +51,17 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     startTransistion(async () => {
-      const res = await resetPassword(token, form);
+      const res = await authApi.resetPassword(token, form);
       if (res.success) {
         setForm({ password: "", confirmPassword: "" });
-        toast.success(res.message);
+        toast.success(res.data.message);
         router.push("/auth/signin");
       } else {
-        toast.error(res.message);
+        toast.error(res.data.message);
       }
     });
   };
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-y-4 w-full">
       <div className="flex flex-col gap-y-1.5">

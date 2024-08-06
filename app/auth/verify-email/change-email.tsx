@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -7,37 +7,34 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useServerAction } from "zsa-react";
+import userApi from "@/service/collections/user-collections";
 import { changeEmail } from "../actions";
 
 const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
   const [optenDialog, setOptenDialog] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
+  const [isPending, startTransistion] = useTransition();
 
-  const { isPending, isSuccess, isError, execute } =
-    useServerAction(changeEmail);
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(false);
-    if (currentEmail != email) {
-      await execute({ email });
-    } else {
-      setEmail("");
-      setOptenDialog(false);
-    }
+    startTransistion(async () => {
+      setError(false);
+      if (currentEmail != email) {
+        const { success } = await changeEmail(email);
+        if (success) {
+          setEmail("");
+          toast.success("Updated and resending e-mail...");
+          setOptenDialog(false);
+        } else {
+          setError(true);
+        }
+      } else {
+        setEmail("");
+        setOptenDialog(false);
+      }
+    });
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      setEmail("");
-      toast.success("Updated and resending e-mail...");
-      setOptenDialog(false);
-    }
-    if (isError) {
-      setError(true);
-    }
-  }, [isSuccess, isError]);
 
   return (
     <Dialog open={optenDialog} onOpenChange={setOptenDialog}>

@@ -1,32 +1,31 @@
 import configs from "@/config";
-import { ZSAError } from "zsa";
 
 type FetchHttpOption = RequestInit & {
   baseUrl?: string;
 };
 
 export interface IError {
-  statusCode: number;
-  headers: Headers;
+  success: false;
   data: { message: string };
 }
 
+export interface ISuccess<ResponseData> {
+  success: true;
+  headers: Headers;
+  data: ResponseData;
+}
+
 export class FetchHttpError extends Error {
-  private headers: Headers;
-  private statusCode: number;
   private data: { message: string };
   constructor(props: IError) {
     super(props.data.message);
-    this.headers = props.headers;
-    this.statusCode = props.statusCode;
     this.data = props.data;
   }
 
   serialize(): IError {
     return {
-      headers: this.headers,
       data: this.data,
-      statusCode: this.statusCode,
+      success: false,
     };
   }
 }
@@ -60,19 +59,18 @@ export class FetchHttp {
     });
     if (!res.ok) {
       const { message }: { message: string } = await res.json();
-      // throw new FetchHttpError({
-      //   headers: res.headers,
-      //   statusCode: res.status,
-      //   data: { message },
-      // })
-      throw new ZSAError("ERROR", message);
+      throw new FetchHttpError({
+        success: false,
+        data: { message },
+      });
     }
     const data: ResponseData = await res.json();
-    return {
-      // statusCode: res.status,
+    const result: ISuccess<ResponseData> = {
+      success: true,
       headers: res.headers,
       data,
     };
+    return result;
   }
 
   protected get<ResponseData>(url: string, options?: FetchHttpOption) {

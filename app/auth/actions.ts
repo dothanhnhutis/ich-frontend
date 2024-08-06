@@ -1,36 +1,22 @@
 "use server";
-import { baseProcedure } from "@/lib/zsa-procedure";
+import userApi from "@/service/collections/user-collections";
+import authApi from "@/service/collections/auth.collection";
+import { SignInInput, SignUpInput } from "@/schemas/auth";
 import { cookieParser } from "@/lib/cookies-parser";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createServerAction } from "zsa";
-import { signInSchema, signUpSchema } from "@/schemas/auth";
+import { redirect } from "next/navigation";
 
-export const emailCheck = baseProcedure
-  .createServerAction()
-  .input(signInSchema.pick({ email: true }), { type: "json" })
-  .handler(async ({ input, ctx }) => {
-    cookies().set("registered", "", {
-      expires: 0,
-      path: "/auth/signin",
-    });
-    const { authService } = ctx;
-    const { data } = await authService.signIn(input);
-    return data;
-  });
+export async function emailCheck(input: Pick<SignInInput, "email">) {
+  const { success, data } = await authApi.signIn(input);
+  console.log(data);
+  return success;
+}
 
-export const signIn = baseProcedure
-  .createServerAction()
-  .input(signInSchema, { type: "json" })
-  .handler(async ({ input, ctx }) => {
-    cookies().set("registered", "", {
-      expires: 0,
-      path: "/auth/signin",
-    });
-    const { authService } = ctx;
-    const { data, headers } = await authService.signIn(input);
-    for (const cookie of headers.getSetCookie()) {
+export async function signIn(input: SignInInput | Pick<SignInInput, "email">) {
+  const res = await authApi.signIn(input);
+  if (res.success) {
+    for (const cookie of res.headers.getSetCookie()) {
       const parser = cookieParser(cookie);
       if (parser) {
         console.log(parser);
@@ -40,43 +26,38 @@ export const signIn = baseProcedure
     }
     revalidatePath("/auth/signin");
     redirect("/account/profile");
-  });
+  }
+  return res;
+}
 
-export const reActivateAccount = baseProcedure
-  .createServerAction()
-  .input(signInSchema.pick({ email: true }), { type: "json" })
-  .handler(async ({ input, ctx }) => {
-    const { authService } = ctx;
-    await authService.reActivateAccount(input.email);
-    cookies().set("send-email", "true");
-    redirect("/auth/send-email");
-  });
-
-export const clearSendEmail = createServerAction().handler(async () => {
+export async function clearSendEmail() {
   cookies().delete("send-email");
-});
+}
 
-export const signUp = baseProcedure
-  .createServerAction()
-  .input(signUpSchema, { type: "json" })
-  .handler(async ({ input, ctx }) => {
-    const { authService } = ctx;
-    const { data } = await authService.signUp(input);
-    return data;
-  });
+export async function reActivateAccount(email: string) {
+  await authApi.reActivateAccount(email);
+  cookies().set("send-email", "true");
+  redirect("/auth/send-email");
+}
 
-export const sendEmailVerify = baseProcedure
-  .createServerAction()
-  .handler(async ({ input, ctx }) => {
-    const { userService } = ctx;
-    await userService.sendEmailVerify();
-  });
+export async function signUp(input: SignUpInput) {
+  const { success, data } = await authApi.signUp(input);
+  return { success, message: data.message };
+}
 
-export const changeEmail = baseProcedure
-  .createServerAction()
-  .input(signUpSchema.pick({ email: true }), { type: "json" })
-  .handler(async ({ input, ctx }) => {
-    const { userService } = ctx;
-    await userService.changeEmail(input);
-    revalidatePath("/auth/verify-email");
-  });
+export async function sendEmailVerify() {
+  const allCookies = cookies().getAll();
+  const cookie = allCookies
+    .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+    .join("; ");
+  await userApi.sendEmailVerify(cookie);
+}
+
+export async function changeEmail(email: string) {
+  const allCookies = cookies().getAll();
+  const cookie = allCookies
+    .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+    .join("; ");
+  const { data, success } = await userApi.changeEmail(cookie, { email });
+  return { message: data.message, success };
+}

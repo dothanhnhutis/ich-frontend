@@ -1,12 +1,13 @@
 "use client";
 import React, { useEffect } from "react";
-import { useServerAction } from "zsa-react";
 import { clearSendEmail } from "../actions";
 
 const Send = () => {
-  const { execute } = useServerAction(clearSendEmail);
   useEffect(() => {
-    execute();
+    const handleClearSendEmail = async () => {
+      clearSendEmail();
+    };
+    handleClearSendEmail();
   }, []);
   return <div>SendEmail</div>;
 };
