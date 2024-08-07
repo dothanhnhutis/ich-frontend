@@ -8,7 +8,7 @@ import {
 } from "@/routes";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getCurrentUser } from "./service/api/user.service";
+import { getCurrentUser } from "./app/actions";
 
 function redirect(request: NextRequest, path?: string) {
   const { nextUrl } = request;
@@ -18,15 +18,18 @@ function redirect(request: NextRequest, path?: string) {
   headers.set("x-current-search-params", nextUrl.searchParams.toString());
 
   if (path) {
-    return NextResponse.redirect(new URL(path, nextUrl), {
+    const response = NextResponse.redirect(new URL(path, nextUrl), {
       headers,
     });
+    if (path == "/auth/signin") response.cookies.delete("session");
+    return response;
   } else {
-    return NextResponse.next({
+    const response = NextResponse.next({
       request: {
         headers,
       },
     });
+    return response;
   }
 }
 
@@ -38,9 +41,6 @@ export async function middleware(request: NextRequest) {
   const currentUser = await getCurrentUser();
   const isLoggedIn = !!currentUser;
   const emailVerified = currentUser?.emailVerified || false;
-  const isClosed = currentUser?.isActive || false;
-  const isBlocked = currentUser?.isBlocked || false;
-
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
 
   const isPrivateRoute = privateRegExpRoutes.some((routes) =>

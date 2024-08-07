@@ -17,6 +17,7 @@ const PrivateLayout = async ({ children }: { children: React.ReactNode }) => {
       >
         <div className="bg-muted/40 relative">
           <UserHeader currentUser={currentUser} />
+
           {children}
         </div>
       </ThemeProvider>
