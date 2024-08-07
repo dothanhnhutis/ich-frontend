@@ -3,15 +3,20 @@ import Link from "next/link";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { SearchUserRes } from "@/service/api/user.service";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import CardEmpty from "@/assets/svgs/card-empty";
+import { SearchUserRes } from "@/schemas/user";
 
 export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
-  if (!data || data.length == 0) return <CardEmpty />;
+  if (!data || data.length == 0)
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <CardEmpty />
+      </div>
+    );
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 mt-4">
       {data.map((user) => (
         <div
           key={user.email}
@@ -41,6 +46,7 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
                 <p className="text-base font-semibold">{user.username}</p>
                 <p>{user.email}</p>
                 <div className="flex gap-2 items-center">
+                  {user.hasPassword && <Badge>cerdential</Badge>}
                   {user.linkProvider.map((l) => (
                     <Badge key={l.provider}>{l.provider}</Badge>
                   ))}
@@ -50,8 +56,8 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
             </div>
 
             <div className="flex flex-col gap-2 w-32">
-              <Button size="sm" className="text-xs p-1 h-auto">
-                Edit
+              <Button asChild size="sm" className="text-xs p-1 h-auto">
+                <Link href={`/manager/users/${user.id}/edit`}>Edit</Link>
               </Button>
               <Button
                 size="sm"

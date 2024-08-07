@@ -1,7 +1,6 @@
 "use client";
 import React, { useTransition } from "react";
-import { notFound, useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,20 +12,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { EditUserType, Role, User } from "@/schemas/user";
-import { isEqual } from "lodash";
-// import { editUserById } from "@/service/api/user";
+import { EditUserInput, User } from "@/schemas/user";
+import { editUserById } from "../../actions";
+import { toast } from "sonner";
 
-export const EditUserForm = ({
-  user,
-}: {
-  user: User & { role: Omit<User["role"], "ADMIN"> };
-}) => {
+export const EditUserForm = ({ user }: { user: User }) => {
   const router = useRouter();
-  const [form, setForm] = React.useState<EditUserType>({
-    // role: user.role,
+  const [form, setForm] = React.useState<EditUserInput>({
+    role: user.role,
+    address: user.address || "",
+    suspended: user.suspended,
+    phone: user.phone || "",
+    username: user.username,
   });
 
   const handleOnchange = (
@@ -39,13 +37,13 @@ export const EditUserForm = ({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     startTransistion(async () => {
-      // const res = await editUserById(id, form);
-      // if (res.statusCode == 200) {
-      //   toast.success(res.message);
-      //   router.push("/manager/users");
-      // } else {
-      //   toast.error(res.message);
-      // }
+      const res = await editUserById(user.id, form);
+      if (res.success) {
+        toast.success(res.message);
+        router.push("/manager/users");
+      } else {
+        toast.error(res.message);
+      }
     });
   };
   return (
@@ -54,30 +52,12 @@ export const EditUserForm = ({
       className="grid grid-cols-2 gap-4 overflow-y-scroll bg-background p-4 rounded-md"
     >
       <div className="col-span-2 lg:col-span-1">
-        <Label className="leading-snug text-muted-foreground">Email</Label>
-        <Input
-          type="text"
-          name="username"
-          className="focus-visible:ring-transparent"
-        />
-      </div>
-      <div className="col-span-2 lg:col-span-1">
         <Label className="leading-snug text-muted-foreground">Name</Label>
         <Input
-          type="text"
-          name="name"
-          className="focus-visible:ring-transparent"
-        />
-      </div>
-
-      <div className="col-span-2 lg:col-span-1">
-        <Label className="leading-snug text-muted-foreground">Phone</Label>
-        <Input
-          disabled={isPending}
-          value={form.phone ?? ""}
+          value={form.username}
           onChange={handleOnchange}
-          name="phone"
           type="text"
+          name="username"
           className="focus-visible:ring-transparent"
         />
       </div>
@@ -87,7 +67,7 @@ export const EditUserForm = ({
         <Select
           disabled={isPending}
           onValueChange={(v) =>
-            setForm((prev) => ({ ...prev, role: v as EditUserType["role"] }))
+            setForm((prev) => ({ ...prev, role: v as EditUserInput["role"] }))
           }
           defaultValue={form.role}
         >
@@ -101,24 +81,18 @@ export const EditUserForm = ({
           </SelectContent>
         </Select>
       </div>
-      <div className="col-span-2  flex items-center justify-between">
-        <div>
-          <Label htmlFor="status">Status</Label>
-          <p className="text-xs font-light text-muted-foreground">
-            Do you want this account to be activated?
-          </p>
-        </div>
-
-        <Switch
+      <div className="col-span-2 lg:col-span-1">
+        <Label className="leading-snug text-muted-foreground">Phone</Label>
+        <Input
           disabled={isPending}
-          id="status"
-          checked={form.inActive}
-          onCheckedChange={(checked) =>
-            setForm((prev) => ({ ...prev, isActive: checked }))
-          }
+          value={form.phone ?? ""}
+          onChange={handleOnchange}
+          name="phone"
+          type="text"
+          className="focus-visible:ring-transparent"
         />
       </div>
-      <div className="col-span-2 ">
+      <div className="col-span-2 lg:col-span-1">
         <Label className="leading-snug text-muted-foreground">Address</Label>
         <Input
           disabled={isPending}
@@ -129,18 +103,30 @@ export const EditUserForm = ({
           className="focus-visible:ring-transparent"
         />
       </div>
-      <div className="col-span-2">
-        <Label className="leading-snug text-muted-foreground">Bio</Label>
-        <Textarea
+      <div className="col-span-2  flex items-center justify-between">
+        <div>
+          <Label
+            htmlFor="status"
+            className="leading-snug text-muted-foreground"
+          >
+            Suspended
+          </Label>
+          <p className="text-xs font-light text-muted-foreground">
+            Do you want this account to be Suspended?
+          </p>
+        </div>
+
+        <Switch
           disabled={isPending}
-          onChange={handleOnchange}
-          name="bio"
-          maxLength={255}
-          className="focus-visible:ring-transparent"
-          placeholder="Tell us a little bit about yourself"
-          value={form.bio ?? ""}
+          id="status"
+          name="suspended"
+          checked={form.suspended}
+          onCheckedChange={(checked) =>
+            setForm((prev) => ({ ...prev, suspended: checked }))
+          }
         />
       </div>
+
       <div className="col-span-2">
         <div className="flex flex-col sm:flex-row gap-2 justify-end">
           <Button

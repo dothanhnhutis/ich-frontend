@@ -1,9 +1,7 @@
-"use client";
 import React from "react";
 import { Label } from "@/components/ui/label";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -13,11 +11,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useAuthContext } from "@/components/providers/auth-provider";
-import { disactivateAccount } from "../actions";
+import { getCurrentUser } from "@/app/actions";
+import DisableAccountBtn from "./disable-btn";
 
 const SettingPage = async () => {
-  const { currentUser } = useAuthContext();
+  const currentUser = await getCurrentUser();
 
   return (
     <div className="space-y-2">
@@ -42,13 +40,7 @@ const SettingPage = async () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={async () => {
-                await disactivateAccount();
-              }}
-            >
-              Delete
-            </AlertDialogAction>
+            <DisableAccountBtn />
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

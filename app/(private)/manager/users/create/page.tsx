@@ -20,13 +20,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
-import { CreateUserType, roles } from "@/schemas/user";
-import { createUser } from "@/service/api/user.service";
+import { CreateUserInput, roles } from "@/schemas/user";
+import { createUser } from "../actions";
 
 const CreateUserPage = () => {
   const router = useRouter();
   const [isHiddenPassword, setIsHiddenPassword] = React.useState<boolean>(true);
-  const [form, setForm] = React.useState<CreateUserType>({
+  const [form, setForm] = React.useState<CreateUserInput>({
     email: "",
     password: "",
     inActive: true,
@@ -89,6 +89,7 @@ const CreateUserPage = () => {
                 id="password"
                 placeholder="Password"
                 name="password"
+                autoComplete="off"
               />
               <button
                 className="flex flex-shrink-0 items-center px-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -155,7 +156,7 @@ const CreateUserPage = () => {
               onValueChange={(v) =>
                 setForm((prev) => ({
                   ...prev,
-                  role: v as CreateUserType["role"],
+                  role: v as CreateUserInput["role"],
                 }))
               }
               defaultValue={form.role}
@@ -164,8 +165,10 @@ const CreateUserPage = () => {
                 <SelectValue placeholder="Select a role to display" />
               </SelectTrigger>
               <SelectContent>
-                {roles.map((role) => (
-                  <SelectItem value={role}>{role}</SelectItem>
+                {roles.map((role, idx) => (
+                  <SelectItem key={idx} value={role}>
+                    {role}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

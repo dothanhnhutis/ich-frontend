@@ -6,7 +6,7 @@ import { UserCardView } from "./user-card";
 import { useQuery } from "@tanstack/react-query";
 import { useUserData } from "@/components/providers/user-provider";
 import UserTableView from "./user-table";
-import { searchUser } from "@/service/api/user.service";
+import { searchUser } from "./actions";
 
 const UserData = ({
   searchParams,
@@ -22,8 +22,8 @@ const UserData = ({
       return await searchUser({
         email: filter?.emails,
         role: filter?.roles,
-        inActive: searchParams?.tab == "inactive" ? true : undefined,
-        suspended: searchParams?.tab == "suspended" ? true : undefined,
+        inActive: searchParams?.tab == "inactive" ? true : false,
+        suspended: searchParams?.tab == "suspended" ? true : false,
         page: filter?.page,
         limit: filter?.limit,
       });

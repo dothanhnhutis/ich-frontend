@@ -1,5 +1,11 @@
 import { z } from "zod";
-export const roles = ["MANAGER", "SALER", "WRITER", "CUSTOMER"] as const;
+export const roles = [
+  "ADMIN",
+  "MANAGER",
+  "SALER",
+  "WRITER",
+  "CUSTOMER",
+] as const;
 export const editPasswordSchema = z
   .object({
     oldPassword: z.string(),
@@ -56,7 +62,7 @@ export const editPictureSchema = z.object({
 });
 
 export const editUserSchema = createUserSchema
-  .omit({ email: true, password: true })
+  .omit({ email: true, password: true, inActive: true })
   .extend({
     bio: z
       .string({
@@ -68,26 +74,24 @@ export const editUserSchema = createUserSchema
       required_error: "phone field is required",
       invalid_type_error: "phone field must be string",
     }),
-    picture: z
-      .string({
-        required_error: "picture field is required",
-        invalid_type_error: "picture field must be string",
-      })
-      .nullable(),
     address: z.string({
       required_error: "address field is required",
       invalid_type_error: "address field must be string",
+    }),
+    suspended: z.boolean({
+      required_error: "suspended field is required",
+      invalid_type_error: "suspended field must be boolean",
     }),
   })
   .partial();
 
 export type EditPassword = z.infer<typeof editPasswordSchema>;
-export type CreateUserType = z.infer<typeof createUserSchema>;
-export type EditUserType = z.infer<typeof editUserSchema>;
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type EditUserInput = z.infer<typeof editUserSchema>;
 export type EditProfileInput = z.infer<typeof editProfileSchema>;
 export type EditPictureInput = z.infer<typeof editPictureSchema>;
 
-export type Role = "ADMIN" | CreateUserType["role"];
+export type Role = CreateUserInput["role"];
 
 export type User = {
   id: string;
@@ -109,4 +113,30 @@ export type User = {
   address?: string | null;
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type SearchUserInput = {
+  email?: string[] | undefined;
+  role?: Role[] | undefined;
+  emailVerified?: boolean | undefined;
+  inActive?: boolean | undefined;
+  suspended?: boolean | undefined;
+  orderBy?:
+    | (
+        | "email.asc"
+        | "email.desc"
+        | "role.asc"
+        | "role.desc"
+        | "emailVerified.asc"
+        | "emailVerified.desc"
+      )[]
+    | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
+};
+
+export type SearchUserRes = User & {
+  linkProvider: {
+    provider: "google" | "credential";
+  }[];
 };

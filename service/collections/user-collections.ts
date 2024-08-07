@@ -1,11 +1,15 @@
 import { FetchHttp, FetchHttpError, IError, ISuccess } from "./http";
 import { ResetPasswordInput, SignInInput } from "@/schemas/auth";
 import {
+  CreateUserInput,
   EditPassword,
   EditPictureInput,
   EditProfileInput,
+  EditUserInput,
+  SearchUserRes,
   User,
 } from "@/schemas/user";
+import { SearchUserInput } from "../api/user.service";
 
 class UserService extends FetchHttp {
   constructor() {
@@ -181,6 +185,7 @@ class UserService extends FetchHttp {
       }
     }
   }
+
   async editPassword(cookie: string, input: EditPassword) {
     try {
       return await this.post<{ message: string }>("/change-password", input, {
@@ -216,6 +221,107 @@ class UserService extends FetchHttp {
         return error.serialize();
       } else {
         console.log("UserService createPassword() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+
+  async searchUser(cookie: string, props?: SearchUserInput) {
+    let searchParams = "";
+    if (props) {
+      searchParams =
+        "?" +
+        Object.entries(props)
+          .map(([key, value]) => {
+            if (Array.isArray(value)) {
+              return `${key}=${value.join(",")}`;
+            } else {
+              return `${key}=${value}`;
+            }
+          })
+          .join("&");
+    }
+    try {
+      const res = await this.get<{
+        users: SearchUserRes[];
+        metadata: {
+          hasNextPage: boolean;
+          totalPage: number;
+          totalItem: number;
+        };
+      }>(`/_search${searchParams}`, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+      return res;
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService searchUser() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+
+  async createUser(cookie: string, input: CreateUserInput) {
+    try {
+      return await this.post<{ message: string }>("", input, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService createUser() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+
+  async getUserById(cookie: string, id: string) {
+    try {
+      return await this.get<User>("/" + id, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService getUserById() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+  async editUserById(cookie: string, id: string, input: EditUserInput) {
+    try {
+      return await this.patch<{ message: string }>(`/${id}`, input, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService editUserById() method error: ", error);
         return {
           success: false,
           data: { message: error.message },

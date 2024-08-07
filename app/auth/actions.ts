@@ -6,9 +6,10 @@ import { cookieParser } from "@/lib/cookies-parser";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookieServer } from "../actions";
 
 export async function emailCheck(input: Pick<SignInInput, "email">) {
-  const { success, data } = await authApi.signIn(input);
+  const { success } = await authApi.signIn(input);
   return success;
 }
 
@@ -50,19 +51,13 @@ export async function signUp(input: SignUpInput) {
 }
 
 export async function sendEmailVerify() {
-  const allCookies = cookies().getAll();
-  const cookie = allCookies
-    .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
-    .join("; ");
-  await userApi.sendEmailVerify(cookie);
+  await userApi.sendEmailVerify(await cookieServer());
 }
 
 export async function changeEmail(email: string) {
-  const allCookies = cookies().getAll();
-  const cookie = allCookies
-    .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
-    .join("; ");
-  const { data, success } = await userApi.changeEmail(cookie, { email });
+  const { data, success } = await userApi.changeEmail(await cookieServer(), {
+    email,
+  });
   return { message: data.message, success };
 }
 

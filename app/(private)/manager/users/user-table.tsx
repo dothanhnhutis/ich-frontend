@@ -18,9 +18,10 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { SearchUserRes } from "@/service/api/user.service";
 import { toast } from "sonner";
 import Link from "next/link";
+import { SearchUserRes } from "@/schemas/user";
+
 const UserTableView = ({ data = [] }: { data?: SearchUserRes[] }) => {
   const copyToClipboard = (id: string) => {
     navigator.clipboard.writeText(id);

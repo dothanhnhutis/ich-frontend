@@ -1,10 +1,10 @@
 "use server";
 import {
-  CreateUserType,
+  CreateUserInput,
   User,
   EditPassword,
   Role,
-  EditUserType,
+  EditUserInput,
 } from "@/schemas/user";
 import { FetchHttpError, http } from "../http";
 import { cookies } from "next/headers";
@@ -271,7 +271,7 @@ export async function searchUser(props?: SearchUserInput) {
   }
 }
 
-export const createUser = async (data: CreateUserType) => {
+export const createUser = async (data: CreateUserInput) => {
   try {
     const allCookies = cookies().getAll();
     const res = await http.post<{ message: string }>("/users", data, {
@@ -319,7 +319,7 @@ export async function getUserById(id: string) {
   }
 }
 
-export async function editUserById(data: EditUserType) {
+export async function editUserById(data: EditUserInput) {
   const allCookies = cookies().getAll();
   try {
     const res = await http.post<{ message: string }>("/users/", data, {

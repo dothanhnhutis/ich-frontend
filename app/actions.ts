@@ -3,12 +3,15 @@ import { cookies } from "next/headers";
 import userApi from "@/service/collections/user-collections";
 import authApi from "@/service/collections/auth.collection";
 
-export async function getCurrentUser() {
-  const allCookies = cookies().getAll();
-  const cookie = allCookies
+export async function cookieServer() {
+  return cookies()
+    .getAll()
     .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
     .join("; ");
-  const { success, data } = await userApi.currentUser(cookie);
+}
+
+export async function getCurrentUser() {
+  const { success, data } = await userApi.currentUser(await cookieServer());
   return success ? data : undefined;
 }
 

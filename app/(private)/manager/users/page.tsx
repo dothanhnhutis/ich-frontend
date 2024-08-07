@@ -16,8 +16,6 @@ const UserManagerPage = async ({
 }: {
   searchParams?: { [index: string]: string | string[] | undefined };
 }) => {
-  const currentUser = await getCurrentUser();
-
   if (Object.entries(searchParams || {}).length == 0) {
     redirect("/manager/users?tab=active");
   }
