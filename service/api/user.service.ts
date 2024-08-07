@@ -190,7 +190,7 @@ export type SearchUserRes = {
   email: string;
   emailVerified: boolean;
   role: Role;
-  inActive: boolean;
+  disabled: boolean;
   username: string;
   suspended: boolean;
   phone: string | null;
@@ -207,7 +207,7 @@ export type SearchUserInput = {
   email?: string[] | undefined;
   role?: Role[] | undefined;
   emailVerified?: boolean | undefined;
-  inActive?: boolean | undefined;
+  disabled?: boolean | undefined;
   suspended?: boolean | undefined;
   orderBy?:
     | (

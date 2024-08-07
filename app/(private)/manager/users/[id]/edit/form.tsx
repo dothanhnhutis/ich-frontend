@@ -23,6 +23,7 @@ export const EditUserForm = ({ user }: { user: User }) => {
     role: user.role,
     address: user.address || "",
     suspended: user.suspended,
+    disabled: user.disabled,
     phone: user.phone || "",
     username: user.username,
   });
@@ -103,28 +104,44 @@ export const EditUserForm = ({ user }: { user: User }) => {
           className="focus-visible:ring-transparent"
         />
       </div>
-      <div className="col-span-2  flex items-center justify-between">
-        <div>
-          <Label
-            htmlFor="status"
-            className="leading-snug text-muted-foreground"
-          >
-            Suspended
-          </Label>
+      <div className="col-span-2 lg:col-span-1">
+        <Label htmlFor="status" className="leading-snug text-muted-foreground">
+          Activate
+        </Label>
+        <div className="flex items-center justify-between">
           <p className="text-xs font-light text-muted-foreground">
-            Do you want this account to be Suspended?
+            Do you want this account to be activate?
           </p>
+          <Switch
+            disabled={isPending}
+            id="status"
+            name="disabled"
+            checked={!form.disabled}
+            onCheckedChange={(checked) =>
+              setForm((prev) => ({ ...prev, disabled: !checked }))
+            }
+          />
         </div>
+      </div>
 
-        <Switch
-          disabled={isPending}
-          id="status"
-          name="suspended"
-          checked={form.suspended}
-          onCheckedChange={(checked) =>
-            setForm((prev) => ({ ...prev, suspended: checked }))
-          }
-        />
+      <div className="col-span-2 lg:col-span-1">
+        <Label htmlFor="status" className="leading-snug text-muted-foreground">
+          Suspended
+        </Label>
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-light text-muted-foreground">
+            Do you want this account to be suspended?
+          </p>
+          <Switch
+            disabled={isPending}
+            id="status"
+            name="suspended"
+            checked={form.suspended}
+            onCheckedChange={(checked) =>
+              setForm((prev) => ({ ...prev, suspended: checked }))
+            }
+          />
+        </div>
       </div>
 
       <div className="col-span-2">

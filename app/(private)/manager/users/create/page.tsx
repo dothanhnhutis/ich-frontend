@@ -29,7 +29,7 @@ const CreateUserPage = () => {
   const [form, setForm] = React.useState<CreateUserInput>({
     email: "",
     password: "",
-    inActive: true,
+    disabled: true,
     role: "CUSTOMER",
     username: "",
   });
@@ -184,9 +184,9 @@ const CreateUserPage = () => {
             <Switch
               disabled={isPending}
               id="status"
-              checked={form.inActive}
+              checked={form.disabled}
               onCheckedChange={(checked) =>
-                setForm((prev) => ({ ...prev, inActive: checked }))
+                setForm((prev) => ({ ...prev, disabled: checked }))
               }
             />
           </div>

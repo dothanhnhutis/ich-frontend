@@ -22,7 +22,7 @@ const UserData = ({
       return await searchUser({
         email: filter?.emails,
         role: filter?.roles,
-        inActive: searchParams?.tab == "inactive" ? true : false,
+        disabled: searchParams?.tab == "disabled" ? true : false,
         suspended: searchParams?.tab == "suspended" ? true : false,
         page: filter?.page,
         limit: filter?.limit,
@@ -34,7 +34,7 @@ const UserData = ({
     <>
       <UserToolBar
         tab={
-          searchParams?.tab == "inactive" || searchParams?.tab == "suspended"
+          searchParams?.tab == "disabled" || searchParams?.tab == "suspended"
             ? searchParams?.tab
             : "active"
         }

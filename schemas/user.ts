@@ -32,9 +32,9 @@ export const createUserSchema = z.object({
       invalid_type_error: "email field must be string",
     })
     .email("Invalid email"),
-  inActive: z.boolean({
-    required_error: "inActive field is required",
-    invalid_type_error: "inActive field must be boolean",
+  disabled: z.boolean({
+    required_error: "disabled field is required",
+    invalid_type_error: "disabled field must be boolean",
   }),
   role: z.enum(roles),
   username: z.string({
@@ -62,7 +62,7 @@ export const editPictureSchema = z.object({
 });
 
 export const editUserSchema = createUserSchema
-  .omit({ email: true, password: true, inActive: true })
+  .omit({ email: true, password: true, disabled: true })
   .extend({
     bio: z
       .string({
@@ -81,6 +81,10 @@ export const editUserSchema = createUserSchema
     suspended: z.boolean({
       required_error: "suspended field is required",
       invalid_type_error: "suspended field must be boolean",
+    }),
+    disabled: z.boolean({
+      required_error: "disabled field is required",
+      invalid_type_error: "disabled field must be boolean",
     }),
   })
   .partial();
@@ -106,7 +110,7 @@ export type User = {
   passwordResetExpires?: Date | null;
   role: Role;
   suspended: boolean;
-  inActive: boolean;
+  disabled: boolean;
   reActiveToken?: string | null;
   reActiveExpires?: Date | null;
   phone?: string | null;
@@ -119,7 +123,7 @@ export type SearchUserInput = {
   email?: string[] | undefined;
   role?: Role[] | undefined;
   emailVerified?: boolean | undefined;
-  inActive?: boolean | undefined;
+  disabled?: boolean | undefined;
   suspended?: boolean | undefined;
   orderBy?:
     | (
@@ -136,7 +140,7 @@ export type SearchUserInput = {
 };
 
 export type SearchUserRes = User & {
-  linkProvider: {
+  linkProviders: {
     provider: "google" | "credential";
   }[];
 };

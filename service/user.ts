@@ -32,7 +32,7 @@ export class User {
     passwordResetExpires,
     role,
     suspended,
-    inActive,
+    disabled,
     reActiveToken,
     reActiveExpires,
     phone,
@@ -50,7 +50,7 @@ export class User {
     passwordResetExpires?: Date | null;
     role: Role;
     suspended: boolean;
-    inActive: boolean;
+    disabled: boolean;
     reActiveToken?: string | null;
     reActiveExpires?: Date | null;
     phone?: string | null;
@@ -68,7 +68,7 @@ export class User {
     this._passwordResetExpires = passwordResetExpires;
     this._role = role;
     this._suspended = suspended;
-    this._inActive = inActive;
+    this._inActive = disabled;
     this._reActiveToken = reActiveToken;
     this._reActiveExpires = reActiveExpires;
     this._phone = phone;

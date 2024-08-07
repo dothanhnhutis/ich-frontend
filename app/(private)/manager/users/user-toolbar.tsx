@@ -11,7 +11,7 @@ import { UserSortBy } from "./user-sort-by";
 export const UserToolBar = ({
   tab = "active",
 }: {
-  tab?: "active" | "inactive" | "suspended";
+  tab?: "active" | "disabled" | "suspended";
 }) => {
   const { viewMode, filter } = useUserData();
 
@@ -33,15 +33,6 @@ export const UserToolBar = ({
           Active
         </Link>
         <Link
-          href="/manager/users?tab=inactive"
-          className={cn(
-            "font-semibold p-2",
-            tab == "inactive" ? "border-b-2 border-primary" : ""
-          )}
-        >
-          InActive
-        </Link>
-        <Link
           href="/manager/users?tab=suspended"
           className={cn(
             "font-semibold p-2",
@@ -49,6 +40,15 @@ export const UserToolBar = ({
           )}
         >
           Suspended
+        </Link>
+        <Link
+          href="/manager/users?tab=disabled"
+          className={cn(
+            "font-semibold p-2",
+            tab == "disabled" ? "border-b-2 border-primary" : ""
+          )}
+        >
+          Disabled
         </Link>
       </div>
       <div className="flex gap-4">
