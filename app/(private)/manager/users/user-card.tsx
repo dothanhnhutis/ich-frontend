@@ -7,6 +7,8 @@ import { format } from "date-fns";
 import CardEmpty from "@/assets/svgs/card-empty";
 import { SearchUserRes } from "@/schemas/user";
 import ActionBtn from "./action-btn";
+import { editUserById } from "./actions";
+import { toast } from "sonner";
 
 export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
   if (!data || data.length == 0)
@@ -16,7 +18,27 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
       </div>
     );
 
-  const handle = () => {};
+  const handleAction = async (
+    id: string,
+    type: "suspend" | "reactivate" | "disable" | "enable"
+  ) => {
+    const { success, message } = await editUserById(
+      id,
+      type == "suspend"
+        ? {
+            suspended: true,
+          }
+        : type == "reactivate"
+        ? { suspended: false }
+        : { disabled: type == "disable" }
+    );
+    if (success) {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 mt-4">
       {data.map((user) => (
@@ -69,15 +91,31 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
               {(user.suspended || !user.disabled) && (
                 <ActionBtn
                   as="modal"
-                  modalSubtitle="as"
-                  modalTitle="adasd"
+                  modalTitle={
+                    user.suspended
+                      ? "Are you reactivate sure?"
+                      : !user.disabled
+                      ? "Are you suspend sure?"
+                      : ""
+                  }
+                  modalSubtitle={
+                    user.suspended
+                      ? "This action will reactivate the account"
+                      : !user.disabled
+                      ? "The account has been temporarily deactivated and can be activated at any time by the user."
+                      : ""
+                  }
+                  onSubmit={async () => {
+                    if (user.suspended || !user.disabled) {
+                      await handleAction(
+                        user.id,
+                        user.suspended ? "reactivate" : "suspend"
+                      );
+                    }
+                  }}
                   destructive={!user.suspended}
                   labelAction={
-                    user.suspended
-                      ? "Active"
-                      : !user.disabled
-                      ? "Suspended"
-                      : ""
+                    user.suspended ? "Active" : !user.disabled ? "Suspend" : ""
                   }
                   className={
                     user.suspended
@@ -91,8 +129,20 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
               {(user.disabled || !user.suspended) && (
                 <ActionBtn
                   as="modal"
-                  modalSubtitle="as"
-                  modalTitle="adasd"
+                  modalSubtitle={
+                    user.disabled
+                      ? "This action will enable the account"
+                      : !user.suspended
+                      ? "The account is permanently disabled and requires admin intervention for reactivation."
+                      : ""
+                  }
+                  modalTitle={
+                    user.disabled
+                      ? "Are you sure to enable this account?"
+                      : !user.suspended
+                      ? "Are you sure to disable this account?"
+                      : ""
+                  }
                   destructive={!user.disabled}
                   labelAction={
                     user.disabled
@@ -101,6 +151,14 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
                       ? "Disactivate"
                       : ""
                   }
+                  onSubmit={async () => {
+                    if (user.disabled || !user.suspended) {
+                      await handleAction(
+                        user.id,
+                        user.disabled ? "enable" : "disable"
+                      );
+                    }
+                  }}
                   className={
                     user.disabled
                       ? "bg-green-400 hover:bg-green-400/90"

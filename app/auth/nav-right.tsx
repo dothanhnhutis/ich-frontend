@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import UserMenu from "./user-menu";
 import { useAuthContext } from "@/components/providers/auth-provider";
+import { SwitchTheme } from "@/components/switch-theme";
 const goToSignInRoute: RegExp = /^\/auth\/(signup|recover|reset-password)$/;
 
 const NavRight = () => {
@@ -37,7 +38,7 @@ const NavRight = () => {
           </div>
         </div>
       ) : (
-        <></>
+        <SwitchTheme />
       )}
     </div>
   );

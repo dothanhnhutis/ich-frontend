@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
 type ActionBtn =
   | {
@@ -33,6 +33,7 @@ type ActionBtn =
     };
 
 const ActionBtn = (data: ActionBtn) => {
+  const [open, setOpen] = useState<boolean>(false);
   if (data.as == "link") {
     return (
       <Button
@@ -45,7 +46,7 @@ const ActionBtn = (data: ActionBtn) => {
     );
   } else {
     return (
-      <AlertDialog>
+      <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger asChild>
           <Button
             size="sm"
@@ -67,7 +68,10 @@ const ActionBtn = (data: ActionBtn) => {
 
             <Button
               variant={data.destructive ? "destructive" : "default"}
-              onClick={data.onSubmit}
+              onClick={() => {
+                if (data.onSubmit) data.onSubmit();
+                setOpen(false);
+              }}
             >
               {data.labelAction}
             </Button>

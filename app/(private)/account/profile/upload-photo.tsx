@@ -19,18 +19,17 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { editPicture } from "../actions";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
-export const UploadPhoto = ({
-  url,
-  children,
-}: {
-  url: string | undefined;
-  children: React.ReactNode;
-}) => {
+export const UploadPhoto = ({ children }: { children: React.ReactNode }) => {
+  const { currentUser } = useAuthContext();
+
   const [open, setOpen] = useState<boolean>(false);
   const cropperRef = useRef<ReactCropperElement>(null);
   const [zoomSlider, setZoomSlider] = useState<number>(0.2);
-  const [dataUrl, setDataUrl] = useState<string | undefined>(url);
+  const [dataUrl, setDataUrl] = useState<string | undefined>(
+    currentUser?.picture || undefined
+  );
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,7 +64,7 @@ export const UploadPhoto = ({
 
   useEffect(() => {
     setZoomSlider(0.2);
-    setDataUrl(url);
+    setDataUrl(currentUser?.picture || undefined);
   }, [open]);
 
   const [isPending, startTransistion] = useTransition();

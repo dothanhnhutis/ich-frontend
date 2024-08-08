@@ -1,5 +1,4 @@
 import React from "react";
-import Navigation from "./sider-bar";
 import UserSiderBar from "./sider-bar";
 
 const UserLayout = ({ children }: { children: React.ReactNode }) => {

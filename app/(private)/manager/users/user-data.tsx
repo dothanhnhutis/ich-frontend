@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { UserPagination } from "./user-pagination";
 import { UserToolBar } from "./user-toolbar";
 import { UserCardView } from "./user-card";
@@ -16,7 +16,8 @@ const UserData = ({
   };
 }) => {
   const { filter, viewMode } = useUserData();
-  const { isPending, data, isError } = useQuery({
+
+  const { isPending, data } = useQuery({
     queryKey: ["user", searchParams?.tab, JSON.stringify(filter)],
     queryFn: async () => {
       return await searchUser({
@@ -39,6 +40,7 @@ const UserData = ({
             : "active"
         }
       />
+      {isPending && <div>loading....</div>}
       {viewMode == "card" ? (
         <UserCardView data={data?.users} />
       ) : (

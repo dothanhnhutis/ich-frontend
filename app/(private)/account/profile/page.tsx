@@ -1,16 +1,18 @@
+"use client";
 import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 
 import { UploadPhoto } from "./upload-photo";
-import { getCurrentUser } from "@/service/api/user.service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
 import EditProfileForm from "./edit-profile-form";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
 const ProfilePage = async () => {
-  const currentUser = await getCurrentUser();
+  const { currentUser } = useAuthContext();
+
   return (
     <>
       <h3 className="text-lg font-medium">Profile</h3>
@@ -20,7 +22,7 @@ const ProfilePage = async () => {
       <Separator className="my-4" />
       <div className="lg:flex lg:justify-center lg:items-start space-y-4 lg:space-y-0">
         <div className="order-last lg:w-1/4 lg:flex lg:justify-center">
-          <UploadPhoto url={currentUser?.picture || undefined}>
+          <UploadPhoto>
             <Avatar className="size-40 cursor-pointer">
               <AvatarImage src={currentUser?.picture || AvatarDefault.src} />
               <AvatarFallback className="bg-transparent">
@@ -50,7 +52,7 @@ const ProfilePage = async () => {
               <p>{currentUser.address}</p>
             </div>
           )}
-          <EditProfileForm currentUser={currentUser} />
+          <EditProfileForm />
         </div>
       </div>
     </>

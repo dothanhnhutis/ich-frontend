@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { getCurrentUser } from "./actions";
+import { TankStackProvider } from "@/components/providers/TankStackProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,8 +29,17 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <AuthProvider initUser={currentUser}>{children}</AuthProvider>
-        <Toaster visibleToasts={5} richColors />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TankStackProvider>
+            <AuthProvider initUser={currentUser}>{children}</AuthProvider>
+            <Toaster visibleToasts={5} richColors />
+          </TankStackProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

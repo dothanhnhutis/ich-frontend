@@ -36,6 +36,7 @@ export async function getUserById(id: string) {
   const { success, data } = await userApi.getUserById(await cookieServer(), id);
   return success ? data : undefined;
 }
+
 export async function editUserById(id: string, input: EditUserInput) {
   const { success, data } = await userApi.editUserById(
     await cookieServer(),

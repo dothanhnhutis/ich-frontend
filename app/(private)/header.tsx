@@ -6,9 +6,11 @@ import { SwitchTheme } from "@/components/switch-theme";
 import { Button } from "@/components/ui/button";
 import { BellIcon, MenuIcon } from "lucide-react";
 import { UserMenu } from "./user-menu";
-import { User } from "@/schemas/user";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
-const UserHeader = ({ currentUser }: { currentUser?: User }) => {
+const UserHeader = () => {
+  const { currentUser } = useAuthContext();
+
   return (
     <header className="sticky top-0 left-0 right-0 z-50 border-b bg-background">
       <nav className="flex justify-between items-center p-3 h-[72px]">
