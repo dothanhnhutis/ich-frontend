@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RotateCcwIcon, ZoomInIcon } from "lucide-react";
 import { cn, getImageInfo } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { editPicture } from "../actions";
 import { useAuthContext } from "@/components/providers/auth-provider";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const UploadPhoto = ({ children }: { children: React.ReactNode }) => {
   const { currentUser } = useAuthContext();
@@ -69,26 +69,26 @@ export const UploadPhoto = ({ children }: { children: React.ReactNode }) => {
     setDataUrl(currentUser?.picture || undefined);
   }, [open]);
 
-  const [isPending, startTransistion] = useTransition();
-
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (input: string) =>
+      await editPicture({
+        type: "base64",
+        data: input,
+      }),
+    onSuccess: ({ success }) => {
+      if (success) {
+        queryClient.invalidateQueries({ queryKey: ["me"] });
+        toast.success("Update avatar success");
+        setOpen(false);
+      } else {
+        toast.error("Update avatar fail");
+      }
+    },
+  });
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const cropper = cropperRef.current?.cropper;
-    startTransistion(async () => {
-      if (cropper) {
-        const res = await editPicture({
-          type: "base64",
-          data: cropper.getCroppedCanvas().toDataURL(),
-        });
-        if (res.success) {
-          queryClient.invalidateQueries({ queryKey: ["me"] });
-          toast.success("Update avatar success");
-          setOpen(false);
-        } else {
-          toast.error("Update avatar fail");
-        }
-      }
-    });
+    if (cropper) mutate(cropper.getCroppedCanvas().toDataURL());
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import { PencilIcon } from "lucide-react";
 import {
   Dialog,
@@ -18,14 +18,12 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "sonner";
 import { editProfile } from "../actions";
 import { useAuthContext } from "@/components/providers/auth-provider";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const EditProfileForm = () => {
   const queryClient = useQueryClient();
-
-  const [open, setOpen] = useState<boolean>(false);
   const { currentUser } = useAuthContext();
-
+  const [open, setOpen] = useState<boolean>(false);
   const [form, setform] = useState<EditProfileInput>({
     username: currentUser?.username || "",
     phone: currentUser?.phone || "",
@@ -36,20 +34,23 @@ const EditProfileForm = () => {
     setform((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const [isPending, startTransistion] = useTransition();
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    startTransistion(async () => {
-      const res = await editProfile(form);
-      if (res.success) {
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (input: EditProfileInput) => {
+      return await editProfile(input);
+    },
+    onSuccess({ success, message }) {
+      if (success) {
         queryClient.invalidateQueries({ queryKey: ["me"] });
-        toast.success(res.message);
+        toast.success(message);
       } else {
-        toast.error(res.message);
+        toast.error(message);
       }
       setOpen(false);
-    });
+    },
+  });
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    mutate(form);
   };
 
   return (
@@ -117,6 +118,7 @@ const EditProfileForm = () => {
               type="submit"
               disabled={
                 isPending ||
+                form.username == "" ||
                 (currentUser?.username == form.username &&
                   currentUser?.phone == form.phone &&
                   currentUser?.address == form.address)

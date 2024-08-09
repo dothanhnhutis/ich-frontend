@@ -3,7 +3,7 @@ export const roles = [
   "ADMIN",
   "MANAGER",
   "SALER",
-  "WRITER",
+  "BLOGER",
   "CUSTOMER",
 ] as const;
 export const editPasswordSchema = z
@@ -32,9 +32,9 @@ export const createUserSchema = z.object({
       invalid_type_error: "email field must be string",
     })
     .email("Invalid email"),
-  disabled: z.boolean({
-    required_error: "disabled field is required",
-    invalid_type_error: "disabled field must be boolean",
+  suspended: z.boolean({
+    required_error: "suspended field is required",
+    invalid_type_error: "suspended field must be boolean",
   }),
   role: z.enum(roles),
   username: z.string({
@@ -62,14 +62,8 @@ export const editPictureSchema = z.object({
 });
 
 export const editUserSchema = createUserSchema
-  .omit({ email: true, password: true, disabled: true })
+  .omit({ email: true, password: true })
   .extend({
-    bio: z
-      .string({
-        required_error: "bio field is required",
-        invalid_type_error: "bio field must be string",
-      })
-      .max(255, "bio_length_error"),
     phone: z.string({
       required_error: "phone field is required",
       invalid_type_error: "phone field must be string",
@@ -78,10 +72,6 @@ export const editUserSchema = createUserSchema
       required_error: "address field is required",
       invalid_type_error: "address field must be string",
     }),
-    suspended: z.boolean({
-      required_error: "suspended field is required",
-      invalid_type_error: "suspended field must be boolean",
-    }),
     disabled: z.boolean({
       required_error: "disabled field is required",
       invalid_type_error: "disabled field must be boolean",
@@ -89,7 +79,7 @@ export const editUserSchema = createUserSchema
   })
   .partial();
 
-export type EditPassword = z.infer<typeof editPasswordSchema>;
+export type EditPasswordInput = z.infer<typeof editPasswordSchema>;
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type EditUserInput = z.infer<typeof editUserSchema>;
 export type EditProfileInput = z.infer<typeof editProfileSchema>;

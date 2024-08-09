@@ -81,7 +81,7 @@ const InputFilter = ({
   );
 };
 
-const roleOption: Role[] = ["MANAGER", "SALER", "WRITER", "CUSTOMER"];
+const roleOption: Role[] = ["MANAGER", "SALER", "BLOGER", "CUSTOMER"];
 
 export const UserFilterSheet = (
   init: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">

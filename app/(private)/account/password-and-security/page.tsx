@@ -1,11 +1,11 @@
 "use client";
+import React from "react";
+import { CheckIcon, MailIcon } from "lucide-react";
+import { PasswordForm } from "./form";
+import { useAuthContext } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { CheckIcon, MailIcon } from "lucide-react";
-import React from "react";
-import { PasswordForm } from "./form";
-import { useAuthContext } from "@/components/providers/auth-provider";
 
 const PasswordAndSecurityPage = () => {
   const { currentUser } = useAuthContext();

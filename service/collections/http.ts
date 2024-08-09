@@ -44,9 +44,12 @@ export class FetchHttp {
     const baseUrl =
       options?.baseUrl || configs.NEXT_PUBLIC_SERVER_URL + this._path;
 
-    const fullUrl = url.startsWith("/")
-      ? `${baseUrl}${url}`
-      : `${baseUrl}/${url}`;
+    const fullUrl =
+      url == ""
+        ? baseUrl
+        : url.startsWith("/")
+        ? `${baseUrl}${url}`
+        : `${baseUrl}/${url}`;
 
     const res = await fetch(fullUrl, {
       ...options,

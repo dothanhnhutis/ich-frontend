@@ -2,7 +2,7 @@ import { FetchHttp, FetchHttpError, IError, ISuccess } from "./http";
 import { ResetPasswordInput, SignInInput } from "@/schemas/auth";
 import {
   CreateUserInput,
-  EditPassword,
+  EditPasswordInput,
   EditPictureInput,
   EditProfileInput,
   EditUserInput,
@@ -145,7 +145,7 @@ class UserService extends FetchHttp {
 
   async getUserByPasswordResetToken(token: string) {
     try {
-      return await this.get<User>("/users/" + token);
+      return await this.get<User>("/" + token);
     } catch (error: any) {
       if (error instanceof FetchHttpError) {
         return error.serialize();
@@ -186,7 +186,7 @@ class UserService extends FetchHttp {
     }
   }
 
-  async editPassword(cookie: string, input: EditPassword) {
+  async editPassword(cookie: string, input: EditPasswordInput) {
     try {
       return await this.post<{ message: string }>("/change-password", input, {
         headers: {
@@ -208,7 +208,7 @@ class UserService extends FetchHttp {
 
   async createPassword(
     cookie: string,
-    input: Omit<EditPassword, "oldPassword">
+    input: Omit<EditPasswordInput, "oldPassword">
   ) {
     try {
       return await this.post<{ message: string }>("/password", input, {

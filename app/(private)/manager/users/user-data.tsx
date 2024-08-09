@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useUserData } from "@/components/providers/user-provider";
 import UserTableView from "./user-table";
 import { searchUser } from "./actions";
+import { Loading } from "@/components/loading";
 
 const UserData = ({
   searchParams,
@@ -40,13 +41,15 @@ const UserData = ({
             : "active"
         }
       />
-      {isPending && <div>loading....</div>}
-      {viewMode == "card" ? (
-        <UserCardView data={data?.users} />
-      ) : (
-        <UserTableView data={data?.users} />
-      )}
-      {data?.users && data?.users.length > 0 && (
+      {isPending && <Loading />}
+      {!isPending &&
+        (viewMode == "card" ? (
+          <UserCardView data={data?.users} />
+        ) : (
+          <UserTableView data={data?.users} />
+        ))}
+
+      {!isPending && data?.users && data?.users.length > 0 && (
         <UserPagination totalPage={data?.metadata.totalPage} />
       )}
     </>

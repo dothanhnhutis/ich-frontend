@@ -1,12 +1,12 @@
 "use client";
-import React, { useTransition, useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 import { LockIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import { EditPassword, editPasswordSchema } from "@/schemas/user";
+import { EditPasswordInput, editPasswordSchema } from "@/schemas/user";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
 import {
   Dialog,
@@ -18,20 +18,18 @@ import { toast } from "sonner";
 import { createPassword, editPassword } from "../actions";
 import { recover } from "@/app/actions";
 import { omit } from "lodash";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthContext } from "@/components/providers/auth-provider";
 
 export const PasswordForm = () => {
   const queryClient = useQueryClient();
   const { currentUser } = useAuthContext();
-
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [isPending, startTransistion] = useTransition();
   const [isHiddenPassword, setIsHiddenPassword] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(true);
   const [focusingField, setOnFocusAt] = useState<string | undefined>();
 
-  const [form, setForm] = useState<EditPassword>({
+  const [form, setForm] = useState<EditPasswordInput>({
     oldPassword: "",
     newPassword: "",
     confirmNewPassword: "",
@@ -63,23 +61,30 @@ export const PasswordForm = () => {
     [form]
   );
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsError(false);
-    startTransistion(async () => {
-      const res = currentUser?.hasPassword
-        ? await editPassword(form)
-        : await createPassword(omit(form, ["oldPassword"]));
-      if (res.success) {
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (input: EditPasswordInput) => {
+      return currentUser?.hasPassword
+        ? await editPassword(input)
+        : await createPassword(omit(input, ["oldPassword"]));
+    },
+    onSettled() {
+      setIsError(false);
+    },
+    onSuccess({ success, message }) {
+      if (success) {
         queryClient.invalidateQueries({ queryKey: ["me"] });
-        toast.success(res.message);
+        toast.success(message);
         setOpenDialog(false);
       } else {
-        toast.error(res.message);
-
+        toast.error(message);
         setIsError(true);
       }
-    });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    mutate(form);
   };
 
   useEffect(() => {
@@ -91,23 +96,25 @@ export const PasswordForm = () => {
     setIsError(false);
     setIsHiddenPassword(true);
   }, [openDialog]);
-  const [isPendingSendEmail, startTransistionSendEmail] = useTransition();
-  const handleSendEmailForgotPassword = async () => {
-    startTransistionSendEmail(async () => {
-      const { success, message } = await recover(currentUser?.email!);
+
+  const { isPending: isSending, mutate: send } = useMutation({
+    mutationFn: async (email: string) => {
+      return await recover(email);
+    },
+    onSuccess({ success, message }) {
       if (success) {
         toast.success(message);
       } else {
         toast.error(message);
       }
-    });
-  };
+    },
+  });
 
   return (
     <Dialog
       open={openDialog}
       onOpenChange={(open) => {
-        if (!isPendingSendEmail) setOpenDialog(open);
+        if (!isSending) setOpenDialog(open);
       }}
     >
       <Button
@@ -173,14 +180,16 @@ export const PasswordForm = () => {
                 <p className="text-red-500 font-medium text-xs">
                   Current password is incorrect.{" "}
                   <button
-                    disabled={isPendingSendEmail}
+                    disabled={isSending}
                     type="button"
-                    onClick={handleSendEmailForgotPassword}
+                    onClick={() => {
+                      send(currentUser.email);
+                    }}
                     className="text-primary disabled:opacity-50"
                   >
                     Forgot password?
                   </button>
-                  {isPendingSendEmail && (
+                  {isSending && (
                     <AiOutlineLoading3Quarters className="text-primary inline size-4 animate-spin flex-shrink-0 ml-1" />
                   )}
                 </p>
@@ -308,7 +317,7 @@ export const PasswordForm = () => {
           <div className="flex gap-4 flex-col sm:flex-row justify-end">
             <Button
               disabled={
-                isPendingSendEmail ||
+                isSending ||
                 isPending ||
                 (currentUser?.hasPassword && form.oldPassword.length == 0) ||
                 form.newPassword.length == 0 ||

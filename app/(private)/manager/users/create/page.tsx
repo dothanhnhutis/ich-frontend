@@ -26,13 +26,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const CreateUserPage = () => {
   const queryClient = useQueryClient();
-
   const router = useRouter();
   const [isHiddenPassword, setIsHiddenPassword] = React.useState<boolean>(true);
   const [form, setForm] = React.useState<CreateUserInput>({
     email: "",
     password: "",
-    disabled: true,
+    suspended: false,
     role: "CUSTOMER",
     username: "",
   });
@@ -173,28 +172,31 @@ const CreateUserPage = () => {
                 <SelectValue placeholder="Select a role to display" />
               </SelectTrigger>
               <SelectContent>
-                {roles.map((role, idx) => (
-                  <SelectItem key={idx} value={role}>
-                    {role}
-                  </SelectItem>
-                ))}
+                {roles
+                  .filter((r) => r != "ADMIN")
+                  .map((role, idx) => (
+                    <SelectItem key={idx} value={role}>
+                      {role}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
           <div className="flex  justify-between space-y-1.5">
             <div>
-              <Label htmlFor="status">Active</Label>
+              <Label htmlFor="status">Suspend</Label>
               <p className="text-xs font-light text-muted-foreground mt-1">
-                Do you want the account to be active immediately after creation?
+                Do you want the account to be suspend immediately after
+                creation?
               </p>
             </div>
 
             <Switch
               disabled={isPending}
               id="status"
-              checked={form.disabled}
+              checked={form.suspended}
               onCheckedChange={(checked) =>
-                setForm((prev) => ({ ...prev, disabled: checked }))
+                setForm((prev) => ({ ...prev, suspended: checked }))
               }
             />
           </div>

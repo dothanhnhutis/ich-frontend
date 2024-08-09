@@ -22,7 +22,7 @@ export const privateRegExpRoutes = [
 
 export const roleAccessRoutes: Record<Role, RegExp[]> = {
   CUSTOMER: [BaseRoutes],
-  WRITER: [BaseRoutes, PostRoutes],
+  BLOGER: [BaseRoutes, PostRoutes],
   SALER: [],
   MANAGER: [BaseRoutes, PostRoutes, ProductRoutes],
   ADMIN: privateRegExpRoutes,

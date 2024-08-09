@@ -48,7 +48,7 @@ const permissions: {
       },
     },
   ],
-  WRITER: [
+  BLOGER: [
     {
       icon: <ClipboardSignatureIcon className="lg:mr-2 size-6" />,
       href: "/manager/posts",

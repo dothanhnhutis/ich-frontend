@@ -3,6 +3,7 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -12,12 +13,17 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import DisableAccountBtn from "./disable-btn";
 import { useAuthContext } from "@/components/providers/auth-provider";
+import { useMutation } from "@tanstack/react-query";
+import { disactivateAccount } from "../actions";
 
 const SettingPage = () => {
   const { currentUser } = useAuthContext();
-
+  const { mutate } = useMutation({
+    mutationFn: async () => {
+      await disactivateAccount();
+    },
+  });
   return (
     <div className="space-y-2">
       <Label className="text-red-500">Delete Account</Label>
@@ -41,7 +47,13 @@ const SettingPage = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <DisableAccountBtn />
+            <AlertDialogAction
+              onClick={() => {
+                mutate();
+              }}
+            >
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

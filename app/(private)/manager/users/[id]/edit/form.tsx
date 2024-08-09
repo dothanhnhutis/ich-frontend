@@ -53,6 +53,24 @@ export const EditUserForm = ({ user }: { user: User }) => {
       className="grid grid-cols-2 gap-4 overflow-y-scroll bg-background p-4 rounded-md"
     >
       <div className="col-span-2 lg:col-span-1">
+        <Label className="leading-snug text-muted-foreground">ID</Label>
+        <Input
+          disabled
+          value={user.id}
+          type="text"
+          className="focus-visible:ring-transparent"
+        />
+      </div>
+      <div className="col-span-2 lg:col-span-1">
+        <Label className="leading-snug text-muted-foreground">Email</Label>
+        <Input
+          disabled
+          value={user.email}
+          type="text"
+          className="focus-visible:ring-transparent"
+        />
+      </div>
+      <div className="col-span-2 lg:col-span-1">
         <Label className="leading-snug text-muted-foreground">Name</Label>
         <Input
           value={form.username}
@@ -77,7 +95,7 @@ export const EditUserForm = ({ user }: { user: User }) => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="MANAGER">MANAGER</SelectItem>
-            <SelectItem value="WRITER">WRITTER</SelectItem>
+            <SelectItem value="BLOGER">WRITTER</SelectItem>
             <SelectItem value="CUSTOMER">CUSTOMER</SelectItem>
           </SelectContent>
         </Select>
@@ -106,19 +124,19 @@ export const EditUserForm = ({ user }: { user: User }) => {
       </div>
       <div className="col-span-2 lg:col-span-1">
         <Label htmlFor="status" className="leading-snug text-muted-foreground">
-          Activate
+          Suspend
         </Label>
         <div className="flex items-center justify-between">
           <p className="text-xs font-light text-muted-foreground">
-            Do you want this account to be activate?
+            Do you want this account to be suspend?
           </p>
           <Switch
             disabled={isPending}
             id="status"
-            name="disabled"
+            name="suspend"
             checked={!form.disabled}
             onCheckedChange={(checked) =>
-              setForm((prev) => ({ ...prev, disabled: !checked }))
+              setForm((prev) => ({ ...prev, suspended: !checked }))
             }
           />
         </div>
@@ -126,19 +144,19 @@ export const EditUserForm = ({ user }: { user: User }) => {
 
       <div className="col-span-2 lg:col-span-1">
         <Label htmlFor="status" className="leading-snug text-muted-foreground">
-          Suspended
+          Disable
         </Label>
         <div className="flex items-center justify-between">
           <p className="text-xs font-light text-muted-foreground">
-            Do you want this account to be suspended?
+            Do you want this account to be disable?
           </p>
           <Switch
             disabled={isPending}
             id="status"
-            name="suspended"
+            name="disabled"
             checked={form.suspended}
             onCheckedChange={(checked) =>
-              setForm((prev) => ({ ...prev, suspended: checked }))
+              setForm((prev) => ({ ...prev, disabled: checked }))
             }
           />
         </div>
