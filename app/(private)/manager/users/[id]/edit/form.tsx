@@ -134,9 +134,9 @@ export const EditUserForm = ({ user }: { user: User }) => {
             disabled={isPending}
             id="status"
             name="suspend"
-            checked={!form.disabled}
+            checked={form.suspended}
             onCheckedChange={(checked) =>
-              setForm((prev) => ({ ...prev, suspended: !checked }))
+              setForm((prev) => ({ ...prev, suspended: checked }))
             }
           />
         </div>
@@ -154,7 +154,7 @@ export const EditUserForm = ({ user }: { user: User }) => {
             disabled={isPending}
             id="status"
             name="disabled"
-            checked={form.suspended}
+            checked={form.disabled}
             onCheckedChange={(checked) =>
               setForm((prev) => ({ ...prev, disabled: checked }))
             }

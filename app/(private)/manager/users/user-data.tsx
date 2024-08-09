@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { UserPagination } from "./user-pagination";
 import { UserToolBar } from "./user-toolbar";
 import { UserCardView } from "./user-card";
@@ -8,6 +8,7 @@ import { useUserData } from "@/components/providers/user-provider";
 import UserTableView from "./user-table";
 import { searchUser } from "./actions";
 import { Loading } from "@/components/loading";
+import { SearchUserInput } from "@/schemas/user";
 
 const UserData = ({
   searchParams,
@@ -21,6 +22,13 @@ const UserData = ({
   const { isPending, data } = useQuery({
     queryKey: ["user", searchParams?.tab, filter],
     queryFn: async () => {
+      const query: SearchUserInput = {
+        email: filter?.emails,
+        role: filter?.roles,
+        page: filter?.page,
+        limit: filter?.limit,
+      };
+
       return await searchUser({
         email: filter?.emails,
         role: filter?.roles,
