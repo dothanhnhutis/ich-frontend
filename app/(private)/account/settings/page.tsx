@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Label } from "@/components/ui/label";
 import {
@@ -11,11 +12,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser } from "@/app/actions";
 import DisableAccountBtn from "./disable-btn";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
-const SettingPage = async () => {
-  const currentUser = await getCurrentUser();
+const SettingPage = () => {
+  const { currentUser } = useAuthContext();
 
   return (
     <div className="space-y-2">

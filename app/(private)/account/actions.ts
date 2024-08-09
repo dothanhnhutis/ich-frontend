@@ -1,6 +1,5 @@
 "use server";
 import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
 import userApi from "@/service/collections/user-collections";
 import {
   EditPassword,
@@ -15,9 +14,6 @@ export async function editProfile(input: EditProfileInput) {
     await cookieServer(),
     input
   );
-  if (success) {
-    revalidatePath("/account/profile");
-  }
   return { success, message: data.message };
 }
 
@@ -26,9 +22,6 @@ export async function editPicture(input: EditPictureInput) {
     await cookieServer(),
     input
   );
-  if (success) {
-    revalidatePath("/account/profile");
-  }
   return { success, message: data.message };
 }
 
@@ -45,9 +38,6 @@ export async function editPassword(input: EditPassword) {
     await cookieServer(),
     input
   );
-  if (success) {
-    revalidatePath("/account/password-and-security");
-  }
   return { success, message: data.message };
 }
 
@@ -56,8 +46,5 @@ export async function createPassword(input: Omit<EditPassword, "oldPassword">) {
     await cookieServer(),
     input
   );
-  if (success) {
-    revalidatePath("/account/password-and-security");
-  }
   return { success, message: data.message };
 }

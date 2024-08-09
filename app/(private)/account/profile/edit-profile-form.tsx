@@ -17,9 +17,14 @@ import { Button } from "@/components/ui/button";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "sonner";
 import { editProfile } from "../actions";
+import { useAuthContext } from "@/components/providers/auth-provider";
+import { useQueryClient } from "@tanstack/react-query";
 
-const EditProfileForm = ({ currentUser }: { currentUser?: User }) => {
+const EditProfileForm = () => {
+  const queryClient = useQueryClient();
+
   const [open, setOpen] = useState<boolean>(false);
+  const { currentUser } = useAuthContext();
 
   const [form, setform] = useState<EditProfileInput>({
     username: currentUser?.username || "",
@@ -38,6 +43,7 @@ const EditProfileForm = ({ currentUser }: { currentUser?: User }) => {
     startTransistion(async () => {
       const res = await editProfile(form);
       if (res.success) {
+        queryClient.invalidateQueries({ queryKey: ["me"] });
         toast.success(res.message);
       } else {
         toast.error(res.message);

@@ -1,5 +1,5 @@
 "use client";
-import React, { useTransition } from "react";
+import React from "react";
 import z from "zod";
 import { toast } from "sonner";
 
@@ -22,8 +22,11 @@ import {
 import Link from "next/link";
 import { CreateUserInput, roles } from "@/schemas/user";
 import { createUser } from "../actions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const CreateUserPage = () => {
+  const queryClient = useQueryClient();
+
   const router = useRouter();
   const [isHiddenPassword, setIsHiddenPassword] = React.useState<boolean>(true);
   const [form, setForm] = React.useState<CreateUserInput>({
@@ -38,19 +41,24 @@ const CreateUserPage = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const [isPending, startTransistion] = useTransition();
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (input: CreateUserInput) => {
+      return await createUser(input);
+    },
+    onSuccess: ({ success, message }) => {
+      if (success) {
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+        toast.success(message);
+        router.push("/manager/users");
+      } else {
+        toast.error(message);
+      }
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    startTransistion(async () => {
-      const res = await createUser(form);
-      if (res.success) {
-        toast.success(res.message);
-        router.push("/manager/users");
-      } else {
-        toast.error(res.message);
-      }
-    });
+    mutate(form);
   };
   return (
     <>

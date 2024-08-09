@@ -1,13 +1,14 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { CheckIcon, MailIcon } from "lucide-react";
 import React from "react";
 import { PasswordForm } from "./form";
-import { getCurrentUser } from "@/app/actions";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
-const PasswordAndSecurityPage = async () => {
-  const currentUser = await getCurrentUser();
+const PasswordAndSecurityPage = () => {
+  const { currentUser } = useAuthContext();
 
   return (
     <>
@@ -34,7 +35,7 @@ const PasswordAndSecurityPage = async () => {
           <Button disabled>
             <MailIcon className="size-4 mr-2" /> Change email
           </Button>
-          <PasswordForm currentUser={currentUser} />
+          <PasswordForm />
         </div>
 
         <div>

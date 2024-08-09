@@ -20,9 +20,11 @@ import { toast } from "sonner";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { editPicture } from "../actions";
 import { useAuthContext } from "@/components/providers/auth-provider";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const UploadPhoto = ({ children }: { children: React.ReactNode }) => {
   const { currentUser } = useAuthContext();
+  const queryClient = useQueryClient();
 
   const [open, setOpen] = useState<boolean>(false);
   const cropperRef = useRef<ReactCropperElement>(null);
@@ -79,6 +81,7 @@ export const UploadPhoto = ({ children }: { children: React.ReactNode }) => {
           data: cropper.getCroppedCanvas().toDataURL(),
         });
         if (res.success) {
+          queryClient.invalidateQueries({ queryKey: ["me"] });
           toast.success("Update avatar success");
           setOpen(false);
         } else {

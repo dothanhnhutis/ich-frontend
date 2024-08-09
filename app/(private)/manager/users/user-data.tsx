@@ -18,7 +18,7 @@ const UserData = ({
   const { filter, viewMode } = useUserData();
 
   const { isPending, data } = useQuery({
-    queryKey: ["user", searchParams?.tab, JSON.stringify(filter)],
+    queryKey: ["user", searchParams?.tab, filter],
     queryFn: async () => {
       return await searchUser({
         email: filter?.emails,

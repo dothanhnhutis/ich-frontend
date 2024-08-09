@@ -43,8 +43,5 @@ export async function editUserById(id: string, input: EditUserInput) {
     id,
     input
   );
-  if (success) {
-    revalidatePath(`/manager/users/${id}/edit`);
-  }
   return { success, message: data.message };
 }

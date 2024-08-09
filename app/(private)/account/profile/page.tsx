@@ -10,7 +10,7 @@ import AvatarDefault from "@/images/avatars/user-1.jpg";
 import EditProfileForm from "./edit-profile-form";
 import { useAuthContext } from "@/components/providers/auth-provider";
 
-const ProfilePage = async () => {
+const ProfilePage = () => {
   const { currentUser } = useAuthContext();
 
   return (

@@ -1,3 +1,4 @@
+"use client";
 import { AlertDialogAction } from "@/components/ui/alert-dialog";
 import React from "react";
 import { disactivateAccount } from "../actions";

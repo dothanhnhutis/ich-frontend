@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import Link from "next/link";
 import { User } from "@/schemas/user";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
 const permissions: {
   [index: string]: {
@@ -59,12 +60,9 @@ const permissions: {
   ],
 };
 
-export const ManagerSiderBar = ({
-  currentUser,
-}: {
-  currentUser?: User | undefined;
-}) => {
+export const ManagerSiderBar = () => {
   const pathName = usePathname();
+  const { currentUser } = useAuthContext();
 
   if (!currentUser) return null;
 

@@ -6,7 +6,7 @@ import { LockIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import { EditPassword, editPasswordSchema, User } from "@/schemas/user";
+import { EditPassword, editPasswordSchema } from "@/schemas/user";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
 import {
   Dialog,
@@ -18,8 +18,13 @@ import { toast } from "sonner";
 import { createPassword, editPassword } from "../actions";
 import { recover } from "@/app/actions";
 import { omit } from "lodash";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
-export const PasswordForm = ({ currentUser }: { currentUser?: User }) => {
+export const PasswordForm = () => {
+  const queryClient = useQueryClient();
+  const { currentUser } = useAuthContext();
+
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [isPending, startTransistion] = useTransition();
   const [isHiddenPassword, setIsHiddenPassword] = useState<boolean>(true);
@@ -66,6 +71,7 @@ export const PasswordForm = ({ currentUser }: { currentUser?: User }) => {
         ? await editPassword(form)
         : await createPassword(omit(form, ["oldPassword"]));
       if (res.success) {
+        queryClient.invalidateQueries({ queryKey: ["me"] });
         toast.success(res.message);
         setOpenDialog(false);
       } else {
