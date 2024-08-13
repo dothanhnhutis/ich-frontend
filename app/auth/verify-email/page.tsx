@@ -1,14 +1,16 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getCurrentUser } from "@/service/api/user.service";
 import SendAgainBtn from "./send-again";
 import ChangeEmailForm from "./change-email";
 import EmailSVG from "@/assets/svgs/email";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
-const VerifyEmailPage = async () => {
-  const currentUser = await getCurrentUser();
+const VerifyEmailPage = () => {
+  const { currentUser } = useAuthContext();
+
   return (
     <div
       className="flex flex-col flex-grow sm:flex-grow-0 sm:grid grid-cols-12 transition-all

@@ -7,24 +7,27 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { recover } from "@/app/actions";
+import { useMutation } from "@tanstack/react-query";
 
 const RecoverForm = (props: { email?: string }) => {
-  const [isPending, startTransistion] = useTransition();
   const [email, setEmail] = useState(() => props.email || "");
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (email: string) => await recover(email),
+    onSuccess(data) {
+      setEmail("");
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (email == "") return;
-    startTransistion(async () => {
-      if (email != "") {
-        const { success, message } = await recover(email);
-        setEmail("");
-        if (success) {
-          toast.success(message);
-        } else {
-          toast.error(message);
-        }
-      }
-    });
+    mutate(email);
   };
   return (
     <form onSubmit={handleSubmit}>

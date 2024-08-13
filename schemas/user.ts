@@ -1,10 +1,10 @@
 import { z } from "zod";
 export const roles = [
-  "ADMIN",
-  "MANAGER",
-  "SALER",
-  "BLOGER",
-  "CUSTOMER",
+  "Admin",
+  "Manager",
+  "Saler",
+  "Bloger",
+  "Customer",
 ] as const;
 export const editPasswordSchema = z
   .object({

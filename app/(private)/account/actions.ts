@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import userApi from "@/service/collections/user-collections";
 import {
-  EditPassword,
+  EditPasswordInput,
   EditPictureInput,
   EditProfileInput,
 } from "@/schemas/user";
@@ -33,7 +33,7 @@ export async function disactivateAccount() {
   }
 }
 
-export async function editPassword(input: EditPassword) {
+export async function editPassword(input: EditPasswordInput) {
   const { success, data } = await userApi.editPassword(
     await cookieServer(),
     input
@@ -41,7 +41,9 @@ export async function editPassword(input: EditPassword) {
   return { success, message: data.message };
 }
 
-export async function createPassword(input: Omit<EditPassword, "oldPassword">) {
+export async function createPassword(
+  input: Omit<EditPasswordInput, "oldPassword">
+) {
   const { success, data } = await userApi.createPassword(
     await cookieServer(),
     input

@@ -8,31 +8,47 @@ import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { changeEmail } from "../actions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
   const [optenDialog, setOptenDialog] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
-  const [isPending, startTransistion] = useTransition();
+  const queryClient = useQueryClient();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    startTransistion(async () => {
-      setError(false);
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (email: string) => {
       if (currentEmail != email) {
-        const { success } = await changeEmail(email);
-        if (success) {
-          setEmail("");
-          toast.success("Updated and resending e-mail...");
-          setOptenDialog(false);
-        } else {
-          setError(true);
-        }
+        return await changeEmail(email);
       } else {
         setEmail("");
         setOptenDialog(false);
       }
-    });
+    },
+    onSettled() {
+      setError(false);
+    },
+    onSuccess(data) {
+      if (!data) {
+        setEmail("");
+        setOptenDialog(false);
+        return;
+      }
+
+      if (data.success) {
+        setEmail("");
+        toast.success("Updated and resending e-mail...");
+        queryClient.invalidateQueries({ queryKey: ["me"] });
+        setOptenDialog(false);
+      } else {
+        setError(true);
+      }
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    mutate(email);
   };
 
   return (

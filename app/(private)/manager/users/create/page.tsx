@@ -31,8 +31,8 @@ const CreateUserPage = () => {
   const [form, setForm] = React.useState<CreateUserInput>({
     email: "",
     password: "",
-    suspended: false,
-    role: "CUSTOMER",
+    disabled: true,
+    role: "Customer",
     username: "",
   });
 

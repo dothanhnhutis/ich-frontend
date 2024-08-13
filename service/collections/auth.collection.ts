@@ -97,7 +97,7 @@ class AuthService extends FetchHttp {
     | IError
   > {
     try {
-      return await this.patch<{ message: string }>("/auth/recover", {
+      return await this.patch<{ message: string }>("/recover", {
         email,
       });
     } catch (error: any) {
@@ -136,7 +136,7 @@ class AuthService extends FetchHttp {
 
   async verifyEmail(token: string): Promise<void | IError> {
     try {
-      await this.get<{ message: string }>(`/auth/confirm-email/${token}`);
+      await this.get<{ message: string }>(`/confirm-email/${token}`);
     } catch (error: any) {
       if (error instanceof FetchHttpError) {
         return error.serialize();

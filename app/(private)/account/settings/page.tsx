@@ -34,7 +34,7 @@ const SettingPage = () => {
 
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="destructive" disabled={currentUser?.role == "ADMIN"}>
+          <Button variant="destructive" disabled={currentUser?.role == "Admin"}>
             Delete your account
           </Button>
         </AlertDialogTrigger>
