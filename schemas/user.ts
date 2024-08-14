@@ -6,6 +6,8 @@ export const roles = [
   "Bloger",
   "Customer",
 ] as const;
+export const status = ["Active", "Suspended", "Disabled"] as const;
+
 export const editPasswordSchema = z
   .object({
     oldPassword: z.string(),
@@ -32,10 +34,7 @@ export const createUserSchema = z.object({
       invalid_type_error: "email field must be string",
     })
     .email("Invalid email"),
-  suspended: z.boolean({
-    required_error: "suspended field is required",
-    invalid_type_error: "suspended field must be boolean",
-  }),
+  status: z.enum(status),
   role: z.enum(roles),
   username: z.string({
     required_error: "username field is required",
@@ -85,22 +84,15 @@ export type EditUserInput = z.infer<typeof editUserSchema>;
 export type EditProfileInput = z.infer<typeof editProfileSchema>;
 export type EditPictureInput = z.infer<typeof editPictureSchema>;
 
-export type Role = CreateUserInput["role"];
-
-export type User = {
+export type User = Omit<CreateUserInput, "password"> & {
   id: string;
-  email: string;
   emailVerified: boolean;
   emailVerificationExpires?: Date | null;
   emailVerificationToken?: string | null;
-  username: string;
   picture: string | null;
   hasPassword: boolean;
   passwordResetToken?: string | null;
   passwordResetExpires?: Date | null;
-  role: Role;
-  suspended: boolean;
-  disabled: boolean;
   reActiveToken?: string | null;
   reActiveExpires?: Date | null;
   phone?: string | null;
@@ -111,10 +103,9 @@ export type User = {
 
 export type SearchUserInput = {
   email?: string[] | undefined;
-  role?: Role[] | undefined;
+  role?: User["role"] | undefined;
   emailVerified?: boolean | undefined;
-  disabled?: boolean | undefined;
-  suspended?: boolean | undefined;
+  status?: User["status"];
   orderBy?:
     | (
         | "email.asc"

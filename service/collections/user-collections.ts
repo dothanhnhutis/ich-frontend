@@ -143,25 +143,6 @@ class UserService extends FetchHttp {
     }
   }
 
-  async getUserByPasswordResetToken(token: string) {
-    try {
-      return await this.get<User>("/" + token);
-    } catch (error: any) {
-      if (error instanceof FetchHttpError) {
-        return error.serialize();
-      } else {
-        console.log(
-          "AuthService getUserByPasswordResetToken() method error: ",
-          error
-        );
-        return {
-          success: false,
-          data: { message: error.message },
-        } as IError;
-      }
-    }
-  }
-
   async disactivateAccount(cookie: string) {
     try {
       return await this.patch<{ message: string }>(

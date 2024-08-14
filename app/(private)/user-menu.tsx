@@ -17,9 +17,12 @@ import { useAuthContext } from "@/components/providers/auth-provider";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
 import { signOut } from "@/service/api/auth.service";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const UserMenu = () => {
   const { currentUser } = useAuthContext();
+  const queryClient = useQueryClient();
+
   const router = useRouter();
   return (
     <DropdownMenu>
@@ -56,7 +59,7 @@ export const UserMenu = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {currentUser?.role == "ADMIN" && (
+        {currentUser?.role == "Admin" && (
           <DropdownMenuItem asChild>
             <Link href="/manager" className="cursor-pointer">
               <span>Manager</span>
@@ -79,6 +82,7 @@ export const UserMenu = () => {
           onClick={() => {
             signOut();
             router.push("/auth/signin");
+            queryClient.clear();
           }}
         >
           <LogOutIcon className="mr-2 h-4 w-4" />

@@ -29,9 +29,11 @@ import { useRouter, usePathname } from "next/navigation";
 import { disactivateAccount } from "@/service/api/user.service";
 import { privateRegExpRoutes } from "@/routes";
 import { useAuthContext } from "@/components/providers/auth-provider";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UserMenu = () => {
   const { currentUser } = useAuthContext();
+  const queryClient = useQueryClient();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -90,6 +92,7 @@ const UserMenu = () => {
             onClick={() => {
               signOut();
               router.push("/auth/signin");
+              queryClient.clear();
             }}
           >
             <LogOutIcon className="mr-2 h-4 w-4" />
@@ -140,6 +143,7 @@ const UserMenu = () => {
             onClick={() => {
               signOut();
               router.refresh();
+              queryClient.clear();
             }}
           >
             <LogOutIcon className="mr-4 h-4 w-4" />

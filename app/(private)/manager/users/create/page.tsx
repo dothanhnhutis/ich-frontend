@@ -9,20 +9,32 @@ import { Input } from "@/components/ui/input";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { AiOutlineCheck } from "react-icons/ai";
-import { Button } from "@/components/ui/button";
-import { ChevronLeftIcon, Loader2 } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Check,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronsDownIcon,
+  ChevronsUpDown,
+  Loader2,
+} from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+
 import Link from "next/link";
 import { CreateUserInput, roles } from "@/schemas/user";
 import { createUser } from "../actions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
 
 const CreateUserPage = () => {
   const queryClient = useQueryClient();
@@ -31,7 +43,7 @@ const CreateUserPage = () => {
   const [form, setForm] = React.useState<CreateUserInput>({
     email: "",
     password: "",
-    disabled: true,
+    status: "Active",
     role: "Customer",
     username: "",
   });
@@ -158,7 +170,8 @@ const CreateUserPage = () => {
           </div>
           <div className="flex flex-col space-y-1.5">
             <Label htmlFor="name">Role</Label>
-            <Select
+
+            {/* <Select
               disabled={isPending}
               onValueChange={(v) =>
                 setForm((prev) => ({
@@ -173,32 +186,125 @@ const CreateUserPage = () => {
               </SelectTrigger>
               <SelectContent>
                 {roles
-                  .filter((r) => r != "ADMIN")
+                  .filter((r) => r != "Admin")
                   .map((role, idx) => (
                     <SelectItem key={idx} value={role}>
                       {role}
                     </SelectItem>
                   ))}
               </SelectContent>
-            </Select>
+            </Select> */}
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  // aria-expanded={open}
+                  aria-expanded={false}
+                  className=" justify-between"
+                >
+                  asdsa
+                  <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0">
+                <Command>
+                  <CommandList>
+                    <CommandGroup>
+                      <CommandItem
+                        // value={role}
+                        onSelect={(currentValue) => {
+                          // setValue(
+                          //   currentValue === value ? "" : currentValue
+                          // );
+                          // setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            true ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <div>
+                          <Label>adasd</Label>
+                          <p>asdsadasd</p>
+                        </div>
+                      </CommandItem>
+                      <CommandItem>
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            false ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <div>
+                          <Label>Customer</Label>
+                          <p>just a normal user</p>
+                        </div>
+                      </CommandItem>
+                      <CommandItem>
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            false ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <div>
+                          <Label>Bloger</Label>
+                          <p>Can manage post</p>
+                        </div>
+                      </CommandItem>
+                      <CommandItem>
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            false ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <div>
+                          <Label>Saler</Label>
+                          <p>Can manage invoice</p>
+                        </div>
+                      </CommandItem>
+                      <CommandItem>
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            false ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <div>
+                          <Label>Manager</Label>
+                          <p>Can manage post and invoice</p>
+                        </div>
+                      </CommandItem>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
-          <div className="flex  justify-between space-y-1.5">
-            <div>
-              <Label htmlFor="status">Suspend</Label>
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="status">Status</Label>
+
+            {/* <div>
+              <Label htmlFor="status">Status</Label>
               <p className="text-xs font-light text-muted-foreground mt-1">
                 Do you want the account to be suspend immediately after
                 creation?
               </p>
-            </div>
+            </div> */}
 
-            <Switch
+            {/* <Switch
               disabled={isPending}
               id="status"
-              checked={form.suspended}
+              // checked={form.suspended}
               onCheckedChange={(checked) =>
                 setForm((prev) => ({ ...prev, suspended: checked }))
               }
-            />
+            /> */}
           </div>
         </div>
 

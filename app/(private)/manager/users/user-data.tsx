@@ -32,8 +32,14 @@ const UserData = ({
       return await searchUser({
         email: filter?.emails,
         role: filter?.roles,
-        disabled: searchParams?.tab == "disabled" ? true : false,
-        suspended: searchParams?.tab == "suspended" ? true : false,
+        status:
+          typeof searchParams?.tab == "string"
+            ? searchParams?.tab == "disabled"
+              ? "Disabled"
+              : searchParams?.tab == "suspended"
+              ? "Suspended"
+              : "Active"
+            : undefined,
         page: filter?.page,
         limit: filter?.limit,
       });

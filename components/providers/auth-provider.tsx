@@ -18,12 +18,14 @@ export const AuthProvider = ({
   children: React.ReactNode;
 }) => {
   const { data } = useQuery({
+    // enabled: false,
     initialData: initUser,
     queryKey: ["me"],
     queryFn: async () => {
       return await getCurrentUser();
     },
   });
+
   return (
     <authContext.Provider value={{ currentUser: data }}>
       {children}

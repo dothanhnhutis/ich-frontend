@@ -11,7 +11,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Link from "next/link";
-import { User } from "@/schemas/user";
 import { useAuthContext } from "@/components/providers/auth-provider";
 
 const permissions: {
@@ -22,7 +21,7 @@ const permissions: {
     isActive: (path: string) => boolean;
   }[];
 } = {
-  ADMIN: [
+  Admin: [
     {
       icon: <PackageIcon className="lg:mr-2 size-6" />,
       href: "/manager/products",
@@ -48,7 +47,7 @@ const permissions: {
       },
     },
   ],
-  BLOGER: [
+  Bloger: [
     {
       icon: <ClipboardSignatureIcon className="lg:mr-2 size-6" />,
       href: "/manager/posts",

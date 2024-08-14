@@ -1,6 +1,6 @@
 import React from "react";
 import ResetPasswordForm from "./form";
-import userApi from "@/service/collections/user-collections";
+import authApi from "@/service/collections/auth.collection";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -11,7 +11,8 @@ const ResetPasswordPage = async ({
 }: {
   searchParams: { token: string };
 }) => {
-  const { success } = await userApi.getUserByPasswordResetToken(token);
+  const { success, data } = await authApi.getSession(token);
+  console.log(data);
   return (
     <div className="flex flex-col flex-grow mx-auto w-full sm:max-w-[570px] p-4 transition-all">
       <div className="flex flex-col flex-grow space-y-6">

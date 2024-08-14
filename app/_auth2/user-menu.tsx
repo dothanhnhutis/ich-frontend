@@ -29,6 +29,7 @@ import { signOut } from "@/service/api/auth.service";
 import { useRouter, usePathname } from "next/navigation";
 import { disactivateAccount } from "@/service/api/user.service";
 import { privateRegExpRoutes } from "@/routes";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UserMenu = ({ currentUser }: { currentUser: User }) => {
   const router = useRouter();
@@ -37,6 +38,7 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
   const isPrivateRoute = useMemo(() => {
     return privateRegExpRoutes.some((routes) => routes.test(pathname));
   }, [pathname]);
+  const queryClient = useQueryClient();
 
   if (isPrivateRoute)
     return (
@@ -88,6 +90,7 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
             onClick={() => {
               signOut();
               router.push("/auth/signin");
+              queryClient.removeQueries({ type: "all" });
             }}
           >
             <LogOutIcon className="mr-2 h-4 w-4" />
@@ -138,6 +141,7 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
             onClick={() => {
               signOut();
               router.refresh();
+              queryClient.removeQueries({ type: "all" });
             }}
           >
             <LogOutIcon className="mr-4 h-4 w-4" />

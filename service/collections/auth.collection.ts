@@ -149,6 +149,22 @@ class AuthService extends FetchHttp {
       }
     }
   }
+
+  async getSession(token: string) {
+    try {
+      return await this.get<any>("?token=" + token);
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("AuthService getSession() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
 }
 
 export default new AuthService();

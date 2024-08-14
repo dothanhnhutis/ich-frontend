@@ -26,9 +26,12 @@ import { User } from "@/schemas/user";
 import { signOut } from "@/service/api/auth.service";
 import { useRouter } from "next/navigation";
 import { disactivateAccount } from "@/service/api/user.service";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UserMenu = ({ currentUser }: { currentUser: User }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
   const [open, setOpen] = useState<boolean>(false);
   return (
     <div className="hidden sm:block">
@@ -70,6 +73,7 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
             onClick={() => {
               signOut();
               router.refresh();
+              queryClient.removeQueries();
             }}
           >
             <LogOutIcon className="mr-4 h-4 w-4" />

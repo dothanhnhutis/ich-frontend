@@ -2,8 +2,7 @@
 import {
   CreateUserInput,
   User,
-  EditPassword,
-  Role,
+  EditPasswordInput,
   EditUserInput,
 } from "@/schemas/user";
 import { FetchHttpError, http } from "../http";
@@ -109,7 +108,7 @@ export async function editProfile(data: Partial<User>) {
   }
 }
 
-export async function editPassword(data: EditPassword) {
+export async function editPassword(data: EditPasswordInput) {
   const allCookies = cookies().getAll();
   try {
     const res = await http.post<{ message: string }>("/users/password", data, {
@@ -189,7 +188,7 @@ export type SearchUserRes = {
   id: string;
   email: string;
   emailVerified: boolean;
-  role: Role;
+  role: User["role"];
   disabled: boolean;
   username: string;
   suspended: boolean;
@@ -205,7 +204,7 @@ export type SearchUserRes = {
 
 export type SearchUserInput = {
   email?: string[] | undefined;
-  role?: Role[] | undefined;
+  role?: User["role"][] | undefined;
   emailVerified?: boolean | undefined;
   disabled?: boolean | undefined;
   suspended?: boolean | undefined;
