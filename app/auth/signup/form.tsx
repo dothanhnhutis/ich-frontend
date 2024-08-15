@@ -25,7 +25,8 @@ export const SignUpForm = () => {
   const handleValidateError = useCallback(
     (
       keys: (
-        | "name_empty"
+        | "firstName_empty"
+        | "lastName_empty"
         | "invaid_email"
         | "password_too_small"
         | "password_too_big"

@@ -18,29 +18,43 @@ export const signInSchema = z.object({
 
 export const signUpSchema = z
   .object({
-    username: z
+    firstName: z
       .string({
-        required_error: "Username field is required",
-        invalid_type_error: "Username field must be string",
+        required_error: "firstName field is required",
+        invalid_type_error: "firstName field must be string",
       })
-      .min(1, "username_empty"),
+      .min(1, "First name can't be empty"),
+    lastName: z
+      .string({
+        required_error: "lastName field is required",
+        invalid_type_error: "lastName field must be string",
+      })
+      .min(1, "Last name can't be empty"),
     email: z
       .string({
         required_error: "Email field is required",
         invalid_type_error: "Email field must be string",
       })
-      .email("invaid_email"),
+      .email("Invalid email"),
     password: z
       .string({
         required_error: "Password field is required",
         invalid_type_error: "Password field must be string",
       })
-      .min(8, "password_too_small")
-      .max(40, "password_too_big")
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/,
-        "password_format_error"
-      ),
+      .min(8, "Password must be at least 8 characters long")
+      .max(40, "Password can not be longer than 40 characters")
+      .superRefine((val, ctx) => {
+        const regex: RegExp =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/;
+        if (!regex.test(val)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["password", "format"],
+            message:
+              "Password must include: letters, numbers and special characters",
+          });
+        }
+      }),
   })
   .strict();
 

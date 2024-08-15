@@ -22,7 +22,7 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
           <SwitchTheme />
         </div>
       </header>
-      {children}
+      <div className=" sm:p-8">{children}</div>
     </div>
   );
 };

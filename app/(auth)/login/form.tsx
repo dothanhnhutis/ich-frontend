@@ -16,6 +16,7 @@ import {
   reActivateAccount,
   signIn,
 } from "@/app/auth/actions";
+import ContinueBtn from "../continue-btn";
 
 export const SignInForm = ({ registered }: { registered?: string }) => {
   const [emailCheckIsError, setEmailCheckIsError] = useState<boolean>(false);
@@ -61,16 +62,6 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
     });
   };
 
-  const handleBack = async () => {
-    await clearEmailRegistered();
-    setTab("email");
-    setDataForm({
-      email: "",
-      password: "",
-    });
-    setSignInError(false);
-  };
-
   const handleReActivate = async () => {
     await reActivateAccount(dataForm.email);
     setDataForm({
@@ -79,12 +70,8 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
     });
   };
 
-  const onClick = () => {
-    document.location.href = `${configs.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/google?redir=/auth/signin`;
-  };
-
   return (
-    <div className="p-4 sm:p-8">
+    <>
       {emailCheckIsError && (
         <div className="flex items-center gap-3 rounded-lg bg-destructive/20 sm:rounded-xl sm:max-w-[570px] sm:mx-auto mb-10 p-4">
           <OctagonAlertIcon className="size-6 text-red-500" />
@@ -101,11 +88,11 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
 
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-6 sm:border sm:rounded-xl sm:max-w-[570px] sm:mx-auto sm:px-12 sm:py-4 transition-all"
+        className="rounded-lg sm:border bg-card text-card-foreground shadow-sm p-4 sm:p-6 sm:mx-auto sm:max-w-sm transition-all"
       >
-        <div className="grid gap-2 text-center">
-          <h1 className="text-3xl font-bold">Login</h1>
-          <p className="text-balance text-muted-foreground">
+        <div className="flex flex-col space-y-1.5">
+          <h3 className="font-semibold tracking-tight text-2xl">Login</h3>
+          <p className="text-sm text-muted-foreground">
             Enter your email below to login to your account
           </p>
         </div>
@@ -116,36 +103,35 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
             continue to log in with your account email and password below.
           </div>
         )}
-
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label>Email</Label>
-            <Input placeholder="test@example.com" />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label>Password</Label>
-              <Link
-                href="/auth/recover"
-                className="ml-auto inline-block text-sm underline"
-              >
-                Forgot your password?
-              </Link>
+        <div className="pt-6">
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label>Email</Label>
+              <Input placeholder="test@example.com" />
             </div>
-            <Input placeholder="******" />
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label>Password</Label>
+                <Link
+                  href="/auth/recover"
+                  className="ml-auto inline-block text-sm underline"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+              <Input placeholder="******" />
+            </div>
+            <Button variant="default">Login</Button>
+            <ContinueBtn label="Login with Google" redir="/login" />
           </div>
-          <Button variant="default">Login</Button>
-          <Button variant="outline" onClick={onClick}>
-            Login with Google
-          </Button>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Don't have an account?{" "}
-          <Link className="underline" href="/auth/signup">
-            Sign up
-          </Link>
+          <div className="mt-4 text-center text-sm">
+            Don't have an account?{" "}
+            <Link className="underline" href="/signup">
+              Sign up
+            </Link>
+          </div>
         </div>
       </form>
-    </div>
+    </>
   );
 };
