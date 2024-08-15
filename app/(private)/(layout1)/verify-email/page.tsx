@@ -1,16 +1,32 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import SendAgainBtn from "./send-again";
 import ChangeEmailForm from "./change-email";
 import EmailSVG from "@/assets/svgs/email";
 import { useAuthContext } from "@/components/providers/auth-provider";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { sendEmailVerify } from "../actions";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import useCountDown from "@/hook/useCountDown";
 
 const VerifyEmailPage = () => {
   const { currentUser } = useAuthContext();
+  const [time, setTime] = useCountDown("reSendEmail", currentUser?.email || "");
+  const { isPending, mutate } = useMutation({
+    mutationFn: async () => {
+      await sendEmailVerify();
+    },
 
+    onSuccess() {
+      setTime();
+      toast.success(
+        "New verification email is successfully sent. Please, check your email..."
+      );
+    },
+  });
   return (
     <div
       className="flex flex-col flex-grow sm:flex-grow-0 sm:grid grid-cols-12 transition-all
@@ -45,10 +61,23 @@ const VerifyEmailPage = () => {
             >
               Go to Gmail Inbox
             </Link>
-            <SendAgainBtn />
+            <Button
+              disabled={isPending || time > 0}
+              onClick={() => mutate()}
+              variant="outline"
+              className="rounded-full border-2 border-primary !text-primary font-bold"
+            >
+              {isPending && (
+                <AiOutlineLoading3Quarters className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+              )}{" "}
+              Send again
+            </Button>
           </div>
 
-          <ChangeEmailForm currentEmail={currentUser?.email!} />
+          <ChangeEmailForm
+            disabled={isPending}
+            currentEmail={currentUser?.email!}
+          />
         </div>
       </div>
     </div>

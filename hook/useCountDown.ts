@@ -30,11 +30,11 @@ const useCountDown = (
     return () => clearTimeout(timeId);
   }, [timeAt, value]);
 
-  const setNewTimeAt = () => {
+  const setNewTimeAt = (second?: number) => {
     const data = JSON.parse(
       window.localStorage.getItem(storageKey) ?? "{}"
     ) as { [index: string]: number };
-    const expireAt = 60 * 1000 + Date.now();
+    const expireAt = (second || 60) * 1000 + Date.now();
     data[value] = expireAt;
     window.localStorage.setItem(storageKey, JSON.stringify(data));
     setTimeAt(expireAt);

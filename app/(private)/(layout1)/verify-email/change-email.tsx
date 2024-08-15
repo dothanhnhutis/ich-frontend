@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -7,53 +7,54 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-// import { changeEmail } from "../actions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { changeEmail } from "../actions";
 
-const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
+const ChangeEmailForm = ({
+  currentEmail,
+  disabled,
+}: {
+  disabled?: boolean;
+  currentEmail: string;
+}) => {
   const [optenDialog, setOptenDialog] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
-  // const { isPending, mutate } = useMutation({
-  //   mutationFn: async (email: string) => {
-  //     if (currentEmail != email) {
-  //       return await changeEmail(email);
-  //     } else {
-  //       setEmail("");
-  //       setOptenDialog(false);
-  //     }
-  //   },
-  //   onSettled() {
-  //     setError(false);
-  //   },
-  //   onSuccess(data) {
-  //     if (!data) {
-  //       setEmail("");
-  //       setOptenDialog(false);
-  //       return;
-  //     }
-
-  //     if (data.success) {
-  //       setEmail("");
-  //       toast.success("Updated and resending e-mail...");
-  //       queryClient.invalidateQueries({ queryKey: ["me"] });
-  //       setOptenDialog(false);
-  //     } else {
-  //       setError(true);
-  //     }
-  //   },
-  // });
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (email: string) => {
+      return await changeEmail(email);
+    },
+    onSettled() {
+      setError(false);
+    },
+    onSuccess(data) {
+      if (data.success) {
+        setEmail("");
+        toast.success("Updated and resending e-mail...");
+        queryClient.invalidateQueries({ queryKey: ["me"] });
+        setOptenDialog(false);
+      } else {
+        setError(true);
+      }
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // mutate(email);
+    if (currentEmail == email) {
+      setEmail("");
+      setOptenDialog(false);
+    }
+    if (!z.string().email().safeParse(email).success) return;
+    mutate(email);
   };
 
   return (
     <Dialog open={optenDialog} onOpenChange={setOptenDialog}>
       <Button
+        disabled={disabled}
         variant="link"
         onClick={() => {
           setOptenDialog(true);
@@ -97,9 +98,10 @@ const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
           >
             <div className="">
               <Input
+                disabled={isPending}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                type="email"
+                type="text"
                 placeholder="Email address"
                 className={cn(
                   "sm:max-w-[300px] focus-visible:ring-offset-0 focus-visible:ring-transparent",
@@ -114,14 +116,11 @@ const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
             </div>
 
             <Button
-              disabled={
-                // isPending ||
-                !z.string().email("invalid email").safeParse(email).success
-              }
+              disabled={isPending}
               variant="outline"
               className="rounded-full border-2 border-primary !text-primary font-bold"
             >
-              {true && (
+              {isPending && (
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
               )}
               Update and resend
