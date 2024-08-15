@@ -10,9 +10,15 @@ import { SignUpInput, signUpSchema } from "@/schemas/auth";
 import configs from "@/config";
 import ContinueBtn from "../continue-btn";
 import { useMutation } from "@tanstack/react-query";
-import { ShellIcon } from "lucide-react";
+import {
+  EyeIcon,
+  EyeOffIcon,
+  LoaderPinwheelIcon,
+  ShellIcon,
+} from "lucide-react";
 import { signUp } from "../actions";
 import { toast } from "sonner";
+import PasswordInput from "../password-input";
 
 const SignUpForm = () => {
   const [formData, setFormData] = React.useState<SignUpInput>({
@@ -92,9 +98,10 @@ const SignUpForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isError().length > 0) return;
+    if (isError().length > 0 || emailExist) return;
     mutate(formData);
   };
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -196,22 +203,21 @@ const SignUpForm = () => {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              placeholder="******"
+
+            <PasswordInput
+              placeholder="********"
               id="password"
               name="password"
-              type="password"
-              autoComplete="off"
               value={formData.password}
               onChange={handleOnchange}
               onBlur={handleOnChangFocus}
               className={cn(
-                "focus-visible:ring-0",
                 focused.includes("password") && isError("password").length > 0
                   ? "border-red-500"
                   : ""
               )}
             />
+
             <div className="flex flex-col gap-y-1">
               <Label className="font-normal text-xs">
                 Your password must include:
@@ -247,7 +253,7 @@ const SignUpForm = () => {
           </div>
           <Button variant="default">
             {isPending ? (
-              <ShellIcon className="h-4 w-4 animate-spin flex-shrink-0" />
+              <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
             ) : (
               "Create an account"
             )}

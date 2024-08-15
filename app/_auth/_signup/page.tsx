@@ -90,7 +90,7 @@ const SignUpPage = () => {
       showSocial={true}
       headerLaybel="Create an account"
       headerDescription={"Fill out all fields below to create an account"}
-      backButtonHref={"/auth/signin"}
+      backButtonHref={"/login"}
       backButtonLaybel="Already have an Account?"
     >
       <form
@@ -142,7 +142,7 @@ const SignUpPage = () => {
           {isExistEmail && (
             <p className="font-medium text-xs">
               You have registered,
-              <Link className="text-primary text-xs" href="/auth/signin">
+              <Link className="text-primary text-xs" href="/login">
                 Sign in
               </Link>
             </p>

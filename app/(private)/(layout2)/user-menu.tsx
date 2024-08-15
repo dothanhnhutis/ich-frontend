@@ -81,7 +81,7 @@ export const UserMenu = () => {
         <DropdownMenuItem
           onClick={() => {
             signOut();
-            router.push("/auth/signin");
+            router.push("/login");
             queryClient.clear();
           }}
         >

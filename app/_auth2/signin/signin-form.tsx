@@ -129,7 +129,7 @@ export const SignInForm = ({
                 </span>
               </div>
             </div>
-            <SignInGoogleBtn redir={"/auth/signin"} />
+            <SignInGoogleBtn redir={"/login"} />
             <footer className="mt-20">
               <div className="relative my-2">
                 <div className="absolute inset-0 flex items-center">

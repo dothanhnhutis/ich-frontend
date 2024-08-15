@@ -25,7 +25,7 @@ export async function signIn(input: SignInInput | Pick<SignInInput, "email">) {
         cookies().set(name, value, opt);
       }
     }
-    revalidatePath("/auth/signin");
+    revalidatePath("/login");
     redirect("/account/profile");
   }
   return res;

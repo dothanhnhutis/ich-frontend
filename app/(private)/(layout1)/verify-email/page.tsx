@@ -16,10 +16,10 @@ const VerifyEmailPage = () => {
       className="flex flex-col flex-grow sm:flex-grow-0 sm:grid grid-cols-12 transition-all
   "
     >
-      <div className="flex flex-col flex-grow sm:flex-grow-0 sm:col-start-3 sm:col-end-11 mx-auto w-full sm:max-w-[570px] p-4">
+      <div className="flex flex-col flex-grow sm:flex-grow-0 sm:col-start-3 sm:col-end-11 mx-auto w-full sm:max-w-screen-sm p-4">
         <div className="flex flex-col flex-grow space-y-6">
           <div className="mt-10 mb-6 text-center">
-            <div className="inline-flex  w-[145px] h-[130px] min-w-[145px] min-h-[130px]">
+            <div className="inline-flex w-[145px] h-[130px] min-w-[145px] min-h-[130px]">
               <EmailSVG />
             </div>
           </div>

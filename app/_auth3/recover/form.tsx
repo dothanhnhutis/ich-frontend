@@ -3,29 +3,31 @@ import Link from "next/link";
 import { toast } from "sonner";
 import React, { useState, useTransition } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { recover } from "@/service/api/auth.service";
+import { recover } from "@/app/actions";
+import { useMutation } from "@tanstack/react-query";
 
 const RecoverForm = (props: { email?: string }) => {
-  const [isPending, startTransistion] = useTransition();
   const [email, setEmail] = useState(() => props.email || "");
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (email: string) => await recover(email),
+    onSuccess(data) {
+      setEmail("");
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (email == "") return;
-    startTransistion(async () => {
-      if (email != "") {
-        const res = await recover(email);
-        setEmail("");
-        if (res.success) {
-          toast.success(res.message);
-        } else {
-          toast.error(res.message);
-        }
-      }
-    });
+    mutate(email);
   };
   return (
     <form onSubmit={handleSubmit}>

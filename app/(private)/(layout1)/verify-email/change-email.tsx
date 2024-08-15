@@ -7,7 +7,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { changeEmail } from "../actions";
+// import { changeEmail } from "../actions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
@@ -16,39 +16,39 @@ const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
   const [error, setError] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
-  const { isPending, mutate } = useMutation({
-    mutationFn: async (email: string) => {
-      if (currentEmail != email) {
-        return await changeEmail(email);
-      } else {
-        setEmail("");
-        setOptenDialog(false);
-      }
-    },
-    onSettled() {
-      setError(false);
-    },
-    onSuccess(data) {
-      if (!data) {
-        setEmail("");
-        setOptenDialog(false);
-        return;
-      }
+  // const { isPending, mutate } = useMutation({
+  //   mutationFn: async (email: string) => {
+  //     if (currentEmail != email) {
+  //       return await changeEmail(email);
+  //     } else {
+  //       setEmail("");
+  //       setOptenDialog(false);
+  //     }
+  //   },
+  //   onSettled() {
+  //     setError(false);
+  //   },
+  //   onSuccess(data) {
+  //     if (!data) {
+  //       setEmail("");
+  //       setOptenDialog(false);
+  //       return;
+  //     }
 
-      if (data.success) {
-        setEmail("");
-        toast.success("Updated and resending e-mail...");
-        queryClient.invalidateQueries({ queryKey: ["me"] });
-        setOptenDialog(false);
-      } else {
-        setError(true);
-      }
-    },
-  });
+  //     if (data.success) {
+  //       setEmail("");
+  //       toast.success("Updated and resending e-mail...");
+  //       queryClient.invalidateQueries({ queryKey: ["me"] });
+  //       setOptenDialog(false);
+  //     } else {
+  //       setError(true);
+  //     }
+  //   },
+  // });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    mutate(email);
+    // mutate(email);
   };
 
   return (
@@ -115,13 +115,13 @@ const ChangeEmailForm = ({ currentEmail }: { currentEmail: string }) => {
 
             <Button
               disabled={
-                isPending ||
+                // isPending ||
                 !z.string().email("invalid email").safeParse(email).success
               }
               variant="outline"
               className="rounded-full border-2 border-primary !text-primary font-bold"
             >
-              {isPending && (
+              {true && (
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
               )}
               Update and resend

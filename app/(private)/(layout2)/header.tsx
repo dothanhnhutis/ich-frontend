@@ -12,7 +12,7 @@ const UserHeader = () => {
   const { currentUser } = useAuthContext();
 
   return (
-    <header className="sticky top-0 left-0 right-0 z-50 border-b bg-background">
+    <header className="sticky top-0 left-0 right-0 z-50 border-b backdrop-blur bg-background/60">
       <nav className="flex justify-between items-center p-3 h-[72px]">
         <Logo className="hidden md:block" />
         <div className="hidden md:flex items-center space-x-6 ml-6 text-sm font-medium">

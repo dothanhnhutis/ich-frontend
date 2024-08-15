@@ -1,10 +1,57 @@
 "use server";
-
-import { SignUpInput } from "@/schemas/auth";
+import { ResetPasswordInput, SignInInput, SignUpInput } from "@/schemas/auth";
 import userApi from "@/service/collections/user-collections";
 import authApi from "@/service/collections/auth.collection";
+import { cookies } from "next/headers";
+import { cookieParser } from "@/lib/cookies-parser";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { cookieServer } from "../actions";
 
 export async function signUp(input: SignUpInput) {
   const { success, data } = await authApi.signUp(input);
+  return { success, message: data.message };
+}
+
+export async function signIn(input: SignInInput) {
+  const res = await authApi.signIn(input);
+  if (res.success) {
+    cookies().delete("registered");
+
+    for (const cookie of res.headers.getSetCookie()) {
+      const parser = cookieParser(cookie);
+      if (parser) {
+        const { name, value, ...opt } = parser;
+        cookies().set(name, value, opt);
+      }
+    }
+    revalidatePath("/login");
+    redirect("/account/profile");
+  }
+  return res;
+}
+
+export async function sendEmailVerify() {
+  await userApi.sendEmailVerify(await cookieServer());
+}
+
+export async function verifyEmail(token: string) {
+  await authApi.verifyEmail(token);
+  revalidatePath("/confirm-email");
+  revalidatePath("/verify-email");
+}
+
+export async function reActivateAccount(email: string) {
+  await authApi.reActivateAccount(email);
+  cookies().set("send-email", "true");
+  redirect("/send-email");
+}
+
+export async function clearSendEmail() {
+  cookies().delete("send-email");
+}
+
+export async function resetPassword(token: string, input: ResetPasswordInput) {
+  const { success, data } = await authApi.resetPassword(token, input);
   return { success, message: data.message };
 }

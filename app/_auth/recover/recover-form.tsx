@@ -35,10 +35,7 @@ const RecoverForm = () => {
         />
       </div>
       <div className="flex justify-end items-center mt-4">
-        <Link
-          href="/auth/signin"
-          className={buttonVariants({ variant: "link" })}
-        >
+        <Link href="/login" className={buttonVariants({ variant: "link" })}>
           Cancel
         </Link>
         <Button disabled={isPending}>

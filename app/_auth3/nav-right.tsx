@@ -17,7 +17,7 @@ const NavRight = () => {
         //     <p className="m-0-bottom">
         //       <span>Already have an account?</span>
         //       <Link
-        //         href="/auth/signin"
+        //         href="/login"
         //         className="block text-sm text-primary font-medium"
         //       >
         //         Sign In

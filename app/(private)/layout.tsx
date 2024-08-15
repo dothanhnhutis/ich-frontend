@@ -1,13 +1,10 @@
 import React from "react";
-import UserHeader from "./header";
+import { getCurrentUser } from "../actions";
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 const PrivateLayout = async ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="bg-muted/40 relative">
-      <UserHeader />
-      {children}
-    </div>
-  );
+  const currentUser = await getCurrentUser();
+  return <AuthProvider initUser={currentUser}>{children}</AuthProvider>;
 };
 
 export default PrivateLayout;

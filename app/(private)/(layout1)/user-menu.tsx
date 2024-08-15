@@ -1,6 +1,4 @@
-"use client";
-import React, { useState } from "react";
-import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,6 +6,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { privateRegExpRoutes } from "@/routes";
+import { useQueryClient } from "@tanstack/react-query";
+import { usePathname, useRouter } from "next/navigation";
+import React from "react";
+import AvatarDefault from "@/images/avatars/user-1.jpg";
+import { User } from "@/schemas/user";
+import { LogOutIcon, SettingsIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,23 +24,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import AvatarDefault from "@/images/avatars/user-1.jpg";
-import { Skeleton } from "@/components/ui/skeleton";
-import { LogOutIcon, SettingsIcon } from "lucide-react";
-import { User } from "@/schemas/user";
-import { signOut } from "@/service/api/auth.service";
-import { useRouter } from "next/navigation";
-import { disactivateAccount } from "@/service/api/user.service";
-import { useQueryClient } from "@tanstack/react-query";
 
 const UserMenu = ({ currentUser }: { currentUser: User }) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const [open, setOpen] = React.useState<boolean>(false);
+  const isPrivateRoute = React.useMemo(() => {
+    return privateRegExpRoutes.some((routes) => routes.test(pathname));
+  }, [pathname]);
   const queryClient = useQueryClient();
-
-  const [open, setOpen] = useState<boolean>(false);
   return (
-    <div className="hidden sm:block">
+    <div>
       <DropdownMenu>
         <DropdownMenuTrigger className="outline-none">
           <Avatar>
@@ -71,9 +71,9 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
 
           <DropdownMenuItem
             onClick={() => {
-              signOut();
+              //   signOut();
               router.refresh();
-              queryClient.removeQueries();
+              queryClient.removeQueries({ type: "all" });
             }}
           >
             <LogOutIcon className="mr-4 h-4 w-4" />
@@ -93,9 +93,9 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
-                if (await disactivateAccount()) {
-                  router.push("/login");
-                }
+                // if (await disactivateAccount()) {
+                //   router.push("/login");
+                // }
               }}
             >
               Continue

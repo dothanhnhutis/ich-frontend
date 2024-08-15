@@ -5,6 +5,7 @@ import {
   emailVerifyRoute,
   privateRegExpRoutes,
   roleAccessRoutes,
+  DEFAULT_LOGOUT_REDIRECT,
 } from "@/routes";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -21,7 +22,7 @@ function redirect(request: NextRequest, path?: string) {
     const response = NextResponse.redirect(new URL(path, nextUrl), {
       headers,
     });
-    if (path == "/auth/signin") response.cookies.delete("session");
+    if (path == "/login") response.cookies.delete("session");
     return response;
   } else {
     const response = NextResponse.next({
@@ -69,7 +70,7 @@ export async function middleware(request: NextRequest) {
     }
   } else {
     if (isPrivateRoute || nextUrl.pathname == emailVerifyRoute) {
-      url = "/auth/signin";
+      url = DEFAULT_LOGOUT_REDIRECT;
     }
   }
 

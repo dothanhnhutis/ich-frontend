@@ -55,7 +55,7 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
       if (res.success) {
         setForm({ password: "", confirmPassword: "" });
         toast.success(res.message);
-        router.push("/auth/signin");
+        router.push("/login");
       } else {
         toast.error(res.message);
       }

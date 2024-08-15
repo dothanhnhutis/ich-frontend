@@ -1,11 +1,11 @@
 import { User } from "./schemas/user";
 
-export const emailVerifyRoute: string = "/account/verify-email";
+export const emailVerifyRoute: string = "/verify-email";
 export const apiAuthPrefix: string = "/api/auth";
 export const DEFAULT_LOGIN_REDIRECT: string = "/account/profile";
+export const DEFAULT_LOGOUT_REDIRECT: string = "/login";
 
-export const authRoutes: RegExp =
-  /^\/auth\/(signin|signup|send-email|recover)?$/;
+export const authRoutes: RegExp = /^\/(login|signup|send-email|recover)?$/;
 const BaseRoutes: RegExp =
   /^\/account\/(profile|settings|password-and-security)$/;
 const PostRoutes: RegExp = /^\/manager\/posts(\/create|.+\/edit)?$/;

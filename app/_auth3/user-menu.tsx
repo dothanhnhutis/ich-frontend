@@ -91,7 +91,7 @@ const UserMenu = () => {
           <DropdownMenuItem
             onClick={() => {
               signOut();
-              router.push("/auth/signin");
+              router.push("/login");
               queryClient.clear();
             }}
           >
@@ -164,7 +164,7 @@ const UserMenu = () => {
             <AlertDialogAction
               onClick={async () => {
                 if (await disactivateAccount()) {
-                  router.push("/auth/signin");
+                  router.push("/login");
                 }
               }}
             >

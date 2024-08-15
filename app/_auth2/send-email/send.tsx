@@ -20,7 +20,7 @@ export const Send = () => {
           in the email to reactivate your account.
         </p>
         <Button asChild>
-          <Link href={"/auth/signin"} className="my-10 px-6 rounded-xl">
+          <Link href={"/login"} className="my-10 px-6 rounded-xl">
             Sign in
           </Link>
         </Button>

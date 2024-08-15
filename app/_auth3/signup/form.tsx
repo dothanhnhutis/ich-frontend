@@ -124,7 +124,7 @@ export const SignUpForm = () => {
         {isExistEmail && (
           <p className="font-medium text-xs text-red-500">
             This email is already in use.{" "}
-            <Link className="text-primary text-xs" href="/auth/signin">
+            <Link className="text-primary text-xs" href="/login">
               Sign in
             </Link>
           </p>

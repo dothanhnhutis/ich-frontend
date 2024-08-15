@@ -29,7 +29,7 @@ export async function disactivateAccount() {
   const { success } = await userApi.disactivateAccount(await cookieServer());
   if (success) {
     cookies().delete("session");
-    redirect("/auth/signin");
+    redirect("/login");
   }
 }
 

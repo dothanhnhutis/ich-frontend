@@ -25,7 +25,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const currentUser = await getCurrentUser();
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
@@ -36,7 +35,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <TankStackProvider>
-            <AuthProvider initUser={currentUser}>{children}</AuthProvider>
+            {children}
             <Toaster visibleToasts={5} richColors />
           </TankStackProvider>
         </ThemeProvider>

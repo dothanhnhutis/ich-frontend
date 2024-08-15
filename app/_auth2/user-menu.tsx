@@ -89,7 +89,7 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
           <DropdownMenuItem
             onClick={() => {
               signOut();
-              router.push("/auth/signin");
+              router.push("/login");
               queryClient.removeQueries({ type: "all" });
             }}
           >
@@ -162,7 +162,7 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
             <AlertDialogAction
               onClick={async () => {
                 if (await disactivateAccount()) {
-                  router.push("/auth/signin");
+                  router.push("/login");
                 }
               }}
             >

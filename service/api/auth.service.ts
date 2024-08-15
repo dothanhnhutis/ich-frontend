@@ -53,7 +53,7 @@ export async function signIn(data: SignInInput): Promise<SignInRes> {
     model: "password",
   };
   try {
-    const res = await http.post<SignInRes>("/auth/signin", data);
+    const res = await http.post<SignInRes>("/login", data);
     for (const cookie of res.headers.getSetCookie()) {
       const cookieParser = parseCookie(cookie);
       cookies().set(cookieParser.name, cookieParser.value, {

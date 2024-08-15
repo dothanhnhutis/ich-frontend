@@ -1,73 +1,110 @@
 "use client";
-import { LockIcon, OctagonAlertIcon, UserIcon } from "lucide-react";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { LoaderPinwheelIcon, OctagonAlertIcon } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import React, { useState, useTransition } from "react";
-import { SignInInput } from "@/schemas/auth";
+import React, { useState } from "react";
+import { SignInInput, signInSchema } from "@/schemas/auth";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import configs from "@/config";
-import {
-  clearEmailRegistered,
-  emailCheck,
-  reActivateAccount,
-  signIn,
-} from "@/app/auth/actions";
 import ContinueBtn from "../continue-btn";
+import PasswordInput from "../password-input";
+import { useMutation } from "@tanstack/react-query";
+import { signIn } from "../actions";
 
-export const SignInForm = ({ registered }: { registered?: string }) => {
+export const SignInForm = ({
+  registered,
+  email,
+}: {
+  registered?: string;
+  email?: string;
+}) => {
   const [emailCheckIsError, setEmailCheckIsError] = useState<boolean>(false);
-  const [signInError, setSignInError] = useState<boolean>(false);
 
-  const [tab, setTab] = React.useState<"email" | "password">(
-    registered ? "password" : "email"
-  );
-
-  const [dataForm, setDataForm] = React.useState<Required<SignInInput>>({
-    email: registered || "",
+  const [focused, setFocused] = React.useState<string[]>([]);
+  const [formData, setFormData] = React.useState<SignInInput>({
+    email: registered || email || "",
     password: "",
   });
 
+  const [error, setError] = useState<{ success: boolean; message: string }>({
+    success: true,
+    message: "",
+  });
+
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDataForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setError({
+      success: true,
+      message: "",
+    });
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const [isPending, startTransistion] = useTransition();
+  const isError = React.useCallback(
+    (field?: "firstName" | "lastName" | "email" | "password" | undefined) => {
+      const val = signInSchema.safeParse(formData);
+      if (val.success) return [];
+      switch (field) {
+        case "email":
+          return val.error.issues.filter((err) => err.path.includes("email"));
+        case "password":
+          return val.error.issues.filter((err) =>
+            err.path.includes("password")
+          );
+        default:
+          return val.error.issues;
+      }
+    },
+    [formData]
+  );
+
+  const handleOnChangFocus = (
+    e: React.FocusEvent<HTMLInputElement, Element>
+  ) => {
+    if (e.type == "blur" && !focused.includes(e.target.name)) {
+      setFocused((prev) => [...prev, e.target.name]);
+    }
+  };
+
+  const handleReset = (holdEmail?: boolean) => {
+    setFormData((prev) => ({
+      email: holdEmail ? prev.email : "",
+      password: "",
+    }));
+    setFocused([]);
+    setError({ success: true, message: "" });
+  };
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (input: SignInInput) => {
+      return await signIn(input);
+    },
+    onSuccess({ success }) {
+      if (!success) {
+        setError({ success: false, message: "Invalid email or password." });
+      }
+    },
+    onMutate() {
+      handleReset();
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (tab == "email" && dataForm.email == "") return;
-    if (tab == "password" && dataForm.password == "") return;
-    startTransistion(async () => {
-      if (tab == "email") {
-        if (await emailCheck({ email: dataForm.email })) {
-          setEmailCheckIsError(false);
-          setTab("password");
-        } else {
-          setEmailCheckIsError(true);
-          setDataForm({
-            email: "",
-            password: "",
-          });
-        }
-      } else {
-        const { success } = await signIn(dataForm);
-        if (!success) {
-          setSignInError(true);
-        }
-      }
-    });
+    if (isError().length > 0 || formData.password == "") return;
+    if (formData.password.length < 8 || formData.password.length > 40)
+      setError({ success: false, message: "Invalid email or password." });
+    mutate(formData);
   };
 
   const handleReActivate = async () => {
-    await reActivateAccount(dataForm.email);
-    setDataForm({
-      email: "",
-      password: "",
-    });
+    // await reActivateAccount(dataForm.email);
+    // setDataForm({
+    //   email: "",
+    //   password: "",
+    // });
   };
 
   return (
@@ -103,25 +140,75 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
             continue to log in with your account email and password below.
           </div>
         )}
+
         <div className="pt-6">
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label>Email</Label>
-              <Input placeholder="test@example.com" />
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                placeholder="test@example.com"
+                onChange={handleOnchange}
+                value={formData.email}
+                className={cn(
+                  "focus-visible:ring-0",
+                  focused.includes("email") && isError("email").length > 0
+                    ? "border-red-500"
+                    : ""
+                )}
+                onBlur={handleOnChangFocus}
+              />
+              {focused.includes("email") &&
+                isError("email").map((error, idx) => (
+                  <p key={idx} className="text-red-500 text-xs font-bold">
+                    {error.message}
+                  </p>
+                ))}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label>Password</Label>
+                <Label htmlFor="password">Password</Label>
                 <Link
                   href="/auth/recover"
-                  className="ml-auto inline-block text-sm underline"
+                  className="ml-auto inline-block text-sm underline "
                 >
                   Forgot your password?
                 </Link>
               </div>
-              <Input placeholder="******" />
+              <PasswordInput
+                id="password"
+                name="password"
+                placeholder="********"
+                onChange={handleOnchange}
+                value={formData.password}
+                className={cn(
+                  focused.includes("password") && isError("password").length > 0
+                    ? "border-red-500"
+                    : ""
+                )}
+                onBlur={handleOnChangFocus}
+              />
+              {focused.includes("password") &&
+                isError("password").map((error, idx) => (
+                  <p key={idx} className="text-red-500 text-xs font-bold">
+                    {error.message}
+                  </p>
+                ))}
+              {!error.success && (
+                <p className="text-red-500 text-xs font-bold">
+                  {error.message}
+                </p>
+              )}
             </div>
-            <Button variant="default">Login</Button>
+
+            <Button variant="default">
+              {isPending ? (
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
+              ) : (
+                "Login"
+              )}
+            </Button>
             <ContinueBtn label="Login with Google" redir="/login" />
           </div>
           <div className="mt-4 text-center text-sm">
