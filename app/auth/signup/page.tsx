@@ -1,6 +1,7 @@
 import React from "react";
 import { SignInGoogleBtn } from "../signin-google-btn";
 import { SignUpForm } from "./form";
+import Link from "next/link";
 
 const SignUpPage = () => {
   return (
@@ -19,6 +20,19 @@ const SignUpPage = () => {
           </div>
         </div>
         <SignUpForm />
+        <div className="hidden sm:block">
+          <div className="text-right pt-30 text-sm">
+            <p className="m-0-bottom">
+              <span>Already have an account?</span>
+              <Link
+                href="/auth/signin"
+                className="block text-sm text-primary font-medium"
+              >
+                Sign In
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

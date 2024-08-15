@@ -13,6 +13,9 @@ import {
   reActivateAccount,
   signIn,
 } from "../actions";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import configs from "@/config";
 
 export const SignInForm = ({ registered }: { registered?: string }) => {
   const [emailCheckIsError, setEmailCheckIsError] = useState<boolean>(false);
@@ -76,6 +79,10 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
     });
   };
 
+  const onClick = () => {
+    document.location.href = `${configs.NEXT_PUBLIC_SERVER_URL}/api/v1/auth/google?redir=/auth/signin`;
+  };
+
   return (
     <div className="p-4 sm:p-8">
       {emailCheckIsError && (
@@ -98,9 +105,13 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
       >
         {tab == "email" ? (
           <>
-            <h1 className="text-2xl font-semibold tracking-tight text-center mt-4">
-              <span>Log in to ICH</span>
-            </h1>
+            <div className="grid gap-2 text-center">
+              <h1 className="text-3xl font-bold">Login</h1>
+              <p className="text-balance text-muted-foreground">
+                Enter your email below to login to your account
+              </p>
+            </div>
+
             {registered && (
               <div className="text-orange-400 text-sm">
                 We've found an existing ICH account with this email address.
@@ -108,6 +119,35 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
                 below.
               </div>
             )}
+
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label>Email</Label>
+                <Input placeholder="test@example.com" />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label>Password</Label>
+                  <Link
+                    href="/auth/recover"
+                    className="ml-auto inline-block text-sm underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+                <Input placeholder="******" />
+              </div>
+              <Button variant="default">Login</Button>
+              <Button variant="outline" onClick={onClick}>
+                Login with Google
+              </Button>
+            </div>
+            <div className="mt-4 text-center text-sm">
+              Don't have an account?{" "}
+              <Link className="underline" href="/auth/signup">
+                Sign up
+              </Link>
+            </div>
 
             <div className="flex gap-4 items-center border rounded-lg h-10 px-4">
               <UserIcon className="size-4" />
