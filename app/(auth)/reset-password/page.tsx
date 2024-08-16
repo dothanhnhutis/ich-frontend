@@ -21,7 +21,7 @@ const ResetPasswordPage = async ({
         </h1>
         {success ? (
           <>
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-muted-foreground text-center">
               Fill out all fields below to reset your password account
             </p>
             <ResetPasswordForm session={data.session} />

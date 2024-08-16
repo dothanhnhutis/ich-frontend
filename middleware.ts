@@ -10,6 +10,8 @@ import {
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getCurrentUser } from "./app/actions";
+import { cookies } from "next/headers";
+import { User } from "./schemas/user";
 
 function redirect(request: NextRequest, path?: string) {
   const { nextUrl, url } = request;
@@ -19,7 +21,6 @@ function redirect(request: NextRequest, path?: string) {
   headers.set("x-current-search-params", nextUrl.searchParams.toString());
 
   if (path) {
-    console.log("redirect ", url);
     const response = NextResponse.redirect(new URL(path, url), {
       headers,
     });
@@ -36,25 +37,26 @@ function redirect(request: NextRequest, path?: string) {
 }
 
 export async function middleware(request: NextRequest) {
-  let url: string | undefined;
-
   //Protected Route
   const { nextUrl } = request;
-  const currentUser = await getCurrentUser();
-  const isLoggedIn = !!currentUser;
-  const emailVerified = currentUser?.emailVerified || false;
-  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
+  let emailVerified: boolean = false;
+  let user: User | undefined;
+  if (cookies().has("session")) {
+    user = await getCurrentUser();
+    emailVerified = user?.emailVerified || false;
+  }
 
+  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPrivateRoute = privateRegExpRoutes.some((routes) =>
     routes.test(nextUrl.pathname)
   );
 
-  if (currentUser) {
-    if (currentUser.emailVerified) {
+  if (user) {
+    if (emailVerified) {
       if (nextUrl.pathname == EMAIL_VERIFY_ROUTE)
         return redirect(request, DEFAULT_LOGIN_REDIRECT);
       if (
-        !roleAccessRoutes[currentUser.role].some((routes) =>
+        !roleAccessRoutes[user.role].some((routes) =>
           routes.test(nextUrl.pathname)
         )
       )
@@ -70,34 +72,6 @@ export async function middleware(request: NextRequest) {
       return redirect(request, DEFAULT_LOGOUT_REDIRECT);
     }
   }
-
-  // if (isLoggedIn) {
-  //   if (emailVerified) {
-  //     if (
-  //       nextUrl.pathname == EMAIL_VERIFY_ROUTE ||
-  //       (isPrivateRoute &&
-  //         !roleAccessRoutes[currentUser.role].some((routes) =>
-  //           routes.test(nextUrl.pathname)
-  //         ))
-  //     ) {
-  //       url = DEFAULT_LOGIN_REDIRECT;
-  //     }
-  //   } else {
-  //     if (isPrivateRoute) {
-  //       url = EMAIL_VERIFY_ROUTE;
-  //     }
-  //   }
-
-  //   if (authRoutes.test(nextUrl.pathname)) {
-  //     url = DEFAULT_LOGIN_REDIRECT;
-  //   }
-  // } else {
-  //   if (isPrivateRoute || nextUrl.pathname == EMAIL_VERIFY_ROUTE) {
-  //     url = DEFAULT_LOGOUT_REDIRECT;
-  //   }
-  // }
-
-  // return redirect(request, url);
 }
 
 export const config = {

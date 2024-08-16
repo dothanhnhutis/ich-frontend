@@ -22,13 +22,16 @@ import { useQueryClient } from "@tanstack/react-query";
 export const UserMenu = () => {
   const { currentUser } = useAuthContext();
   const queryClient = useQueryClient();
-
   const router = useRouter();
+  if (!currentUser) return <></>;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="outline-none">
         <Avatar>
-          <AvatarImage src={currentUser?.picture ?? AvatarDefault.src} />
+          <AvatarImage
+            referrerPolicy="no-referrer"
+            src={currentUser.picture ?? AvatarDefault.src}
+          />
           <AvatarFallback className="bg-transparent">
             <Skeleton className="h-10 w-10 rounded-full" />
           </AvatarFallback>
@@ -37,7 +40,10 @@ export const UserMenu = () => {
       <DropdownMenuContent align="end" className="w-[360px]">
         <DropdownMenuLabel className="flex items-center gap-3">
           <Avatar className="w-24 h-24">
-            <AvatarImage src={currentUser?.picture ?? AvatarDefault.src} />
+            <AvatarImage
+              referrerPolicy="no-referrer"
+              src={currentUser.picture ?? AvatarDefault.src}
+            />
             <AvatarFallback className="bg-transparent">
               <Skeleton className="w-24 h-24 rounded-full" />
             </AvatarFallback>
@@ -45,16 +51,14 @@ export const UserMenu = () => {
 
           <div className="w-full overflow-hidden">
             <p className="font-medium text-lg">
-              {currentUser?.username ?? "error"}
+              {currentUser.firstName + " " + currentUser.lastName ?? "error"}
             </p>
             <p className="text-muted-foreground font-normal">
-              {currentUser?.role ?? "error"}
+              {currentUser.role ?? "error"}
             </p>
             <div className="flex items-center space-x-2 text-muted-foreground w-full">
               <MailIcon size={16} />
-              <p className="text-sm truncate">
-                {currentUser?.email ?? `error`}
-              </p>
+              <p className="text-sm truncate">{currentUser.email ?? `error`}</p>
             </div>
           </div>
         </DropdownMenuLabel>

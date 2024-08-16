@@ -1,22 +1,18 @@
 "use client";
-import { LoaderPinwheelIcon, OctagonAlertIcon } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import React from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import React, { useState } from "react";
-import { SignInInput, signInSchema } from "@/schemas/auth";
-
+import { z } from "zod";
+import { LoaderPinwheelIcon, OctagonAlertIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SignInInput } from "@/schemas/auth";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import ContinueBtn from "../continue-btn";
 import PasswordInput from "../password-input";
 import { useMutation } from "@tanstack/react-query";
-import { reActivateAccount, signIn } from "../actions";
-import { z } from "zod";
+import { clearEmailRegistered, reActivateAccount, signIn } from "../actions";
 import { useRouter } from "next/navigation";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const SignInForm = ({
   registered,
@@ -25,14 +21,18 @@ export const SignInForm = ({
   registered?: string;
   email?: string;
 }) => {
-  const [accountSuspended, setAccountSuspended] = useState<boolean>(false);
+  const [accountSuspended, setAccountSuspended] =
+    React.useState<boolean>(false);
   const router = useRouter();
   const [formData, setFormData] = React.useState<SignInInput>({
     email: registered || email || "",
     password: "",
   });
 
-  const [error, setError] = useState<{ success: boolean; message: string }>({
+  const [error, setError] = React.useState<{
+    success: boolean;
+    message: string;
+  }>({
     success: true,
     message: "",
   });
@@ -92,6 +92,15 @@ export const SignInForm = ({
     handleReset();
   };
 
+  const registeredRef = React.useRef<boolean>(!!registered || false);
+
+  React.useEffect(() => {
+    const handleClearEmailRegistered = async () => {
+      await clearEmailRegistered();
+    };
+    handleClearEmailRegistered();
+  }, []);
+
   return (
     <>
       {accountSuspended && (
@@ -107,6 +116,15 @@ export const SignInForm = ({
           </p>
         </div>
       )}
+      {registeredRef.current && (
+        <div className="flex items-center gap-3 rounded-lg bg-amber-200 text-orange-500 sm:rounded-xl sm:max-w-md mx-4 sm:mx-auto transition-all mt-4 mb-10 p-4 ">
+          <OctagonAlertIcon className="size-6  flex flex-shrink-0" />
+          <p className="text-sm ">
+            We've found an existing ICH account with this email address. Please
+            continue to login with your account email and password below.
+          </p>
+        </div>
+      )}
 
       <form
         onSubmit={handleSubmit}
@@ -118,13 +136,6 @@ export const SignInForm = ({
             Enter your email below to login to your account
           </p>
         </div>
-
-        {registered && (
-          <div className="text-orange-400 text-sm">
-            We've found an existing ICH account with this email address. Please
-            continue to log in with your account email and password below.
-          </div>
-        )}
 
         <div className="pt-6">
           <div className="grid gap-4">
@@ -154,6 +165,7 @@ export const SignInForm = ({
                 id="password"
                 name="password"
                 placeholder="********"
+                autoComplete="off"
                 onChange={handleOnchange}
                 value={formData.password}
               />
@@ -166,11 +178,10 @@ export const SignInForm = ({
             </div>
 
             <Button disabled={isPending} variant="default">
-              {isPending ? (
-                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
-              ) : (
-                "Login"
+              {isPending && (
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
               )}
+              Login
             </Button>
             <ContinueBtn label="Login with Google" redir="/login" />
           </div>

@@ -20,6 +20,7 @@ import { recover } from "@/app/actions";
 import { omit } from "lodash";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthContext } from "@/components/providers/auth-provider";
+import PasswordInput from "@/app/(auth)/password-input";
 
 export const PasswordForm = () => {
   const queryClient = useQueryClient();
@@ -44,6 +45,7 @@ export const PasswordForm = () => {
       setOnFocusAt(undefined);
     }
   };
+
   const handleValidateError = useCallback(
     (
       keys: (
@@ -137,6 +139,22 @@ export const PasswordForm = () => {
           {currentUser?.hasPassword && (
             <div className="space-y-2">
               <Label htmlFor="old-password">Current password</Label>
+              {/* <PasswordInput
+                id="old-password"
+                name="old-password"
+                autoComplete="off"
+                spellCheck="false"
+                placeholder="********1"
+                value={form.oldPassword}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    oldPassword: e.target.value,
+                  }))
+                }
+                open={true}
+                onOpenChange={() => setIsHiddenPassword((prev) => !prev)}
+              /> */}
               <div
                 className={cn(
                   "flex gap-x-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
@@ -166,7 +184,6 @@ export const PasswordForm = () => {
                   className="disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={isPending}
                   type="button"
-                  tabIndex={-1}
                   onClick={() => setIsHiddenPassword((prev) => !prev)}
                 >
                   {isHiddenPassword ? (

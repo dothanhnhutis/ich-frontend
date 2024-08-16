@@ -56,3 +56,7 @@ export async function resetPassword(input: ResetPasswordInput) {
 export async function activateAccount(token: string) {
   await authApi.activateAccount(token);
 }
+
+export async function clearEmailRegistered() {
+  cookies().delete("registered");
+}

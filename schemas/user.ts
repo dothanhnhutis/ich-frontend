@@ -36,10 +36,18 @@ export const createUserSchema = z.object({
     .email("Invalid email"),
   status: z.enum(status),
   role: z.enum(roles),
-  username: z.string({
-    required_error: "username field is required",
-    invalid_type_error: "username field must be string",
-  }),
+  firstName: z
+    .string({
+      required_error: "firstName field is required",
+      invalid_type_error: "firstName field must be string",
+    })
+    .min(1, "First name can't be empty"),
+  lastName: z
+    .string({
+      required_error: "lastName field is required",
+      invalid_type_error: "lastName field must be string",
+    })
+    .min(1, "Last name can't be empty"),
   password: z.string({
     required_error: "password field is required",
     invalid_type_error: "password field must be string",
@@ -48,7 +56,8 @@ export const createUserSchema = z.object({
 
 export const editProfileSchema = z
   .object({
-    username: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
     phone: z.string(),
     address: z.string(),
   })
@@ -87,14 +96,8 @@ export type EditPictureInput = z.infer<typeof editPictureSchema>;
 export type User = Omit<CreateUserInput, "password"> & {
   id: string;
   emailVerified: boolean;
-  emailVerificationExpires?: Date | null;
-  emailVerificationToken?: string | null;
   picture: string | null;
   hasPassword: boolean;
-  passwordResetToken?: string | null;
-  passwordResetExpires?: Date | null;
-  reActiveToken?: string | null;
-  reActiveExpires?: Date | null;
   phone?: string | null;
   address?: string | null;
   createdAt: Date;

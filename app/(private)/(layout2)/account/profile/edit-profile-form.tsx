@@ -25,7 +25,8 @@ const EditProfileForm = () => {
   const { currentUser } = useAuthContext();
   const [open, setOpen] = useState<boolean>(false);
   const [form, setform] = useState<EditProfileInput>({
-    username: currentUser?.username || "",
+    firstName: currentUser?.firstName || "",
+    lastName: currentUser?.lastName || "",
     phone: currentUser?.phone || "",
     address: currentUser?.address || "",
   });
@@ -50,6 +51,7 @@ const EditProfileForm = () => {
   });
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(form);
     mutate(form);
   };
 
@@ -67,46 +69,62 @@ const EditProfileForm = () => {
             This is how others will see you on the site.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input
-              className="focus-visible:ring-0 focus-visible:ring-transparent"
-              type="text"
-              id="username"
-              name="username"
-              value={form.username}
-              onChange={handleOnchange}
-            />
-            {/* <p className="text-[0.8rem] text-muted-foreground">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First name</Label>
+              <Input
+                className="focus-visible:ring-0 focus-visible:ring-transparent"
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={form.firstName}
+                onChange={handleOnchange}
+              />
+              {/* <p className="text-[0.8rem] text-muted-foreground">
               This is your public display name. It can be your real name or a
               pseudonym. You can only change this once every 30 days.
             </p> */}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last name</Label>
+              <Input
+                className="focus-visible:ring-0 focus-visible:ring-transparent"
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={form.lastName}
+                onChange={handleOnchange}
+              />
+              {/* <p className="text-[0.8rem] text-muted-foreground">
+              This is your public display name. It can be your real name or a
+              pseudonym. You can only change this once every 30 days.
+            </p> */}
+            </div>
+            <div className="col-span-2 space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                className="focus-visible:ring-0 focus-visible:ring-transparent"
+                type="text"
+                id="phone"
+                name="phone"
+                value={form.phone || ""}
+                onChange={handleOnchange}
+              />
+            </div>
+            <div className="col-span-2 space-y-2">
+              <Label htmlFor="address">Address</Label>
+              <Input
+                className="focus-visible:ring-0 focus-visible:ring-transparent"
+                type="text"
+                id="address"
+                name="address"
+                value={form.address || ""}
+                onChange={handleOnchange}
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              className="focus-visible:ring-0 focus-visible:ring-transparent"
-              type="text"
-              id="phone"
-              name="phone"
-              value={form.phone || ""}
-              onChange={handleOnchange}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
-            <Input
-              className="focus-visible:ring-0 focus-visible:ring-transparent"
-              type="text"
-              id="address"
-              name="address"
-              value={form.address || ""}
-              onChange={handleOnchange}
-            />
-          </div>
-
-          <DialogFooter>
+          <DialogFooter className="pt-3">
             <Button
               type="button"
               onClick={() => setOpen(false)}
@@ -118,14 +136,16 @@ const EditProfileForm = () => {
               type="submit"
               disabled={
                 isPending ||
-                form.username == "" ||
-                (currentUser?.username == form.username &&
+                form.firstName == "" ||
+                form.lastName == "" ||
+                (currentUser?.firstName == form.firstName &&
+                  currentUser?.lastName == form.lastName &&
                   currentUser?.phone == form.phone &&
                   currentUser?.address == form.address)
               }
             >
               {isPending && (
-                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
               )}
               Save
             </Button>

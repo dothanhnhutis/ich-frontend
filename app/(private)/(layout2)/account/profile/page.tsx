@@ -12,7 +12,6 @@ import { useAuthContext } from "@/components/providers/auth-provider";
 
 const ProfilePage = () => {
   const { currentUser } = useAuthContext();
-
   return (
     <>
       <h3 className="text-lg font-medium">Profile</h3>
@@ -24,7 +23,7 @@ const ProfilePage = () => {
         <div className="order-last lg:w-1/4 lg:flex lg:justify-center">
           <UploadPhoto>
             <Avatar className="size-40 cursor-pointer">
-              <AvatarImage src={currentUser?.picture || AvatarDefault.src} />
+              <AvatarImage src={currentUser!.picture || AvatarDefault.src} />
               <AvatarFallback className="bg-transparent">
                 <Skeleton className="size-40 rounded-full" />
               </AvatarFallback>
@@ -34,22 +33,22 @@ const ProfilePage = () => {
         <div className="relative w-full space-y-4">
           <div>
             <Label>Username</Label>
-            <p>{currentUser?.username}</p>
+            <p>{currentUser!.firstName + " " + currentUser!.lastName}</p>
           </div>
           <div>
             <Label>Email</Label>
-            <p>{currentUser?.email}</p>
+            <p>{currentUser!.email}</p>
           </div>
           {currentUser?.phone && (
             <div>
               <Label>Phone</Label>
-              <p>{currentUser.phone}</p>
+              <p>{currentUser?.phone}</p>
             </div>
           )}
           {currentUser?.address && (
             <div>
               <Label>Address</Label>
-              <p>{currentUser.address}</p>
+              <p>{currentUser?.address}</p>
             </div>
           )}
           <EditProfileForm />

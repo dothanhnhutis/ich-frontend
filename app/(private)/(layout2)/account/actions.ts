@@ -1,12 +1,10 @@
 "use server";
-import { cookies } from "next/headers";
 import userApi from "@/service/collections/user-collections";
 import {
   EditPasswordInput,
   EditPictureInput,
   EditProfileInput,
 } from "@/schemas/user";
-import { redirect } from "next/navigation";
 import { cookieServer } from "@/app/actions";
 
 export async function editProfile(input: EditProfileInput) {

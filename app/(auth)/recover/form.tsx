@@ -48,11 +48,10 @@ const RecoverForm = (props: { email?: string }) => {
         </Link>
 
         <Button disabled={isPending} variant="default">
-          {isPending ? (
-            <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
-          ) : (
-            "Send Email"
+          {isPending && (
+            <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
           )}
+          Send Email
         </Button>
       </div>
     </form>

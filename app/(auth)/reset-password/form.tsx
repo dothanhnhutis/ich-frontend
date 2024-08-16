@@ -89,7 +89,6 @@ const ResetPasswordForm = ({ session }: { session: string }) => {
           onChange={handleOnchange}
           onBlur={handleOnChangFocus}
           disabled={isPending}
-          type={isHiddenPassword ? "password" : "text"}
           open={isHiddenPassword}
           onOpenChange={() => setIsHiddenPassword((prev) => !prev)}
         />
@@ -137,7 +136,6 @@ const ResetPasswordForm = ({ session }: { session: string }) => {
           onChange={handleOnchange}
           onBlur={handleOnChangFocus}
           disabled={isPending}
-          type={isHiddenPassword ? "password" : "text"}
           open={isHiddenPassword}
           onOpenChange={() => setIsHiddenPassword((prev) => !prev)}
         />
@@ -151,8 +149,8 @@ const ResetPasswordForm = ({ session }: { session: string }) => {
       </div>
       <Button disabled={isPending}>
         {isPending && (
-          <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
-        )}{" "}
+          <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
+        )}
         Reset
       </Button>
     </form>

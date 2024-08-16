@@ -51,7 +51,9 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
                 <Skeleton className="w-24 h-24 rounded-full" />
               </AvatarFallback>
             </Avatar>
-            <p className="font-medium text-lg">{currentUser.username}</p>
+            <p className="font-medium text-lg">
+              {currentUser.firstName + " " + currentUser.lastName}
+            </p>
             <p className="text-muted-foreground font-sm">{currentUser.role}</p>
           </DropdownMenuLabel>
 

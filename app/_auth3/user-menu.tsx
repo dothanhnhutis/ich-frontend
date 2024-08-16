@@ -63,7 +63,8 @@ const UserMenu = () => {
             </Avatar>
             <div className="w-full overflow-hidden">
               <p className="font-medium text-lg">
-                {currentUser?.username ?? "error"}
+                {currentUser?.firstName + " " + currentUser?.lastName ??
+                  "error"}
               </p>
               <p className="text-muted-foreground font-normal">
                 {currentUser?.role ?? "error"}
@@ -126,7 +127,9 @@ const UserMenu = () => {
                 <Skeleton className="w-24 h-24 rounded-full" />
               </AvatarFallback>
             </Avatar>
-            <p className="font-medium text-lg">{currentUser?.username}</p>
+            <p className="font-medium text-lg">
+              {currentUser?.firstName + " " + currentUser?.lastName}
+            </p>
             <p className="text-muted-foreground font-sm">{currentUser?.role}</p>
           </DropdownMenuLabel>
 
