@@ -17,12 +17,3 @@ export async function changeEmail(email: string) {
   });
   return { message: data.message, success };
 }
-
-export async function disactivateAccount(path?: string) {
-  const { success } = await userApi.disactivateAccount(await cookieServer());
-  if (success) {
-    cookies().delete("session");
-    if (path) revalidatePath(path);
-    redirect(DEFAULT_LOGOUT_REDIRECT);
-  }
-}
