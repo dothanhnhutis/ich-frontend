@@ -116,15 +116,7 @@ class UserService extends FetchHttp {
     }
   }
 
-  async resetPassword(
-    token: string,
-    input: ResetPasswordInput
-  ): Promise<
-    | ISuccess<{
-        message: string;
-      }>
-    | IError
-  > {
+  async resetPassword(token: string, input: ResetPasswordInput) {
     try {
       return await this.patch<{ message: string }>(
         "/auth/reset-password/" + token,
@@ -291,6 +283,7 @@ class UserService extends FetchHttp {
       }
     }
   }
+
   async editUserById(cookie: string, id: string, input: EditUserInput) {
     try {
       return await this.patch<{ message: string }>(`/${id}`, input, {
@@ -303,6 +296,26 @@ class UserService extends FetchHttp {
         return error.serialize();
       } else {
         console.log("UserService editUserById() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+
+  async signOut(cookie: string) {
+    try {
+      return await this.delete<{ message: string }>("/auth/signout", {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService signOut() method error: ", error);
         return {
           success: false,
           data: { message: error.message },

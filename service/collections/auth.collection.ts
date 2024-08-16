@@ -40,12 +40,7 @@ class AuthService extends FetchHttp {
     }
   }
 
-  async signUp(input: SignUpInput): Promise<
-    | ISuccess<{
-        message: string;
-      }>
-    | IError
-  > {
+  async signUp(input: SignUpInput) {
     try {
       const res = await this.post<{ message: string }>("/signup", input);
       return res;
@@ -62,21 +57,9 @@ class AuthService extends FetchHttp {
     }
   }
 
-  async resetPassword(
-    token: string,
-    input: ResetPasswordInput
-  ): Promise<
-    | ISuccess<{
-        message: string;
-      }>
-    | IError
-  > {
+  async resetPassword(input: ResetPasswordInput) {
     try {
-      const res = await this.patch<{ message: string }>(
-        "/auth/reset-password/" + token,
-        input
-      );
-      return res;
+      return await this.patch<{ message: string }>("/reset-password", input);
     } catch (error: any) {
       if (error instanceof FetchHttpError) {
         return error.serialize();
@@ -90,12 +73,7 @@ class AuthService extends FetchHttp {
     }
   }
 
-  async recover(email: string): Promise<
-    | ISuccess<{
-        message: string;
-      }>
-    | IError
-  > {
+  async recover(email: string) {
     try {
       return await this.patch<{ message: string }>("/recover", {
         email,
@@ -113,12 +91,7 @@ class AuthService extends FetchHttp {
     }
   }
 
-  async activateAccount(token: string): Promise<
-    | ISuccess<{
-        message: string;
-      }>
-    | IError
-  > {
+  async activateAccount(token: string) {
     try {
       return await this.get<{ message: string }>("/auth/reactivate/" + token);
     } catch (error: any) {
@@ -152,7 +125,10 @@ class AuthService extends FetchHttp {
 
   async getSession(token: string) {
     try {
-      return await this.get<any>("?token=" + token);
+      return await this.get<{
+        type: "emailVerification" | "recoverAccount" | "reActivate";
+        session: string;
+      }>("?token=" + token);
     } catch (error: any) {
       if (error instanceof FetchHttpError) {
         return error.serialize();

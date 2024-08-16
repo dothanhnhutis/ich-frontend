@@ -251,7 +251,7 @@ const SignUpForm = () => {
               </p>
             </div>
           </div>
-          <Button variant="default">
+          <Button disabled={isPending} variant="default">
             {isPending ? (
               <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
             ) : (

@@ -12,6 +12,7 @@ const ResetPasswordPage = async ({
   searchParams: { token: string };
 }) => {
   const { success, data } = await authApi.getSession(token);
+
   return (
     <div className="flex flex-col flex-grow mx-auto w-full sm:max-w-[570px] p-4 transition-all">
       <div className="flex flex-col flex-grow space-y-6">
@@ -23,7 +24,7 @@ const ResetPasswordPage = async ({
             <p className="text-sm text-muted-foreground text-center">
               Fill out all fields below to reset your password account
             </p>
-            <ResetPasswordForm token={token} />
+            <ResetPasswordForm session={data.session} />
           </>
         ) : (
           <p className="text-sm text-red-500 text-center">

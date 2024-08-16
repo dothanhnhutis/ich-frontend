@@ -15,13 +15,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { useMutation } from "@tanstack/react-query";
-import { disactivateAccount } from "../actions";
+import { disactivateAccount } from "@/app/actions";
 
 const SettingPage = () => {
   const { currentUser } = useAuthContext();
   const { mutate } = useMutation({
     mutationFn: async () => {
-      await disactivateAccount();
+      await disactivateAccount("/account/settings");
     },
   });
   return (

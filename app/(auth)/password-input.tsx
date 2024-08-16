@@ -1,14 +1,23 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { EyeOffIcon, EyeIcon } from "lucide-react";
 import React, { useState } from "react";
+import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 
-const PasswordInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
-  const [isPassword, setIsPassword] = useState<boolean>(true);
+const PasswordInput = (
+  props: {
+    open?: boolean;
+    onOpenChange?(open: boolean): void;
+  } & React.InputHTMLAttributes<HTMLInputElement>
+) => {
+  const { className, open, onOpenChange, ...ps } = props;
+  const [isPassword, setIsPassword] = useState<boolean>(open || true);
   const handleToggleBtn = () => {
-    setIsPassword((prev) => !prev);
+    if (onOpenChange) {
+      onOpenChange(isPassword);
+    } else {
+      setIsPassword((prev) => !prev);
+    }
   };
-  const { className, ...ps } = props;
 
   return (
     <div
@@ -22,13 +31,13 @@ const PasswordInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
         className="bg-transparent w-full outline-0 text-sm"
         {...ps}
       />
-      {isPassword ? (
-        <EyeOffIcon
+      {open || isPassword ? (
+        <PiEyeClosedBold
           onClick={handleToggleBtn}
           className="flex flex-shrink-0 size-5 cursor-pointer ml-3"
         />
       ) : (
-        <EyeIcon
+        <PiEyeBold
           onClick={handleToggleBtn}
           className="flex flex-shrink-0 size-5 cursor-pointer ml-3"
         />

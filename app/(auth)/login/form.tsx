@@ -12,7 +12,11 @@ import { Input } from "@/components/ui/input";
 import ContinueBtn from "../continue-btn";
 import PasswordInput from "../password-input";
 import { useMutation } from "@tanstack/react-query";
-import { signIn } from "../actions";
+import { reActivateAccount, signIn } from "../actions";
+import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const SignInForm = ({
   registered,
@@ -21,9 +25,8 @@ export const SignInForm = ({
   registered?: string;
   email?: string;
 }) => {
-  const [emailCheckIsError, setEmailCheckIsError] = useState<boolean>(false);
-
-  const [focused, setFocused] = React.useState<string[]>([]);
+  const [accountSuspended, setAccountSuspended] = useState<boolean>(false);
+  const router = useRouter();
   const [formData, setFormData] = React.useState<SignInInput>({
     email: registered || email || "",
     password: "",
@@ -39,33 +42,8 @@ export const SignInForm = ({
       success: true,
       message: "",
     });
+    if (e.target.name == "email") setAccountSuspended(false);
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const isError = React.useCallback(
-    (field?: "firstName" | "lastName" | "email" | "password" | undefined) => {
-      const val = signInSchema.safeParse(formData);
-      if (val.success) return [];
-      switch (field) {
-        case "email":
-          return val.error.issues.filter((err) => err.path.includes("email"));
-        case "password":
-          return val.error.issues.filter((err) =>
-            err.path.includes("password")
-          );
-        default:
-          return val.error.issues;
-      }
-    },
-    [formData]
-  );
-
-  const handleOnChangFocus = (
-    e: React.FocusEvent<HTMLInputElement, Element>
-  ) => {
-    if (e.type == "blur" && !focused.includes(e.target.name)) {
-      setFocused((prev) => [...prev, e.target.name]);
-    }
   };
 
   const handleReset = (holdEmail?: boolean) => {
@@ -73,7 +51,7 @@ export const SignInForm = ({
       email: holdEmail ? prev.email : "",
       password: "",
     }));
-    setFocused([]);
+    setAccountSuspended(false);
     setError({ success: true, message: "" });
   };
 
@@ -81,39 +59,45 @@ export const SignInForm = ({
     mutationFn: async (input: SignInInput) => {
       return await signIn(input);
     },
-    onSuccess({ success }) {
+    onSuccess({ success, data }) {
       if (!success) {
-        setError({ success: false, message: "Invalid email or password." });
+        if (data.message == "Your account is currently closed") {
+          handleReset(true);
+          setAccountSuspended(true);
+        } else {
+          setError({ success: false, message: data.message });
+          handleReset();
+        }
+      } else {
+        router.push(DEFAULT_LOGIN_REDIRECT);
       }
-    },
-    onMutate() {
-      handleReset();
     },
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isError().length > 0 || formData.password == "") return;
-    if (formData.password.length < 8 || formData.password.length > 40)
+    if (formData.email == "" || formData.password == "") return;
+    if (
+      !z.string().email().safeParse(formData.email).success ||
+      formData.password.length < 8 ||
+      formData.password.length > 40
+    )
       setError({ success: false, message: "Invalid email or password." });
     mutate(formData);
   };
 
   const handleReActivate = async () => {
-    // await reActivateAccount(dataForm.email);
-    // setDataForm({
-    //   email: "",
-    //   password: "",
-    // });
+    await reActivateAccount(formData.email);
+    handleReset();
   };
 
   return (
     <>
-      {emailCheckIsError && (
-        <div className="flex items-center gap-3 rounded-lg bg-destructive/20 sm:rounded-xl sm:max-w-[570px] sm:mx-auto mb-10 p-4">
-          <OctagonAlertIcon className="size-6 text-red-500" />
-          <p className="text-sm">
-            Your account is currently closed. If you would like to re-activate
+      {accountSuspended && (
+        <div className="flex items-center gap-3 rounded-lg bg-amber-200 text-orange-500 sm:rounded-xl sm:max-w-md mx-4 sm:mx-auto transition-all mt-4 mb-10 p-4 ">
+          <OctagonAlertIcon className="size-6  flex flex-shrink-0" />
+          <p className="text-sm ">
+            Your account is currently closed. If you would like to reactivate
             your account, click{" "}
             <button onClick={handleReActivate} className="underline">
               here
@@ -125,7 +109,7 @@ export const SignInForm = ({
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-lg sm:border bg-card text-card-foreground shadow-sm p-4 sm:p-6 sm:mx-auto sm:max-w-sm transition-all"
+        className="rounded-lg sm:border bg-card text-card-foreground shadow-sm p-4 sm:p-6 sm:mx-auto sm:max-w-md transition-all"
       >
         <div className="flex flex-col space-y-1.5">
           <h3 className="font-semibold tracking-tight text-2xl">Login</h3>
@@ -151,26 +135,15 @@ export const SignInForm = ({
                 placeholder="test@example.com"
                 onChange={handleOnchange}
                 value={formData.email}
-                className={cn(
-                  "focus-visible:ring-0",
-                  focused.includes("email") && isError("email").length > 0
-                    ? "border-red-500"
-                    : ""
-                )}
-                onBlur={handleOnChangFocus}
               />
-              {focused.includes("email") &&
-                isError("email").map((error, idx) => (
-                  <p key={idx} className="text-red-500 text-xs font-bold">
-                    {error.message}
-                  </p>
-                ))}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
                 <Link
-                  href="/auth/recover"
+                  href={`/recover${
+                    formData.email == "" ? "" : "?email=" + formData.email
+                  }`}
                   className="ml-auto inline-block text-sm underline "
                 >
                   Forgot your password?
@@ -182,19 +155,8 @@ export const SignInForm = ({
                 placeholder="********"
                 onChange={handleOnchange}
                 value={formData.password}
-                className={cn(
-                  focused.includes("password") && isError("password").length > 0
-                    ? "border-red-500"
-                    : ""
-                )}
-                onBlur={handleOnChangFocus}
               />
-              {focused.includes("password") &&
-                isError("password").map((error, idx) => (
-                  <p key={idx} className="text-red-500 text-xs font-bold">
-                    {error.message}
-                  </p>
-                ))}
+
               {!error.success && (
                 <p className="text-red-500 text-xs font-bold">
                   {error.message}
@@ -202,7 +164,7 @@ export const SignInForm = ({
               )}
             </div>
 
-            <Button variant="default">
+            <Button disabled={isPending} variant="default">
               {isPending ? (
                 <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
               ) : (

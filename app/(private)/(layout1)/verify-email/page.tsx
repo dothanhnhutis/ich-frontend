@@ -67,8 +67,12 @@ const VerifyEmailPage = () => {
               variant="outline"
               className="rounded-full border-2 border-primary !text-primary font-bold"
             >
-              {isPending && (
+              {isPending ? (
                 <AiOutlineLoading3Quarters className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+              ) : time > 0 ? (
+                `(${time}s)`
+              ) : (
+                <></>
               )}{" "}
               Send again
             </Button>

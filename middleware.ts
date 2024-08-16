@@ -2,24 +2,25 @@ import {
   authRoutes,
   DEFAULT_LOGIN_REDIRECT,
   apiAuthPrefix,
-  emailVerifyRoute,
   privateRegExpRoutes,
   roleAccessRoutes,
   DEFAULT_LOGOUT_REDIRECT,
+  EMAIL_VERIFY_ROUTE,
 } from "@/routes";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getCurrentUser } from "./app/actions";
 
 function redirect(request: NextRequest, path?: string) {
-  const { nextUrl } = request;
+  const { nextUrl, url } = request;
   //add Header
   const headers = new Headers(request.headers);
   headers.set("x-current-path", nextUrl.pathname);
   headers.set("x-current-search-params", nextUrl.searchParams.toString());
 
   if (path) {
-    const response = NextResponse.redirect(new URL(path, nextUrl), {
+    console.log("redirect ", url);
+    const response = NextResponse.redirect(new URL(path, url), {
       headers,
     });
     if (path == "/login") response.cookies.delete("session");
@@ -48,33 +49,55 @@ export async function middleware(request: NextRequest) {
     routes.test(nextUrl.pathname)
   );
 
-  if (isLoggedIn) {
-    if (emailVerified) {
+  if (currentUser) {
+    if (currentUser.emailVerified) {
+      if (nextUrl.pathname == EMAIL_VERIFY_ROUTE)
+        return redirect(request, DEFAULT_LOGIN_REDIRECT);
       if (
-        nextUrl.pathname == emailVerifyRoute ||
-        (isPrivateRoute &&
-          !roleAccessRoutes[currentUser.role].some((routes) =>
-            routes.test(nextUrl.pathname)
-          ))
-      ) {
-        url = DEFAULT_LOGIN_REDIRECT;
-      }
+        !roleAccessRoutes[currentUser.role].some((routes) =>
+          routes.test(nextUrl.pathname)
+        )
+      )
+        return redirect(request, DEFAULT_LOGIN_REDIRECT);
     } else {
-      if (isPrivateRoute) {
-        url = emailVerifyRoute;
-      }
+      if (isPrivateRoute) return redirect(request, EMAIL_VERIFY_ROUTE);
     }
-
     if (authRoutes.test(nextUrl.pathname)) {
-      url = DEFAULT_LOGIN_REDIRECT;
+      return redirect(request, DEFAULT_LOGIN_REDIRECT);
     }
   } else {
-    if (isPrivateRoute || nextUrl.pathname == emailVerifyRoute) {
-      url = DEFAULT_LOGOUT_REDIRECT;
+    if (isPrivateRoute) {
+      return redirect(request, DEFAULT_LOGOUT_REDIRECT);
     }
   }
 
-  return redirect(request, url);
+  // if (isLoggedIn) {
+  //   if (emailVerified) {
+  //     if (
+  //       nextUrl.pathname == EMAIL_VERIFY_ROUTE ||
+  //       (isPrivateRoute &&
+  //         !roleAccessRoutes[currentUser.role].some((routes) =>
+  //           routes.test(nextUrl.pathname)
+  //         ))
+  //     ) {
+  //       url = DEFAULT_LOGIN_REDIRECT;
+  //     }
+  //   } else {
+  //     if (isPrivateRoute) {
+  //       url = EMAIL_VERIFY_ROUTE;
+  //     }
+  //   }
+
+  //   if (authRoutes.test(nextUrl.pathname)) {
+  //     url = DEFAULT_LOGIN_REDIRECT;
+  //   }
+  // } else {
+  //   if (isPrivateRoute || nextUrl.pathname == EMAIL_VERIFY_ROUTE) {
+  //     url = DEFAULT_LOGOUT_REDIRECT;
+  //   }
+  // }
+
+  // return redirect(request, url);
 }
 
 export const config = {

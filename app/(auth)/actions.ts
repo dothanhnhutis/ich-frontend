@@ -17,7 +17,6 @@ export async function signIn(input: SignInInput) {
   const res = await authApi.signIn(input);
   if (res.success) {
     cookies().delete("registered");
-
     for (const cookie of res.headers.getSetCookie()) {
       const parser = cookieParser(cookie);
       if (parser) {
@@ -25,8 +24,6 @@ export async function signIn(input: SignInInput) {
         cookies().set(name, value, opt);
       }
     }
-    revalidatePath("/login");
-    redirect("/account/profile");
   }
   return res;
 }
@@ -51,7 +48,7 @@ export async function clearSendEmail() {
   cookies().delete("send-email");
 }
 
-export async function resetPassword(token: string, input: ResetPasswordInput) {
-  const { success, data } = await authApi.resetPassword(token, input);
+export async function resetPassword(input: ResetPasswordInput) {
+  const { success, data } = await authApi.resetPassword(input);
   return { success, message: data.message };
 }

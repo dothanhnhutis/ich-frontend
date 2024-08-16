@@ -25,14 +25,6 @@ export async function editPicture(input: EditPictureInput) {
   return { success, message: data.message };
 }
 
-export async function disactivateAccount() {
-  const { success } = await userApi.disactivateAccount(await cookieServer());
-  if (success) {
-    cookies().delete("session");
-    redirect("/login");
-  }
-}
-
 export async function editPassword(input: EditPasswordInput) {
   const { success, data } = await userApi.editPassword(
     await cookieServer(),

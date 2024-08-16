@@ -1,118 +1,107 @@
 "use client";
-import React, { useCallback, useState, useTransition } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
-import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { ResetPasswordInput, resetPasswordSchema } from "@/schemas/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { resetPassword } from "../actions";
+import PasswordInput from "../password-input";
+import { useMutation } from "@tanstack/react-query";
 
-const ResetPasswordForm = ({ token }: { token: string }) => {
+const ResetPasswordForm = ({ session }: { session: string }) => {
   const router = useRouter();
-  const [isPending, startTransistion] = useTransition();
   const [isHiddenPassword, setIsHiddenPassword] = React.useState<boolean>(true);
-  const [focusingField, setOnFocusAt] = useState<string | undefined>();
 
-  const [form, setForm] = useState<ResetPasswordInput>({
+  const [formData, setFormData] = React.useState<ResetPasswordInput>({
+    session,
     password: "",
     confirmPassword: "",
   });
 
+  const isError = React.useCallback(
+    (field?: "password" | "confirmPassword" | undefined) => {
+      const val = resetPasswordSchema.safeParse(formData);
+      if (val.success) return [];
+      switch (field) {
+        case "password":
+          return val.error.issues.filter((err) =>
+            err.path.includes("password")
+          );
+        case "confirmPassword":
+          return val.error.issues.filter((err) =>
+            err.path.includes("confirmPassword")
+          );
+        default:
+          return val.error.issues;
+      }
+    },
+    [formData]
+  );
+
+  const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const [focused, setFocused] = React.useState<string[]>([]);
+
   const handleOnChangFocus = (
     e: React.FocusEvent<HTMLInputElement, Element>
   ) => {
-    if (e.type == "focus") {
-      setOnFocusAt(e.target.name);
-    }
-    if (e.type == "blur") {
-      setOnFocusAt(undefined);
+    if (e.type == "blur" && !focused.includes(e.target.name)) {
+      setFocused((prev) => [...prev, e.target.name]);
     }
   };
-  const handleValidateError = useCallback(
-    (
-      keys: (
-        | "password_too_small"
-        | "password_too_big"
-        | "password_format_error"
-        | "password_do_not_match"
-      )[]
-    ) => {
-      const val = resetPasswordSchema.safeParse(form);
-      if (val.success) return false;
-      const errors = val.error.issues.map((i) => i.message);
-      return keys.filter((val) => errors.includes(val)).length > 0;
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (input: ResetPasswordInput) => {
+      return await resetPassword(input);
     },
-    [form]
-  );
+    onSuccess({ success, message }) {
+      if (success) {
+        setFormData((prev) => ({ ...prev, password: "", confirmPassword: "" }));
+        toast.success(message);
+        router.push("/login");
+      } else {
+        toast.error(message);
+      }
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    startTransistion(async () => {
-      const res = await resetPassword(token, form);
-      if (res.success) {
-        setForm({ password: "", confirmPassword: "" });
-        toast.success(res.message);
-        router.push("/login");
-      } else {
-        toast.error(res.message);
-      }
-    });
+    if (isError().length > 0) return;
+    mutate(formData);
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-y-4 w-full">
       <div className="flex flex-col gap-y-1.5">
         <Label htmlFor="new-password">New password</Label>
-        <div
-          className={cn(
-            "flex gap-x-2 h-10 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background",
-            isPending && "cursor-not-allowed opacity-50"
-          )}
-        >
-          <input
-            value={form.password}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, password: e.target.value }))
-            }
-            onFocus={handleOnChangFocus}
-            onBlur={handleOnChangFocus}
-            disabled={isPending}
-            type={isHiddenPassword ? "password" : "text"}
-            className="flex-grow outline-none bg-transparent placeholder:align-middle placeholder:justify-center placeholder:text-muted-foreground text-sm disabled:cursor-not-allowed disabled:opacity-50"
-            id="new-password"
-            name="password"
-            autoComplete="off"
-            placeholder="********"
-          />
-          <button
-            className="disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={isPending}
-            type="button"
-            tabIndex={-1}
-            onClick={() => setIsHiddenPassword((prev) => !prev)}
-          >
-            {isHiddenPassword ? (
-              <PiEyeClosedBold size={20} />
-            ) : (
-              <PiEyeBold size={20} />
-            )}
-          </button>
-        </div>
-        <div
-          className={cn(
-            focusingField == "password" || form.password.length > 0
-              ? "flex flex-col gap-y-1"
-              : "hidden"
-          )}
-        >
+        <PasswordInput
+          id="new-password"
+          name="password"
+          autoComplete="off"
+          placeholder="********"
+          value={formData.password}
+          onChange={handleOnchange}
+          onBlur={handleOnChangFocus}
+          disabled={isPending}
+          type={isHiddenPassword ? "password" : "text"}
+          open={isHiddenPassword}
+          onOpenChange={() => setIsHiddenPassword((prev) => !prev)}
+        />
+
+        <div className="flex flex-col gap-y-1">
           <p className="font-normal text-xs">Your password must include:</p>
           <p
             className={cn(
               "inline-flex gap-x-2 items-center text-gray-500",
-              handleValidateError(["password_too_small", "password_too_big"])
+              isError("password").filter(
+                (err) => err.code == "too_small" || err.code == "too_big"
+              ).length > 0
                 ? ""
                 : "text-green-400"
             )}
@@ -123,7 +112,8 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
           <p
             className={cn(
               "inline-flex gap-x-2 items-center text-gray-500",
-              handleValidateError(["password_format_error"])
+              isError("password").filter((err) => err.code == "custom").length >
+                0
                 ? ""
                 : "text-green-400"
             )}
@@ -137,63 +127,33 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
       </div>
       <div className="flex flex-col gap-y-1.5">
         <Label htmlFor="confirm-password">Confirm password</Label>
-        <div
-          className={cn(
-            "flex gap-x-2 h-10 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background",
-            isPending && "cursor-not-allowed opacity-50"
-          )}
-        >
-          <input
-            value={form.confirmPassword}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                confirmPassword: e.target.value,
-              }))
-            }
-            onFocus={handleOnChangFocus}
-            onBlur={handleOnChangFocus}
-            disabled={isPending}
-            type={isHiddenPassword ? "password" : "text"}
-            className="flex-grow outline-none bg-transparent placeholder:align-middle placeholder:justify-center placeholder:text-muted-foreground text-sm disabled:cursor-not-allowed disabled:opacity-50"
-            id="confirm-password"
-            name="confirmPassword"
-            autoComplete="off"
-            placeholder="********"
-          />
-          <button
-            className="disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={isPending}
-            type="button"
-            tabIndex={-1}
-            onClick={() => setIsHiddenPassword((prev) => !prev)}
-          >
-            {isHiddenPassword ? (
-              <PiEyeClosedBold size={20} />
-            ) : (
-              <PiEyeBold size={20} />
-            )}
-          </button>
-        </div>
-        {!focusingField && handleValidateError(["password_do_not_match"]) && (
-          <p className="text-red-500 font-medium text-xs">
-            {`Confirm password don't match`}
-          </p>
-        )}
+
+        <PasswordInput
+          id="confirm-password"
+          name="confirmPassword"
+          autoComplete="off"
+          placeholder="********"
+          value={formData.confirmPassword}
+          onChange={handleOnchange}
+          onBlur={handleOnChangFocus}
+          disabled={isPending}
+          type={isHiddenPassword ? "password" : "text"}
+          open={isHiddenPassword}
+          onOpenChange={() => setIsHiddenPassword((prev) => !prev)}
+        />
+
+        {focused.includes("confirmPassword") &&
+          isError("confirmPassword").map((error, idx) => (
+            <p key={idx} className="font-bold text-xs text-red-500">
+              {error.message}
+            </p>
+          ))}
       </div>
-      <Button
-        disabled={
-          isPending ||
-          form.password.length == 0 ||
-          form.confirmPassword.length == 0 ||
-          (!focusingField && !resetPasswordSchema.safeParse(form).success)
-        }
-      >
-        {isPending ? (
+      <Button disabled={isPending}>
+        {isPending && (
           <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
-        ) : (
-          "Reset"
-        )}
+        )}{" "}
+        Reset
       </Button>
     </form>
   );

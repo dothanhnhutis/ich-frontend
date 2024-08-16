@@ -1,3 +1,4 @@
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -7,9 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { privateRegExpRoutes } from "@/routes";
 import { useQueryClient } from "@tanstack/react-query";
-import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
 import { User } from "@/schemas/user";
@@ -24,14 +23,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { disactivateAccount, signOut } from "@/app/actions";
 
 const UserMenu = ({ currentUser }: { currentUser: User }) => {
-  const router = useRouter();
-  const pathname = usePathname();
   const [open, setOpen] = React.useState<boolean>(false);
-  const isPrivateRoute = React.useMemo(() => {
-    return privateRegExpRoutes.some((routes) => routes.test(pathname));
-  }, [pathname]);
   const queryClient = useQueryClient();
   return (
     <div>
@@ -71,8 +66,7 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
 
           <DropdownMenuItem
             onClick={() => {
-              //   signOut();
-              router.refresh();
+              signOut();
               queryClient.removeQueries({ type: "all" });
             }}
           >
@@ -93,9 +87,7 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
-                // if (await disactivateAccount()) {
-                //   router.push("/login");
-                // }
+                await disactivateAccount("/verify-email");
               }}
             >
               Continue

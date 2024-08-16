@@ -1,13 +1,13 @@
 "use client";
 import Link from "next/link";
 import { toast } from "sonner";
-import React, { useState, useTransition } from "react";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import React, { useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { recover } from "@/app/actions";
 import { useMutation } from "@tanstack/react-query";
+import { LoaderPinwheelIcon } from "lucide-react";
 
 const RecoverForm = (props: { email?: string }) => {
   const [email, setEmail] = useState(() => props.email || "");
@@ -46,11 +46,13 @@ const RecoverForm = (props: { email?: string }) => {
         <Link href="/login" className={buttonVariants({ variant: "link" })}>
           Cancel
         </Link>
-        <Button disabled={isPending}>
-          {isPending && (
-            <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+
+        <Button disabled={isPending} variant="default">
+          {isPending ? (
+            <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
+          ) : (
+            "Send Email"
           )}
-          Send Email
         </Button>
       </div>
     </form>
