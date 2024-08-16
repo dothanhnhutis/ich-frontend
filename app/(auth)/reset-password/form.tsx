@@ -8,7 +8,7 @@ import { ResetPasswordInput, resetPasswordSchema } from "@/schemas/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { resetPassword } from "../actions";
-import PasswordInput from "../password-input";
+import PasswordInput from "../../../components/password-input";
 import { useMutation } from "@tanstack/react-query";
 
 const ResetPasswordForm = ({ session }: { session: string }) => {

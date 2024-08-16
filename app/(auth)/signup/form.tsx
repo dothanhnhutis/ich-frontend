@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { signUp } from "../actions";
 import { toast } from "sonner";
-import PasswordInput from "../password-input";
+import PasswordInput from "../../../components/password-input";
 
 const SignUpForm = () => {
   const [formData, setFormData] = React.useState<SignUpInput>({

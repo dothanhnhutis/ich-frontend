@@ -1,23 +1,30 @@
 "use client";
 import { cn } from "@/lib/utils";
-import React, { useState } from "react";
+import React from "react";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 
-const PasswordInput = (
-  props: {
-    open?: boolean;
-    onOpenChange?(open: boolean): void;
-  } & React.InputHTMLAttributes<HTMLInputElement>
-) => {
-  const { className, open, onOpenChange, ...ps } = props;
-  const [isPassword, setIsPassword] = useState<boolean>(open || true);
+const PasswordInput = ({
+  className,
+  defaultOpen,
+  open,
+  onOpenChange,
+  ...props
+}: {
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?(open: boolean): void;
+} & React.InputHTMLAttributes<HTMLInputElement>) => {
+  const [isPassword, setIsPassword] = React.useState<boolean | undefined>(
+    defaultOpen
+  );
+
   const handleToggleBtn = () => {
-    if (onOpenChange) {
-      onOpenChange(isPassword);
-    } else {
-      setIsPassword((prev) => !prev);
-    }
+    setIsPassword((prev) => !prev);
   };
+
+  // React.useEffect(() => {
+  //   if (onOpenChange) onOpenChange(open || isPassword);
+  // }, [isPassword]);
 
   return (
     <div
@@ -29,7 +36,7 @@ const PasswordInput = (
       <input
         type={isPassword ? "password" : "text"}
         className="bg-transparent w-full outline-0 text-sm"
-        {...ps}
+        {...props}
       />
       {open || isPassword ? (
         <PiEyeClosedBold

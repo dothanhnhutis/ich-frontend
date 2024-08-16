@@ -20,48 +20,59 @@ import { recover } from "@/app/actions";
 import { omit } from "lodash";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthContext } from "@/components/providers/auth-provider";
-import PasswordInput from "@/app/(auth)/password-input";
+import PasswordInput from "@/components/password-input";
 
 export const PasswordForm = () => {
   const queryClient = useQueryClient();
   const { currentUser } = useAuthContext();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [isHiddenPassword, setIsHiddenPassword] = useState<boolean>(true);
-  const [isError, setIsError] = useState<boolean>(true);
-  const [focusingField, setOnFocusAt] = useState<string | undefined>();
 
-  const [form, setForm] = useState<EditPasswordInput>({
+  const [formData, setFormData] = useState<EditPasswordInput>({
     oldPassword: "",
     newPassword: "",
     confirmNewPassword: "",
   });
+
+  const isError = React.useCallback(
+    (
+      field?: "oldPassword" | "newPassword" | "confirmNewPassword" | undefined
+    ) => {
+      const val = editPasswordSchema.safeParse(formData);
+      if (val.success) return [];
+      switch (field) {
+        case "oldPassword":
+          return val.error.issues.filter((err) =>
+            err.path.includes("oldPassword")
+          );
+        case "newPassword":
+          return val.error.issues.filter((err) =>
+            err.path.includes("newPassword")
+          );
+        case "confirmNewPassword":
+          return val.error.issues.filter((err) =>
+            err.path.includes("confirmNewPassword")
+          );
+        default:
+          return val.error.issues;
+      }
+    },
+    [formData]
+  );
+
+  const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const [focused, setFocused] = React.useState<string[]>([]);
+
   const handleOnChangFocus = (
     e: React.FocusEvent<HTMLInputElement, Element>
   ) => {
-    if (e.type == "focus") {
-      setOnFocusAt(e.target.name);
-    }
-    if (e.type == "blur") {
-      setOnFocusAt(undefined);
+    if (e.type == "blur" && !focused.includes(e.target.name)) {
+      setFocused((prev) => [...prev, e.target.name]);
     }
   };
-
-  const handleValidateError = useCallback(
-    (
-      keys: (
-        | "password_too_small"
-        | "password_too_big"
-        | "password_format_error"
-        | "password_do_not_match"
-      )[]
-    ) => {
-      const val = editPasswordSchema.safeParse(form);
-      if (val.success) return false;
-      const errors = val.error.issues.map((i) => i.message);
-      return keys.filter((val) => errors.includes(val)).length > 0;
-    },
-    [form]
-  );
 
   const { isPending, mutate } = useMutation({
     mutationFn: async (input: EditPasswordInput) => {
@@ -70,7 +81,7 @@ export const PasswordForm = () => {
         : await createPassword(omit(input, ["oldPassword"]));
     },
     onSettled() {
-      setIsError(false);
+      // setIsError(false);
     },
     onSuccess({ success, message }) {
       if (success) {
@@ -79,25 +90,25 @@ export const PasswordForm = () => {
         setOpenDialog(false);
       } else {
         toast.error(message);
-        setIsError(true);
+        // setIsError(true);
       }
     },
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    mutate(form);
+    // mutate(formData);
   };
 
-  useEffect(() => {
-    setForm({
-      oldPassword: "",
-      newPassword: "",
-      confirmNewPassword: "",
-    });
-    setIsError(false);
-    setIsHiddenPassword(true);
-  }, [openDialog]);
+  // useEffect(() => {
+  //   setForm({
+  //     oldPassword: "",
+  //     newPassword: "",
+  //     confirmNewPassword: "",
+  //   });
+  //   setIsError(false);
+  //   setIsHiddenPassword(true);
+  // }, [openDialog]);
 
   const { isPending: isSending, mutate: send } = useMutation({
     mutationFn: async (email: string) => {
@@ -116,11 +127,14 @@ export const PasswordForm = () => {
     <Dialog
       open={openDialog}
       onOpenChange={(open) => {
-        if (!isSending) setOpenDialog(open);
+        console.log(open);
+        // if (!isSending) setOpenDialog(open);
       }}
     >
       <Button
         onClick={() => {
+          console.log("111");
+
           setOpenDialog(true);
         }}
       >
@@ -136,6 +150,20 @@ export const PasswordForm = () => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <PasswordInput
+            autoComplete="off"
+            spellCheck="false"
+            placeholder="********"
+            value={"12"}
+            defaultOpen={false}
+            // onChange={handleOnchange}
+            // open={isHiddenPassword}
+            // onOpenChange={(open) => {
+            //   console.log(open);
+            //   setIsHiddenPassword(open);
+            // }}
+            onBlur={handleOnChangFocus}
+          />
           {currentUser?.hasPassword && (
             <div className="space-y-2">
               <Label htmlFor="old-password">Current password</Label>
@@ -162,13 +190,8 @@ export const PasswordForm = () => {
                 )}
               >
                 <input
-                  value={form.oldPassword}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      oldPassword: e.target.value,
-                    }))
-                  }
+                  value={formData.oldPassword}
+                  onChange={handleOnchange}
                   onFocus={handleOnChangFocus}
                   onBlur={handleOnChangFocus}
                   disabled={isPending}
@@ -193,7 +216,7 @@ export const PasswordForm = () => {
                   )}
                 </button>
               </div>
-              {isError && (
+              {true && (
                 <p className="text-red-500 font-medium text-xs">
                   Current password is incorrect.{" "}
                   <button
@@ -215,52 +238,28 @@ export const PasswordForm = () => {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="new-password">New password</Label>
-            <div
-              className={cn(
-                "flex gap-x-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-                isPending && "cursor-not-allowed opacity-50"
-              )}
-            >
-              <input
-                value={form.newPassword}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, newPassword: e.target.value }))
-                }
-                onFocus={handleOnChangFocus}
-                onBlur={handleOnChangFocus}
-                disabled={isPending}
-                type={isHiddenPassword ? "password" : "text"}
-                className="flex-grow outline-none bg-transparent placeholder:align-middle placeholder:justify-center placeholder:text-muted-foreground text-sm disabled:cursor-not-allowed disabled:opacity-50"
-                id="new-password"
-                name="new-password"
-                autoComplete="off"
-                spellCheck="false"
-                placeholder="********"
-              />
-              <button
-                className="disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={isPending}
-                type="button"
-                tabIndex={-1}
-                onClick={() => setIsHiddenPassword((prev) => !prev)}
-              >
-                {isHiddenPassword ? (
-                  <PiEyeClosedBold size={20} />
-                ) : (
-                  <PiEyeBold size={20} />
-                )}
-              </button>
-            </div>
+            <Label htmlFor="newPassword">New password</Label>
+            <PasswordInput
+              id="newPassword"
+              name="newPassword"
+              autoComplete="off"
+              spellCheck="false"
+              placeholder="********"
+              value={formData.newPassword}
+              onChange={handleOnchange}
+              open={isHiddenPassword}
+              onOpenChange={() => setIsHiddenPassword((prev) => !prev)}
+              onBlur={handleOnChangFocus}
+            />
+
             <div className="flex flex-col gap-y-1">
               <p className="font-normal text-xs">Your password must include:</p>
               <p
                 className={cn(
                   "inline-flex gap-x-2 items-center text-gray-500",
-                  handleValidateError([
-                    "password_too_small",
-                    "password_too_big",
-                  ])
+                  isError("newPassword").filter(
+                    (err) => err.code == "too_small" || err.code == "too_big"
+                  ).length > 0
                     ? ""
                     : "text-green-400"
                 )}
@@ -271,7 +270,8 @@ export const PasswordForm = () => {
               <p
                 className={cn(
                   "inline-flex gap-x-2 items-center text-gray-500",
-                  handleValidateError(["password_format_error"])
+                  isError("newPassword").filter((err) => err.code == "custom")
+                    .length > 0
                     ? ""
                     : "text-green-400"
                 )}
@@ -284,64 +284,40 @@ export const PasswordForm = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Confirm password</Label>
-            <div
-              className={cn(
-                "flex gap-x-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-                isPending && "cursor-not-allowed opacity-50"
-              )}
-            >
-              <input
-                value={form.confirmNewPassword}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    confirmNewPassword: e.target.value,
-                  }))
-                }
-                onFocus={handleOnChangFocus}
-                onBlur={handleOnChangFocus}
-                disabled={isPending}
-                type={isHiddenPassword ? "password" : "text"}
-                className="flex-grow outline-none bg-transparent placeholder:align-middle placeholder:justify-center placeholder:text-muted-foreground text-sm disabled:cursor-not-allowed disabled:opacity-50"
-                id="confirm-password"
-                name="confirm-password"
-                autoComplete="off"
-                spellCheck="false"
-                placeholder="********"
-              />
-              <button
-                className="disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={isPending}
-                type="button"
-                tabIndex={-1}
-                onClick={() => setIsHiddenPassword((prev) => !prev)}
-              >
-                {isHiddenPassword ? (
-                  <PiEyeClosedBold size={20} />
-                ) : (
-                  <PiEyeBold size={20} />
-                )}
-              </button>
-            </div>
-            {!focusingField &&
-              handleValidateError(["password_do_not_match"]) && (
-                <p className="text-red-500 font-medium text-xs">
-                  {`Confirm password don't match`}
-                </p>
-              )}
+            <Label htmlFor="confirmNewPassword">Confirm password</Label>
+            <PasswordInput
+              id="confirmNewPassword"
+              name="confirmNewPassword"
+              autoComplete="off"
+              spellCheck="false"
+              placeholder="********"
+              value={formData.confirmNewPassword}
+              onChange={handleOnchange}
+              defaultOpen={true}
+              open={isHiddenPassword}
+              // onOpenChange={(open) => {
+              //   console.log("11", open);
+              //   setIsHiddenPassword(open);
+              // }}
+              onBlur={handleOnChangFocus}
+            />
+
+            {true && (
+              <p className="text-red-500 font-medium text-xs">
+                {`Confirm password don't match`}
+              </p>
+            )}
           </div>
           <div className="flex gap-4 flex-col sm:flex-row justify-end">
             <Button
               disabled={
-                isSending ||
-                isPending ||
-                (currentUser?.hasPassword && form.oldPassword.length == 0) ||
-                form.newPassword.length == 0 ||
-                form.confirmNewPassword.length == 0 ||
-                (!focusingField &&
-                  currentUser?.hasPassword &&
-                  !editPasswordSchema.safeParse(form).success)
+                isSending || isPending
+                // (currentUser?.hasPassword && form.oldPassword.length == 0) ||
+                // form.newPassword.length == 0 ||
+                // form.confirmNewPassword.length == 0 ||
+                // (!focusingField &&
+                //   currentUser?.hasPassword &&
+                //   !editPasswordSchema.safeParse(form).success)
               }
               className="sm:order-last"
             >

@@ -8,7 +8,7 @@ import { SignInInput } from "@/schemas/auth";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import ContinueBtn from "../continue-btn";
-import PasswordInput from "../password-input";
+import PasswordInput from "../../../components/password-input";
 import { useMutation } from "@tanstack/react-query";
 import { clearEmailRegistered, reActivateAccount, signIn } from "../actions";
 import { useRouter } from "next/navigation";
