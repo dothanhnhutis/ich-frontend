@@ -93,7 +93,7 @@ class AuthService extends FetchHttp {
 
   async activateAccount(token: string) {
     try {
-      return await this.get<{ message: string }>("/auth/reactivate/" + token);
+      return await this.get<{ message: string }>("/reactivate/" + token);
     } catch (error: any) {
       if (error instanceof FetchHttpError) {
         return error.serialize();

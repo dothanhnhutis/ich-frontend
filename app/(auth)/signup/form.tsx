@@ -105,7 +105,7 @@ const SignUpForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-lg sm:border bg-card text-card-foreground shadow-sm p-4 sm:p-6 sm:mx-auto sm:max-w-sm transition-all"
+      className="rounded-lg sm:border bg-card text-card-foreground shadow-sm p-4 sm:p-6 sm:mx-auto sm:max-w-md transition-all"
     >
       <div className="flex flex-col space-y-1.5">
         <h3 className="font-semibold tracking-tight text-2xl">Sign Up</h3>

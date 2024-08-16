@@ -66,7 +66,7 @@ export async function middleware(request: NextRequest) {
       return redirect(request, DEFAULT_LOGIN_REDIRECT);
     }
   } else {
-    if (isPrivateRoute) {
+    if (isPrivateRoute || nextUrl.pathname == EMAIL_VERIFY_ROUTE) {
       return redirect(request, DEFAULT_LOGOUT_REDIRECT);
     }
   }

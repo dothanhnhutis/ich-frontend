@@ -52,3 +52,7 @@ export async function resetPassword(input: ResetPasswordInput) {
   const { success, data } = await authApi.resetPassword(input);
   return { success, message: data.message };
 }
+
+export async function activateAccount(token: string) {
+  await authApi.activateAccount(token);
+}

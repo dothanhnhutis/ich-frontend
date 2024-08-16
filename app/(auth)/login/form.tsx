@@ -60,13 +60,14 @@ export const SignInForm = ({
       return await signIn(input);
     },
     onSuccess({ success, data }) {
+      console.log(data);
       if (!success) {
         if (data.message == "Your account is currently closed") {
           handleReset(true);
           setAccountSuspended(true);
         } else {
-          setError({ success: false, message: data.message });
           handleReset();
+          setError({ success: false, message: data.message });
         }
       } else {
         router.push(DEFAULT_LOGIN_REDIRECT);

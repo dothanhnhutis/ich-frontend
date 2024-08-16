@@ -18,6 +18,7 @@ export const privateRegExpRoutes = [
   ProductRoutes,
   UsersRoutes,
   /^\/manager$/,
+  // /^\/verify-email$/,
 ];
 
 export const roleAccessRoutes: Record<User["role"], RegExp[]> = {
