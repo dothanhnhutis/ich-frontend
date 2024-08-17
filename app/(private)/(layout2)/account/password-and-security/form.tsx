@@ -59,13 +59,10 @@ export const PasswordForm = () => {
     },
     [formData]
   );
-
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
   const [focused, setFocused] = React.useState<string[]>([]);
-
   const handleOnChangFocus = (
     e: React.FocusEvent<HTMLInputElement, Element>
   ) => {
@@ -95,20 +92,25 @@ export const PasswordForm = () => {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // mutate(formData);
+  const handleReset = () => {
+    setFormData({
+      oldPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    });
+    setFocused([]);
+    setIsHiddenPassword(true);
   };
 
-  // useEffect(() => {
-  //   setForm({
-  //     oldPassword: "",
-  //     newPassword: "",
-  //     confirmNewPassword: "",
-  //   });
-  //   setIsError(false);
-  //   setIsHiddenPassword(true);
-  // }, [openDialog]);
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isError().length > 0) return;
+    mutate(formData);
+  };
+
+  useEffect(() => {
+    handleReset();
+  }, [openDialog]);
 
   const { isPending: isSending, mutate: send } = useMutation({
     mutationFn: async (email: string) => {
@@ -125,16 +127,14 @@ export const PasswordForm = () => {
 
   return (
     <Dialog
+      defaultOpen={true}
       open={openDialog}
       onOpenChange={(open) => {
-        console.log(open);
-        // if (!isSending) setOpenDialog(open);
+        if (!isSending) setOpenDialog(open);
       }}
     >
       <Button
         onClick={() => {
-          console.log("111");
-
           setOpenDialog(true);
         }}
       >
@@ -150,74 +150,30 @@ export const PasswordForm = () => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <PasswordInput
-            autoComplete="off"
-            spellCheck="false"
-            placeholder="********"
-            value={"12"}
-            defaultOpen={false}
-            // onChange={handleOnchange}
-            // open={isHiddenPassword}
-            // onOpenChange={(open) => {
-            //   console.log(open);
-            //   setIsHiddenPassword(open);
-            // }}
-            onBlur={handleOnChangFocus}
-          />
           {currentUser?.hasPassword && (
             <div className="space-y-2">
-              <Label htmlFor="old-password">Current password</Label>
-              {/* <PasswordInput
-                id="old-password"
-                name="old-password"
+              <Label htmlFor="oldPassword">Current password</Label>
+              <PasswordInput
+                id="oldPassword"
+                name="oldPassword"
                 autoComplete="off"
                 spellCheck="false"
-                placeholder="********1"
-                value={form.oldPassword}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    oldPassword: e.target.value,
-                  }))
-                }
-                open={true}
-                onOpenChange={() => setIsHiddenPassword((prev) => !prev)}
-              /> */}
-              <div
-                className={cn(
-                  "flex gap-x-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-                  isPending && "cursor-not-allowed opacity-50"
-                )}
-              >
-                <input
-                  value={formData.oldPassword}
-                  onChange={handleOnchange}
-                  onFocus={handleOnChangFocus}
-                  onBlur={handleOnChangFocus}
-                  disabled={isPending}
-                  type={isHiddenPassword ? "password" : "text"}
-                  className="flex-grow outline-none bg-transparent placeholder:align-middle placeholder:justify-center placeholder:text-muted-foreground text-sm disabled:cursor-not-allowed disabled:opacity-50"
-                  id="old-password"
-                  name="old-password"
-                  autoComplete="off"
-                  spellCheck="false"
-                  placeholder="********"
-                />
-                <button
-                  className="disabled:cursor-not-allowed disabled:opacity-50"
-                  disabled={isPending}
-                  type="button"
-                  onClick={() => setIsHiddenPassword((prev) => !prev)}
-                >
-                  {isHiddenPassword ? (
-                    <PiEyeClosedBold size={20} />
-                  ) : (
-                    <PiEyeBold size={20} />
-                  )}
-                </button>
-              </div>
-              {true && (
-                <p className="text-red-500 font-medium text-xs">
+                placeholder="********"
+                value={formData.oldPassword}
+                onChange={handleOnchange}
+                onBlur={handleOnChangFocus}
+                open={isHiddenPassword}
+                onOpenChange={setIsHiddenPassword}
+              />
+              {focused.includes("oldPassword") &&
+                isError("oldPassword").map((error, idx) => (
+                  <p key={idx} className="text-red-500 text-xs font-bold">
+                    {error.message}
+                  </p>
+                ))}
+
+              {false && (
+                <p className="text-red-500 text-xs font-bold">
                   Current password is incorrect.{" "}
                   <button
                     disabled={isSending}
@@ -247,9 +203,9 @@ export const PasswordForm = () => {
               placeholder="********"
               value={formData.newPassword}
               onChange={handleOnchange}
-              open={isHiddenPassword}
-              onOpenChange={() => setIsHiddenPassword((prev) => !prev)}
               onBlur={handleOnChangFocus}
+              open={isHiddenPassword}
+              onOpenChange={setIsHiddenPassword}
             />
 
             <div className="flex flex-col gap-y-1">
@@ -293,20 +249,17 @@ export const PasswordForm = () => {
               placeholder="********"
               value={formData.confirmNewPassword}
               onChange={handleOnchange}
-              defaultOpen={true}
-              open={isHiddenPassword}
-              // onOpenChange={(open) => {
-              //   console.log("11", open);
-              //   setIsHiddenPassword(open);
-              // }}
               onBlur={handleOnChangFocus}
+              open={isHiddenPassword}
+              onOpenChange={setIsHiddenPassword}
             />
 
-            {true && (
-              <p className="text-red-500 font-medium text-xs">
-                {`Confirm password don't match`}
-              </p>
-            )}
+            {focused.includes("confirmNewPassword") &&
+              isError("confirmNewPassword").map((error, idx) => (
+                <p key={idx} className="text-red-500 text-xs font-bold">
+                  {error.message}
+                </p>
+              ))}
           </div>
           <div className="flex gap-4 flex-col sm:flex-row justify-end">
             <Button

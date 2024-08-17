@@ -9,22 +9,24 @@ const PasswordInput = ({
   open,
   onOpenChange,
   ...props
-}: {
+}: React.InputHTMLAttributes<HTMLInputElement> & {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?(open: boolean): void;
-} & React.InputHTMLAttributes<HTMLInputElement>) => {
+}) => {
   const [isPassword, setIsPassword] = React.useState<boolean | undefined>(
     defaultOpen
   );
-
   const handleToggleBtn = () => {
-    setIsPassword((prev) => !prev);
+    if (open != undefined) {
+      if (onOpenChange) onOpenChange(!open);
+    } else if (defaultOpen != undefined) {
+      setIsPassword((prev) => !prev);
+      if (onOpenChange) onOpenChange(isPassword!);
+    } else {
+      setIsPassword((prev) => !prev);
+    }
   };
-
-  // React.useEffect(() => {
-  //   if (onOpenChange) onOpenChange(open || isPassword);
-  // }, [isPassword]);
 
   return (
     <div
@@ -34,7 +36,7 @@ const PasswordInput = ({
       )}
     >
       <input
-        type={isPassword ? "password" : "text"}
+        type={open || isPassword ? "password" : "text"}
         className="bg-transparent w-full outline-0 text-sm"
         {...props}
       />

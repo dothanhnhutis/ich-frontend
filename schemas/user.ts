@@ -10,20 +10,33 @@ export const status = ["Active", "Suspended", "Disabled"] as const;
 
 export const editPasswordSchema = z
   .object({
-    oldPassword: z.string(),
+    oldPassword: z
+      .string({
+        required_error: "Current password is required",
+        invalid_type_error: "Current password must be string",
+      })
+      .min(1, "Current password can not empty."),
     newPassword: z
       .string()
-      .min(8, "password_too_small")
-      .max(40, "password_too_big")
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/,
-        "password_format_error"
-      ),
+      .min(8, "Password must be at least 8 characters long")
+      .max(40, "Password can not be longer than 40 characters")
+      .superRefine((val, ctx) => {
+        const regex: RegExp =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/;
+        if (!regex.test(val)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["password", "format"],
+            message:
+              "Password must include: letters, numbers and special characters",
+          });
+        }
+      }),
     confirmNewPassword: z.string(),
   })
   .strict()
   .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "password_do_not_match",
+    message: "Confirm password don't match",
     path: ["confirmNewPassword"],
   });
 
