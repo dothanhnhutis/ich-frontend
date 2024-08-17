@@ -179,7 +179,7 @@ export const PasswordForm = () => {
                     disabled={isSending}
                     type="button"
                     onClick={() => {
-                      send(currentUser.email);
+                      send(currentUser!.email);
                     }}
                     className="text-primary disabled:opacity-50"
                   >
