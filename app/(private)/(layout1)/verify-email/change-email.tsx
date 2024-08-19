@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { LoaderPinwheelIcon } from "react-icons/ai";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -121,7 +121,7 @@ const ChangeEmailForm = ({
               className="rounded-full border-2 border-primary !text-primary font-bold"
             >
               {isPending && (
-                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
               )}
               Update and resend
             </Button>

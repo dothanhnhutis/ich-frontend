@@ -7,7 +7,7 @@ import { getUserById } from "../../actions";
 
 const EditUserPage = async ({ params: { id } }: { params: { id: string } }) => {
   const user = await getUserById(id);
-  if (!user || user.role == "ADMIN") notFound();
+  if (!user || user.role == "Admin") notFound();
 
   return (
     <>

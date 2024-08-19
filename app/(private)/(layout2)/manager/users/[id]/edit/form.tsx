@@ -22,10 +22,10 @@ export const EditUserForm = ({ user }: { user: User }) => {
   const [form, setForm] = React.useState<EditUserInput>({
     role: user.role,
     address: user.address || "",
-    suspended: user.suspended,
-    disabled: user.disabled,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    status: user.status,
     phone: user.phone || "",
-    username: user.username,
   });
 
   const handleOnchange = (

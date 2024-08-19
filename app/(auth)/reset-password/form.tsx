@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
+import { AiOutlineCheck, LoaderPinwheelIcon } from "react-icons/ai";
 import { cn } from "@/lib/utils";
 import { ResetPasswordInput, resetPasswordSchema } from "@/schemas/auth";
 import { toast } from "sonner";
@@ -149,7 +149,7 @@ const ResetPasswordForm = ({ session }: { session: string }) => {
       </div>
       <Button disabled={isPending}>
         {isPending && (
-          <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
+          <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
         )}
         Reset
       </Button>

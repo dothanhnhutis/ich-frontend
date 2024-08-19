@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { toast } from "sonner";
 import React, { useState, useTransition } from "react";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { LoaderPinwheelIcon } from "react-icons/ai";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +46,7 @@ const RecoverForm = (props: { email?: string }) => {
         </Link>
         <Button disabled={isPending}>
           {isPending && (
-            <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+            <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
           )}
           Send Email
         </Button>

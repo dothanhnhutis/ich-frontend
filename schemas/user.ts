@@ -8,6 +8,35 @@ export const roles = [
 ] as const;
 export const status = ["Active", "Suspended", "Disabled"] as const;
 
+export const createPasswordSchema = z
+  .object({
+    newPassword: z
+      .string({
+        required_error: "New password is required",
+        invalid_type_error: "New password must be string",
+      })
+      .min(8, "New password must be at least 8 characters long")
+      .max(40, "New password can not be longer than 40 characters")
+      .superRefine((val, ctx) => {
+        const regex: RegExp =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/;
+        if (!regex.test(val)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["password", "format"],
+            message:
+              "Password must include: letters, numbers and special characters",
+          });
+        }
+      }),
+    confirmNewPassword: z.string(),
+  })
+  .strict()
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Confirm password don't match",
+    path: ["confirmNewPassword"],
+  });
+
 export const editPasswordSchema = z
   .object({
     oldPassword: z
@@ -17,7 +46,10 @@ export const editPasswordSchema = z
       })
       .min(1, "Current password can not empty."),
     newPassword: z
-      .string()
+      .string({
+        required_error: "New password is required",
+        invalid_type_error: "New password must be string",
+      })
       .min(8, "Password must be at least 8 characters long")
       .max(40, "Password can not be longer than 40 characters")
       .superRefine((val, ctx) => {
@@ -43,28 +75,43 @@ export const editPasswordSchema = z
 export const createUserSchema = z.object({
   email: z
     .string({
-      required_error: "email field is required",
-      invalid_type_error: "email field must be string",
+      required_error: "email is required",
+      invalid_type_error: "email must be string",
     })
     .email("Invalid email"),
   status: z.enum(status),
   role: z.enum(roles),
   firstName: z
     .string({
-      required_error: "firstName field is required",
-      invalid_type_error: "firstName field must be string",
+      required_error: "First name is required",
+      invalid_type_error: "First name must be string",
     })
     .min(1, "First name can't be empty"),
   lastName: z
     .string({
-      required_error: "lastName field is required",
-      invalid_type_error: "lastName field must be string",
+      required_error: "lastName is required",
+      invalid_type_error: "lastName must be string",
     })
     .min(1, "Last name can't be empty"),
-  password: z.string({
-    required_error: "password field is required",
-    invalid_type_error: "password field must be string",
-  }),
+  password: z
+    .string({
+      required_error: "New password is required",
+      invalid_type_error: "New password must be string",
+    })
+    .min(8, "New password must be at least 8 characters long")
+    .max(40, "New password can not be longer than 40 characters")
+    .superRefine((val, ctx) => {
+      const regex: RegExp =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]*$/;
+      if (!regex.test(val)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["password", "format"],
+          message:
+            "Password must include: letters, numbers and special characters",
+        });
+      }
+    }),
 });
 
 export const editProfileSchema = z
@@ -86,20 +133,17 @@ export const editUserSchema = createUserSchema
   .omit({ email: true, password: true })
   .extend({
     phone: z.string({
-      required_error: "phone field is required",
-      invalid_type_error: "phone field must be string",
+      required_error: "phone is required",
+      invalid_type_error: "phone must be string",
     }),
     address: z.string({
-      required_error: "address field is required",
-      invalid_type_error: "address field must be string",
-    }),
-    disabled: z.boolean({
-      required_error: "disabled field is required",
-      invalid_type_error: "disabled field must be boolean",
+      required_error: "address is required",
+      invalid_type_error: "address must be string",
     }),
   })
   .partial();
 
+export type CreatePasswordInput = z.infer<typeof createPasswordSchema>;
 export type EditPasswordInput = z.infer<typeof editPasswordSchema>;
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type EditUserInput = z.infer<typeof editUserSchema>;

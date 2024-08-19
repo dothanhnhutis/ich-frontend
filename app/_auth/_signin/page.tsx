@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import FormError from "../form-error";
 import { Button } from "@/components/ui/button";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { LoaderPinwheelIcon } from "react-icons/ai";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -112,7 +112,7 @@ const SigninPage = () => {
           type="submit"
         >
           {isPending ? (
-            <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+            <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
           ) : (
             "Sign In"
           )}

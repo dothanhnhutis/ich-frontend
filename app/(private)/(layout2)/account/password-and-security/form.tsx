@@ -1,13 +1,16 @@
 "use client";
-import React, { useState, useCallback, useEffect } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 
-import { LockIcon } from "lucide-react";
+import { LoaderPinwheelIcon, LockIcon, XIcon } from "lucide-react";
+import { AiOutlineCheck } from "react-icons/ai";
 import { Label } from "@/components/ui/label";
-import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
-import { EditPasswordInput, editPasswordSchema } from "@/schemas/user";
-import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
+import {
+  createPasswordSchema,
+  EditPasswordInput,
+  editPasswordSchema,
+} from "@/schemas/user";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +19,6 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { createPassword, editPassword } from "../actions";
-import { recover } from "@/app/actions";
 import { omit } from "lodash";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthContext } from "@/components/providers/auth-provider";
@@ -25,10 +27,14 @@ import PasswordInput from "@/components/password-input";
 export const PasswordForm = () => {
   const queryClient = useQueryClient();
   const { currentUser } = useAuthContext();
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [isHiddenPassword, setIsHiddenPassword] = useState<boolean>(true);
+  const [openDialog, setOpenDialog] = React.useState<boolean>(false);
+  const [isHiddenPassword, setIsHiddenPassword] = React.useState<boolean>(true);
+  const [invalidCurrentPassword, setInvalidCurrentPassword] =
+    React.useState<boolean>(false);
+  const [newPasswordError, setNewPasswordError] =
+    React.useState<boolean>(false);
 
-  const [formData, setFormData] = useState<EditPasswordInput>({
+  const [formData, setFormData] = React.useState<EditPasswordInput>({
     oldPassword: "",
     newPassword: "",
     confirmNewPassword: "",
@@ -38,13 +44,15 @@ export const PasswordForm = () => {
     (
       field?: "oldPassword" | "newPassword" | "confirmNewPassword" | undefined
     ) => {
-      const val = editPasswordSchema.safeParse(formData);
+      const val = currentUser!.hasPassword
+        ? editPasswordSchema.safeParse(formData)
+        : createPasswordSchema.safeParse(omit(formData, ["oldPassword"]));
       if (val.success) return [];
       switch (field) {
         case "oldPassword":
-          return val.error.issues.filter((err) =>
-            err.path.includes("oldPassword")
-          );
+          return currentUser!.hasPassword
+            ? val.error.issues.filter((err) => err.path.includes("oldPassword"))
+            : [];
         case "newPassword":
           return val.error.issues.filter((err) =>
             err.path.includes("newPassword")
@@ -60,6 +68,10 @@ export const PasswordForm = () => {
     [formData]
   );
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.name == "oldPassword" && invalidCurrentPassword)
+      setInvalidCurrentPassword(false);
+    if (e.target.name == "newPassword" && newPasswordError)
+      setNewPasswordError(false);
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
   const [focused, setFocused] = React.useState<string[]>([]);
@@ -77,9 +89,6 @@ export const PasswordForm = () => {
         ? await editPassword(input)
         : await createPassword(omit(input, ["oldPassword"]));
     },
-    onSettled() {
-      // setIsError(false);
-    },
     onSuccess({ success, message }) {
       if (success) {
         queryClient.invalidateQueries({ queryKey: ["me"] });
@@ -87,7 +96,16 @@ export const PasswordForm = () => {
         setOpenDialog(false);
       } else {
         toast.error(message);
-        // setIsError(true);
+        setFormData({
+          oldPassword: "",
+          newPassword: "",
+          confirmNewPassword: "",
+        });
+        setFocused([]);
+        if (message == "Old password is incorrect")
+          setInvalidCurrentPassword(true);
+        if (message == "The new password and old password must not be the same")
+          setNewPasswordError(true);
       }
     },
   });
@@ -100,6 +118,8 @@ export const PasswordForm = () => {
     });
     setFocused([]);
     setIsHiddenPassword(true);
+    setInvalidCurrentPassword(false);
+    setNewPasswordError(false);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -108,29 +128,16 @@ export const PasswordForm = () => {
     mutate(formData);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     handleReset();
   }, [openDialog]);
-
-  const { isPending: isSending, mutate: send } = useMutation({
-    mutationFn: async (email: string) => {
-      return await recover(email);
-    },
-    onSuccess({ success, message }) {
-      if (success) {
-        toast.success(message);
-      } else {
-        toast.error(message);
-      }
-    },
-  });
 
   return (
     <Dialog
       defaultOpen={true}
       open={openDialog}
       onOpenChange={(open) => {
-        if (!isSending) setOpenDialog(open);
+        if (!isPending) setOpenDialog(open);
       }}
     >
       <Button
@@ -150,10 +157,11 @@ export const PasswordForm = () => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {currentUser?.hasPassword && (
+          {currentUser!.hasPassword && (
             <div className="space-y-2">
               <Label htmlFor="oldPassword">Current password</Label>
               <PasswordInput
+                disabled={isPending}
                 id="oldPassword"
                 name="oldPassword"
                 autoComplete="off"
@@ -172,22 +180,9 @@ export const PasswordForm = () => {
                   </p>
                 ))}
 
-              {false && (
+              {invalidCurrentPassword && (
                 <p className="text-red-500 text-xs font-bold">
-                  Current password is incorrect.{" "}
-                  <button
-                    disabled={isSending}
-                    type="button"
-                    onClick={() => {
-                      send(currentUser!.email);
-                    }}
-                    className="text-primary disabled:opacity-50"
-                  >
-                    Forgot password?
-                  </button>
-                  {isSending && (
-                    <AiOutlineLoading3Quarters className="text-primary inline size-4 animate-spin flex-shrink-0 ml-1" />
-                  )}
+                  Current password is incorrect.
                 </p>
               )}
             </div>
@@ -196,6 +191,7 @@ export const PasswordForm = () => {
           <div className="space-y-2">
             <Label htmlFor="newPassword">New password</Label>
             <PasswordInput
+              disabled={isPending}
               id="newPassword"
               name="newPassword"
               autoComplete="off"
@@ -237,11 +233,20 @@ export const PasswordForm = () => {
                   Letters, numbers and special characters
                 </span>
               </p>
+              {newPasswordError && (
+                <p className="text-red-500 text-xs font-bold flex gap-2 items-center">
+                  <XIcon className="size-4 flex flex-shrink-0" />
+                  <span>
+                    The new password and old password must not be the same
+                  </span>
+                </p>
+              )}
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmNewPassword">Confirm password</Label>
             <PasswordInput
+              disabled={isPending}
               id="confirmNewPassword"
               name="confirmNewPassword"
               autoComplete="off"
@@ -262,20 +267,9 @@ export const PasswordForm = () => {
               ))}
           </div>
           <div className="flex gap-4 flex-col sm:flex-row justify-end">
-            <Button
-              disabled={
-                isSending || isPending
-                // (currentUser?.hasPassword && form.oldPassword.length == 0) ||
-                // form.newPassword.length == 0 ||
-                // form.confirmNewPassword.length == 0 ||
-                // (!focusingField &&
-                //   currentUser?.hasPassword &&
-                //   !editPasswordSchema.safeParse(form).success)
-              }
-              className="sm:order-last"
-            >
+            <Button disabled={isPending} className="sm:order-last">
               {isPending && (
-                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0 mr-2 " />
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0 mr-2 " />
               )}
               Save
             </Button>

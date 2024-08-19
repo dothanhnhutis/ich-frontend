@@ -8,6 +8,7 @@ const PasswordInput = ({
   defaultOpen,
   open,
   onOpenChange,
+  disabled,
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement> & {
   open?: boolean;
@@ -32,23 +33,34 @@ const PasswordInput = ({
     <div
       className={cn(
         "flex items-center py-2 px-3 border rounded-md h-10",
+        disabled ? "opacity-50 cursor-not-allowed" : "",
         className
       )}
     >
       <input
+        disabled={disabled}
         type={open || isPassword ? "password" : "text"}
-        className="bg-transparent w-full outline-0 text-sm"
+        className={cn(
+          "bg-transparent w-full outline-0 text-sm",
+          disabled ? "opacity-50 cursor-not-allowed" : ""
+        )}
         {...props}
       />
       {open || isPassword ? (
         <PiEyeClosedBold
           onClick={handleToggleBtn}
-          className="flex flex-shrink-0 size-5 cursor-pointer ml-3"
+          className={cn(
+            "flex flex-shrink-0 size-5 cursor-pointer ml-3",
+            disabled ? "opacity-50 cursor-not-allowed" : ""
+          )}
         />
       ) : (
         <PiEyeBold
           onClick={handleToggleBtn}
-          className="flex flex-shrink-0 size-5 cursor-pointer ml-3"
+          className={cn(
+            "flex flex-shrink-0 size-5 cursor-pointer ml-3",
+            disabled ? "opacity-50 cursor-not-allowed" : ""
+          )}
         />
       )}
     </div>

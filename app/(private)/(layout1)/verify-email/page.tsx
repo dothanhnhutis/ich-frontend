@@ -9,7 +9,7 @@ import { useAuthContext } from "@/components/providers/auth-provider";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { sendEmailVerify } from "../actions";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { LoaderPinwheelIcon } from "react-icons/ai";
 import useCountDown from "@/hook/useCountDown";
 
 const VerifyEmailPage = () => {
@@ -68,7 +68,7 @@ const VerifyEmailPage = () => {
               className="rounded-full border-2 border-primary !text-primary font-bold"
             >
               {isPending ? (
-                <AiOutlineLoading3Quarters className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+                <LoaderPinwheelIcon className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
               ) : time > 0 ? (
                 `(${time}s)`
               ) : (

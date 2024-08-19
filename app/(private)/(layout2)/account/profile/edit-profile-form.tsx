@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { PencilIcon } from "lucide-react";
+import { LoaderPinwheelIcon, PencilIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EditProfileInput, User } from "@/schemas/user";
 import { Button } from "@/components/ui/button";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "sonner";
 import { editProfile } from "../actions";
 import { useAuthContext } from "@/components/providers/auth-provider";
@@ -51,12 +50,16 @@ const EditProfileForm = () => {
   });
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(form);
     mutate(form);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!isPending) setOpen(open);
+      }}
+    >
       <DialogTrigger asChild>
         <div className="absolute top-0 right-0 hover:bg-accent p-2 rounded-full cursor-pointer ">
           <PencilIcon className="size-5" />
@@ -74,6 +77,7 @@ const EditProfileForm = () => {
             <div className="space-y-2">
               <Label htmlFor="firstName">First name</Label>
               <Input
+                disabled={isPending}
                 className="focus-visible:ring-0 focus-visible:ring-transparent"
                 type="text"
                 id="firstName"
@@ -89,6 +93,7 @@ const EditProfileForm = () => {
             <div className="space-y-2">
               <Label htmlFor="lastName">Last name</Label>
               <Input
+                disabled={isPending}
                 className="focus-visible:ring-0 focus-visible:ring-transparent"
                 type="text"
                 id="lastName"
@@ -104,6 +109,7 @@ const EditProfileForm = () => {
             <div className="col-span-2 space-y-2">
               <Label htmlFor="phone">Phone</Label>
               <Input
+                disabled={isPending}
                 className="focus-visible:ring-0 focus-visible:ring-transparent"
                 type="text"
                 id="phone"
@@ -115,6 +121,7 @@ const EditProfileForm = () => {
             <div className="col-span-2 space-y-2">
               <Label htmlFor="address">Address</Label>
               <Input
+                disabled={isPending}
                 className="focus-visible:ring-0 focus-visible:ring-transparent"
                 type="text"
                 id="address"
@@ -126,6 +133,7 @@ const EditProfileForm = () => {
           </div>
           <DialogFooter className="pt-3">
             <Button
+              disabled={isPending}
               type="button"
               onClick={() => setOpen(false)}
               variant="outline"
@@ -145,7 +153,7 @@ const EditProfileForm = () => {
               }
             >
               {isPending && (
-                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
               )}
               Save
             </Button>

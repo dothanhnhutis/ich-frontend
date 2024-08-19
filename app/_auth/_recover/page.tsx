@@ -4,7 +4,7 @@ import { CardWrapper } from "../card-wrapper";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { LoaderPinwheelIcon } from "react-icons/ai";
 import { recover } from "@/service/api/auth.service";
 import { toast } from "sonner";
 
@@ -42,7 +42,7 @@ const RecoverPage = () => {
         </div>
         <Button disabled={isPending || email.length == 0}>
           {isPending ? (
-            <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+            <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
           ) : (
             "Submit"
           )}

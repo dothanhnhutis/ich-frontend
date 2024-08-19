@@ -1,6 +1,6 @@
 "use client";
 import { LockIcon, OctagonAlertIcon, UserIcon } from "lucide-react";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { LoaderPinwheelIcon } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -164,7 +164,7 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
             </div>
             <Button disabled={isPending}>
               {tab == "email" && isPending ? (
-                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
               ) : (
                 <span>Continue</span>
               )}
@@ -240,7 +240,7 @@ export const SignInForm = ({ registered }: { registered?: string }) => {
 
             <Button disabled={isPending}>
               {isPending ? (
-                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
               ) : (
                 <span>Log in</span>
               )}

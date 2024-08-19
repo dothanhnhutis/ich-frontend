@@ -7,7 +7,7 @@ import { SignUpData, signupSchema } from "@/schemas/auth";
 import { signup } from "@/service/api/auth.service";
 import Link from "next/link";
 import React, { useCallback, useState, useTransition } from "react";
-import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
+import { AiOutlineCheck, LoaderPinwheelIcon } from "react-icons/ai";
 import { toast } from "sonner";
 
 export const SignUpForm = () => {
@@ -181,7 +181,7 @@ export const SignUpForm = () => {
         type="submit"
       >
         {isPending ? (
-          <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+          <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
         ) : (
           "Create my account"
         )}

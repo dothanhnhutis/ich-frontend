@@ -13,7 +13,7 @@ import {
 } from "@/service/api/auth.service";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { cn } from "@/lib/utils";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { LoaderPinwheelIcon } from "react-icons/ai";
 import Cookies from "js-cookie";
 
 export const SignInForm = ({
@@ -115,7 +115,7 @@ export const SignInForm = ({
             </div>
             <Button disabled={isPending}>
               {isPending && (
-                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
               )}{" "}
               Continue
             </Button>
@@ -191,7 +191,7 @@ export const SignInForm = ({
 
             <Button disabled={isPending}>
               {isPending && (
-                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
               )}{" "}
               Log in
             </Button>

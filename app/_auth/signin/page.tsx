@@ -12,7 +12,7 @@ import { SignInData, signInSchema } from "@/schemas/auth";
 import { cn } from "@/lib/utils";
 import { signIn } from "@/service/api/auth.service";
 import { useRouter } from "next/navigation";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { LoaderPinwheelIcon } from "react-icons/ai";
 import { SignInGoogleBtn } from "./signin-google-btn";
 
 const SignInPage = () => {
@@ -189,7 +189,7 @@ const SignInPage = () => {
                 className="rounded-lg"
               >
                 {isPending ? (
-                  <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+                  <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
                 ) : (
                   "Log in"
                 )}

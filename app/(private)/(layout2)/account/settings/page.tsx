@@ -16,12 +16,17 @@ import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { useMutation } from "@tanstack/react-query";
 import { disactivateAccount } from "@/app/actions";
+import { LoaderPinwheelIcon } from "lucide-react";
 
 const SettingPage = () => {
   const { currentUser } = useAuthContext();
-  const { mutate } = useMutation({
+  const [open, setOpen] = React.useState<boolean>(false);
+  const { isPending, mutate } = useMutation({
     mutationFn: async () => {
       await disactivateAccount("/account/settings");
+    },
+    onSettled() {
+      setOpen(false);
     },
   });
   return (
@@ -32,7 +37,12 @@ const SettingPage = () => {
         Please be certain.
       </p>
 
-      <AlertDialog>
+      <AlertDialog
+        open={open}
+        onOpenChange={(open) => {
+          if (!isPending) setOpen(open);
+        }}
+      >
         <AlertDialogTrigger asChild>
           <Button variant="destructive" disabled={currentUser?.role == "Admin"}>
             Delete your account
@@ -46,12 +56,16 @@ const SettingPage = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
+              disabled={isPending}
               onClick={() => {
                 mutate();
               }}
             >
+              {isPending && (
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
+              )}
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

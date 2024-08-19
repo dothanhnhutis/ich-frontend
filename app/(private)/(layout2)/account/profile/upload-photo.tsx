@@ -10,14 +10,13 @@ import {
 } from "@/components/ui/dialog";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
 import { useEffect, useRef, useState } from "react";
-import { RotateCcwIcon, ZoomInIcon } from "lucide-react";
+import { RotateCcwIcon, ZoomInIcon, LoaderPinwheelIcon } from "lucide-react";
 import { cn, getImageInfo } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { editPicture } from "../actions";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -173,7 +172,7 @@ export const UploadPhoto = ({ children }: { children: React.ReactNode }) => {
               />
               <Button disabled={isPending} className="rounded-full w-full">
                 {isPending && (
-                  <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+                  <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
                 )}
                 Save photo
               </Button>

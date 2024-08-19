@@ -6,9 +6,8 @@ import {
 } from "@/schemas/user";
 import userApi from "@/service/collections/user-collections";
 import { cookieServer } from "@/app/actions";
-import { revalidatePath } from "next/cache";
 
-export async function searchUser(input?: SearchUserInput) {
+export async function searchUser(input?: any) {
   const { success, data } = await userApi.searchUser(
     await cookieServer(),
     input

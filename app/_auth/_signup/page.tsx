@@ -7,7 +7,7 @@ import { SignUpData, signupSchema } from "@/schemas/auth";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
-import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
+import { AiOutlineCheck, LoaderPinwheelIcon } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
 import { signUp } from "@/service/api/auth.service";
 import { toast } from "sonner";
@@ -220,7 +220,7 @@ const SignUpPage = () => {
 
         <Button disabled={isPending || isExistEmail}>
           {isPending ? (
-            <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin flex-shrink-0" />
+            <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0" />
           ) : (
             "Next"
           )}
