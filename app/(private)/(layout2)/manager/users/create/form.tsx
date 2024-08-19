@@ -63,6 +63,7 @@ const rolesDropDown: {
 ];
 
 const CreateUserForm = () => {
+  const [open, setOpen] = React.useState(false);
   const queryClient = useQueryClient();
   const router = useRouter();
   const [formData, setFormData] = React.useState<CreateUserInput>({
@@ -195,7 +196,7 @@ const CreateUserForm = () => {
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="role">Role</Label>
-          <Popover>
+          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
                 disabled={isPending}
@@ -208,7 +209,7 @@ const CreateUserForm = () => {
                 <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
+            <PopoverContent className="w-auto p-0">
               <Command>
                 <CommandList>
                   <CommandGroup>
@@ -221,6 +222,7 @@ const CreateUserForm = () => {
                             ...prev,
                             role: currentValue as CreateUserInput["role"],
                           }));
+                          setOpen(false);
                         }}
                       >
                         <Check
@@ -233,7 +235,9 @@ const CreateUserForm = () => {
                         />
                         <div>
                           <Label>{r.name}</Label>
-                          <p>{r.subtitle}</p>
+                          <p className="text-xs font-normal leading-snug text-muted-foreground">
+                            {r.subtitle}
+                          </p>
                         </div>
                       </CommandItem>
                     ))}

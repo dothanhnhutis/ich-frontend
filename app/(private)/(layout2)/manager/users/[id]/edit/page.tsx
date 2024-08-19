@@ -18,7 +18,8 @@ const EditUserPage = async ({ params: { id } }: { params: { id: string } }) => {
         <ChevronLeftIcon className="size-4" />
         <p className="text-xs font-light">Back</p>
       </Link>
-      <h2 className="lg:text-3xl font-bold text-2xl mb-3">Edit Use</h2>
+      <h2 className="lg:text-3xl font-bold text-2xl mb-3">Edit User</h2>
+
       <EditUserForm user={user} />
     </>
   );

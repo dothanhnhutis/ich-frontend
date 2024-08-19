@@ -1,25 +1,71 @@
 "use client";
 import React, { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { EditUserInput, User } from "@/schemas/user";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import AvatarDefault from "@/images/avatars/user-1.jpg";
+import { EditUserInput, editUserSchema, User } from "@/schemas/user";
 import { editUserById } from "../../actions";
 import { toast } from "sonner";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  LoaderPinwheelIcon,
+  OctagonAlertIcon,
+  OctagonPauseIcon,
+  OctagonXIcon,
+} from "lucide-react";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+const rolesDropDown: {
+  id: number;
+  name: string;
+  subtitle: string;
+}[] = [
+  {
+    id: 1,
+    name: "Manager",
+    subtitle: "Can manage post and invoice",
+  },
+  {
+    id: 2,
+    name: "Saler",
+    subtitle: "Can manage invoice",
+  },
+  {
+    id: 3,
+    name: "Bloger",
+    subtitle: "Can manage post",
+  },
+  {
+    id: 4,
+    name: "Customer",
+    subtitle: "Just normal user",
+  },
+];
 
 export const EditUserForm = ({ user }: { user: User }) => {
+  const [open, setOpen] = React.useState(false);
+  const queryClient = useQueryClient();
+
   const router = useRouter();
-  const [form, setForm] = React.useState<EditUserInput>({
+  const [formData, setFormData] = React.useState<EditUserInput>({
     role: user.role,
     address: user.address || "",
     firstName: user.firstName,
@@ -31,155 +77,291 @@ export const EditUserForm = ({ user }: { user: User }) => {
   const handleOnchange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-  const [isPending, startTransistion] = useTransition();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    startTransistion(async () => {
-      const res = await editUserById(user.id, form);
-      if (res.success) {
-        toast.success(res.message);
+  const isError = React.useCallback(
+    (field?: "firstName" | "lastName" | "phone" | "address" | undefined) => {
+      const val = editUserSchema.safeParse(formData);
+      if (val.success) return [];
+      switch (field) {
+        case "firstName":
+          return val.error.issues.filter((err) =>
+            err.path.includes("firstName")
+          );
+        case "lastName":
+          return val.error.issues.filter((err) =>
+            err.path.includes("lastName")
+          );
+        case "phone":
+          return val.error.issues.filter((err) => err.path.includes("phone"));
+        case "address":
+          return val.error.issues.filter((err) => err.path.includes("address"));
+        default:
+          return val.error.issues;
+      }
+    },
+    [formData]
+  );
+
+  const [focused, setFocused] = React.useState<string[]>([]);
+  const handleOnChangFocus = (
+    e: React.FocusEvent<HTMLInputElement, Element>
+  ) => {
+    if (e.type == "blur" && !focused.includes(e.target.name)) {
+      setFocused((prev) => [...prev, e.target.name]);
+    }
+  };
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: async (input: EditUserInput) => {
+      return await editUserById(user.id, formData);
+    },
+    onSuccess: ({ success, message }) => {
+      if (success) {
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+        toast.success(message);
         router.push("/manager/users");
       } else {
-        toast.error(res.message);
+        toast.error(message);
       }
-    });
+    },
+  });
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isError().length > 0) return;
+    mutate(formData);
   };
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="grid grid-cols-2 gap-4 overflow-y-scroll bg-background p-4 rounded-md"
-    >
-      <div className="col-span-2 lg:col-span-1">
-        <Label className="leading-snug text-muted-foreground">ID</Label>
-        <Input
-          disabled
-          value={user.id}
-          type="text"
-          className="focus-visible:ring-transparent"
-        />
+    <form onSubmit={handleSubmit} className="bg-card border p-4 rounded-lg">
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="flex flex-col items-center gap-2 col-span-2">
+          <Label htmlFor="phone">Avatar</Label>
+          <Avatar className="size-28">
+            <AvatarImage
+              referrerPolicy="no-referrer"
+              src={user.picture ?? AvatarDefault.src}
+            />
+            <AvatarFallback className="bg-transparent">
+              <Skeleton className="size-28 rounded-full" />
+            </AvatarFallback>
+          </Avatar>
+        </div>
+        <div className="flex flex-col gap-2 max-[400px]:col-span-2">
+          <Label htmlFor="phone">SID</Label>
+          <p className="text-sm font-normal leading-snug text-muted-foreground">
+            {user.id.split("-").pop()}
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 max-[400px]:col-span-2">
+          <Label>Email</Label>
+          <p className="text-sm font-normal leading-snug text-muted-foreground truncate">
+            {user.email}
+          </p>
+        </div>
       </div>
-      <div className="col-span-2 lg:col-span-1">
-        <Label className="leading-snug text-muted-foreground">Email</Label>
-        <Input
-          disabled
-          value={user.email}
-          type="text"
-          className="focus-visible:ring-transparent"
-        />
-      </div>
-      <div className="col-span-2 lg:col-span-1">
-        <Label className="leading-snug text-muted-foreground">Name</Label>
-        <Input
-          value={form.username}
-          onChange={handleOnchange}
-          type="text"
-          name="username"
-          className="focus-visible:ring-transparent"
-        />
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="firstName">First name</Label>
+          <Input
+            id="firstName"
+            name="firstName"
+            className="focus-visible:ring-transparent "
+            placeholder="First name"
+            disabled={isPending}
+            value={formData.firstName}
+            onChange={handleOnchange}
+            onBlur={handleOnChangFocus}
+          />
+          {focused.includes("firstName") &&
+            isError("firstName").map((error, idx) => (
+              <p key={idx} className="text-red-500 text-xs font-bold">
+                {error.message}
+              </p>
+            ))}
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="lastName">Last name</Label>
+          <Input
+            id="lastName"
+            name="lastName"
+            className="focus-visible:ring-transparent "
+            placeholder="Last name"
+            disabled={isPending}
+            value={formData.lastName}
+            onChange={handleOnchange}
+            onBlur={handleOnChangFocus}
+          />
+          {focused.includes("lastName") &&
+            isError("lastName").map((error, idx) => (
+              <p key={idx} className="text-red-500 text-xs font-bold">
+                {error.message}
+              </p>
+            ))}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="phone">Phone</Label>
+          <Input
+            id="phone"
+            name="phone"
+            className="focus-visible:ring-transparent "
+            placeholder="Phone number"
+            disabled={isPending}
+            value={formData.phone}
+            onChange={handleOnchange}
+            onBlur={handleOnChangFocus}
+          />
+          {focused.includes("phone") &&
+            isError("phone").map((error, idx) => (
+              <p key={idx} className="text-red-500 text-xs font-bold">
+                {error.message}
+              </p>
+            ))}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="address">Address</Label>
+          <Input
+            id="address"
+            name="address"
+            className="focus-visible:ring-transparent "
+            placeholder="Address"
+            disabled={isPending}
+            value={formData.address}
+            onChange={handleOnchange}
+            onBlur={handleOnChangFocus}
+          />
+          {focused.includes("address") &&
+            isError("address").map((error, idx) => (
+              <p key={idx} className="text-red-500 text-xs font-bold">
+                {error.message}
+              </p>
+            ))}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="role">Role</Label>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                disabled={isPending}
+                id="role"
+                variant="outline"
+                role="combobox"
+                className="justify-between"
+              >
+                {formData.role}
+                <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Command>
+                <CommandList>
+                  <CommandGroup>
+                    {rolesDropDown.map((r) => (
+                      <CommandItem
+                        key={r.id}
+                        value={r.name}
+                        onSelect={(currentValue) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            role: currentValue as EditUserInput["role"],
+                          }));
+                          setOpen(false);
+                        }}
+                      >
+                        <CheckIcon
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            r.name == formData.role
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        <div>
+                          <Label>{r.name}</Label>
+                          <p className="text-xs font-normal leading-snug text-muted-foreground">
+                            {r.subtitle}
+                          </p>
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="email">Status</Label>
+          <div className="flex gap-4">
+            <ToggleGroup
+              type="single"
+              className="gap-4 w-full max-[400px]:flex-col"
+              value={formData.status}
+              onValueChange={(value) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  status: value as EditUserInput["status"],
+                }));
+              }}
+            >
+              <ToggleGroupItem
+                disabled={isPending}
+                variant="outline"
+                value="Active"
+                aria-label="Active"
+                className="size-full flex-col items-center justify-center gap-2 p-4 min-[400px:p-4"
+              >
+                <OctagonPauseIcon className="size-6 flex-shrink-0" />
+                Active
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                disabled={isPending}
+                variant="outline"
+                size="lg"
+                value="Suspended"
+                aria-label="Suspend"
+                className="size-full flex-col items-center justify-center gap-2 p-4 min-[400px:p-4"
+              >
+                <OctagonAlertIcon className="size-6 flex-shrink-0" />
+                Suspend
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                disabled={isPending}
+                variant="outline"
+                size="lg"
+                value="Disabled"
+                aria-label="Disable"
+                className="flex-col items-center justify-center gap-2 size-full p-4 min-[400px]:p-4"
+              >
+                <OctagonXIcon className="size-6 flex-shrink-0" />
+                Disable
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+        </div>
       </div>
 
-      <div className="col-span-2 lg:col-span-1">
-        <Label className="leading-snug text-muted-foreground">Role</Label>
-        <Select
+      <div className="flex flex-col sm:flex-row gap-2 justify-end mt-8">
+        <Button
           disabled={isPending}
-          onValueChange={(v) =>
-            setForm((prev) => ({ ...prev, role: v as EditUserInput["role"] }))
-          }
-          defaultValue={form.role}
+          type="button"
+          variant="outline"
+          size="lg"
+          onClick={() => {
+            router.back();
+          }}
         >
-          <SelectTrigger className="focus-visible:ring-transparent">
-            <SelectValue placeholder="Select a role to display" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="MANAGER">MANAGER</SelectItem>
-            <SelectItem value="BLOGER">WRITTER</SelectItem>
-            <SelectItem value="CUSTOMER">CUSTOMER</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="col-span-2 lg:col-span-1">
-        <Label className="leading-snug text-muted-foreground">Phone</Label>
-        <Input
-          disabled={isPending}
-          value={form.phone ?? ""}
-          onChange={handleOnchange}
-          name="phone"
-          type="text"
-          className="focus-visible:ring-transparent"
-        />
-      </div>
-      <div className="col-span-2 lg:col-span-1">
-        <Label className="leading-snug text-muted-foreground">Address</Label>
-        <Input
-          disabled={isPending}
-          value={form.address ?? ""}
-          onChange={handleOnchange}
-          name="address"
-          type="text"
-          className="focus-visible:ring-transparent"
-        />
-      </div>
-      <div className="col-span-2 lg:col-span-1">
-        <Label htmlFor="status" className="leading-snug text-muted-foreground">
-          Suspend
-        </Label>
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-light text-muted-foreground">
-            Do you want this account to be suspend?
-          </p>
-          <Switch
-            disabled={isPending}
-            id="status"
-            name="suspend"
-            checked={form.suspended}
-            onCheckedChange={(checked) =>
-              setForm((prev) => ({ ...prev, suspended: checked }))
-            }
-          />
-        </div>
-      </div>
-
-      <div className="col-span-2 lg:col-span-1">
-        <Label htmlFor="status" className="leading-snug text-muted-foreground">
-          Disable
-        </Label>
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-light text-muted-foreground">
-            Do you want this account to be disable?
-          </p>
-          <Switch
-            disabled={isPending}
-            id="status"
-            name="disabled"
-            checked={form.disabled}
-            onCheckedChange={(checked) =>
-              setForm((prev) => ({ ...prev, disabled: checked }))
-            }
-          />
-        </div>
-      </div>
-
-      <div className="col-span-2">
-        <div className="flex flex-col sm:flex-row gap-2 justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            onClick={() => router.back()}
-          >
-            Back
-          </Button>
-          <Button type="submit" size="lg">
-            {isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              "Save"
-            )}
-          </Button>
-        </div>
+          Cancel
+        </Button>
+        <Button disabled={isPending} type="submit" size="lg">
+          {isPending && (
+            <LoaderPinwheelIcon className=" h-4 w-4 mx-3.5 animate-spin mr-2" />
+          )}
+          Save
+        </Button>
       </div>
     </form>
   );

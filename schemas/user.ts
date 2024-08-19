@@ -86,13 +86,15 @@ export const createUserSchema = z.object({
       required_error: "First name is required",
       invalid_type_error: "First name must be string",
     })
-    .min(1, "First name can't be empty"),
+    .min(1, "First name can't be empty")
+    .max(20, "Last name can not be longer than 20 characters"),
   lastName: z
     .string({
       required_error: "lastName is required",
       invalid_type_error: "lastName must be string",
     })
-    .min(1, "Last name can't be empty"),
+    .min(1, "Last name can't be empty")
+    .max(40, "Last name can not be longer than 40 characters"),
   password: z
     .string({
       required_error: "New password is required",
@@ -132,14 +134,35 @@ export const editPictureSchema = z.object({
 export const editUserSchema = createUserSchema
   .omit({ email: true, password: true })
   .extend({
-    phone: z.string({
-      required_error: "phone is required",
-      invalid_type_error: "phone must be string",
-    }),
-    address: z.string({
-      required_error: "address is required",
-      invalid_type_error: "address must be string",
-    }),
+    phone: z
+      .string({
+        required_error: "Phone is required",
+        invalid_type_error: "Phone must be string",
+      })
+      .superRefine((val, ctx) => {
+        if (val != "") {
+          if (val.length != 10) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["phone"],
+              message: "Phone must be 10 characters",
+            });
+          }
+          if (!/[0-9]{10}/.test(val)) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["phone"],
+              message: "Invalid phone number",
+            });
+          }
+        }
+      }),
+    address: z
+      .string({
+        required_error: "Address is required",
+        invalid_type_error: "Address must be string",
+      })
+      .max(256, "Address can not be longer than 256 characters"),
   })
   .partial();
 

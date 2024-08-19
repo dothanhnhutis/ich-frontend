@@ -23,7 +23,10 @@ const ProfilePage = () => {
         <div className="order-last lg:w-1/4 lg:flex lg:justify-center">
           <UploadPhoto>
             <Avatar className="size-40 cursor-pointer">
-              <AvatarImage src={currentUser!.picture || AvatarDefault.src} />
+              <AvatarImage
+                referrerPolicy="no-referrer"
+                src={currentUser!.picture || AvatarDefault.src}
+              />
               <AvatarFallback className="bg-transparent">
                 <Skeleton className="size-40 rounded-full" />
               </AvatarFallback>

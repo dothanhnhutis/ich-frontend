@@ -9,6 +9,7 @@ import { SearchUserRes } from "@/schemas/user";
 import ActionBtn from "./action-btn";
 import { editUserById } from "./actions";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
   if (!data || data.length == 0)
@@ -17,22 +18,22 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
         <CardEmpty />
       </div>
     );
+  const queryClient = useQueryClient();
 
   const handleAction = async (
     id: string,
     type: "suspend" | "reactivate" | "disable" | "enable"
   ) => {
-    const { success, message } = await editUserById(
-      id,
-      type == "suspend"
-        ? {
-            suspended: true,
-          }
-        : type == "reactivate"
-        ? { suspended: false }
-        : { disabled: type == "disable" }
-    );
+    const { success, message } = await editUserById(id, {
+      status:
+        type == "reactivate" || type == "enable"
+          ? "Active"
+          : type == "suspend"
+          ? "Suspended"
+          : "Disabled",
+    });
     if (success) {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       toast.success(message);
     } else {
       toast.error(message);
@@ -47,7 +48,7 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
           className="rounded-lg bg-card text-card-foreground border w-full"
         >
           <div className="flex items-center justify-between py-3 px-4 border-b text-sm font-medium">
-            <p>ID user: {user.id}</p>
+            <p>ID: {user.id}</p>
             <div className="flex items-center gap-2">
               <Link href="/" className="text-primary font-bold">
                 Chat
@@ -61,13 +62,16 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
             <div className="grid grid-cols-[52px_1fr_1fr] w-full">
               <Avatar>
                 <AvatarImage
+                  referrerPolicy="no-referrer"
                   src={user.picture || "https://github.com/shadcn.png"}
                   alt="avatar"
                 />
                 <AvatarFallback>ICH</AvatarFallback>
               </Avatar>
               <div className="flex flex-col gap-1 text-sm">
-                <p className="text-base font-semibold">{user.username}</p>
+                <p className="text-base font-semibold">
+                  {user.firstName + " " + user.lastName}
+                </p>
                 <p>{user.email}</p>
                 <div className="flex gap-2 items-center">
                   {user.hasPassword && <Badge>Password</Badge>}
@@ -81,91 +85,55 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
               <div className="font-semibold">{user.role}</div>
             </div>
             <div className="flex flex-col gap-2 w-32">
-              {!user.suspended && !user.disabled && (
-                <ActionBtn
-                  as="link"
-                  href={`/manager/users/${user.id}/edit`}
-                  labelAction={"Edit"}
-                />
-              )}
-              {(user.suspended || !user.disabled) && (
-                <ActionBtn
-                  as="modal"
-                  modalTitle={
-                    user.suspended
-                      ? "Are you reactivate sure?"
-                      : !user.disabled
-                      ? "Are you suspend sure?"
-                      : ""
-                  }
-                  modalSubtitle={
-                    user.suspended
-                      ? "This action will reactivate the account"
-                      : !user.disabled
-                      ? "The account has been temporarily deactivated and can be activated at any time by the user."
-                      : ""
-                  }
-                  onSubmit={async () => {
-                    if (user.suspended || !user.disabled) {
-                      await handleAction(
-                        user.id,
-                        user.suspended ? "reactivate" : "suspend"
-                      );
-                    }
-                  }}
-                  destructive={!user.suspended}
-                  labelAction={
-                    user.suspended ? "Active" : !user.disabled ? "Suspend" : ""
-                  }
-                  className={
-                    user.suspended
-                      ? "bg-green-400 hover:bg-green-400/90"
-                      : !user.disabled
-                      ? "bg-amber-400 hover:bg-amber-400/90"
-                      : ""
-                  }
-                />
-              )}
-              {(user.disabled || !user.suspended) && (
+              {user.status == "Active" ? (
+                <>
+                  <ActionBtn
+                    as="link"
+                    href={`/manager/users/${user.id}/edit`}
+                    labelAction="Edit"
+                  />
+                  <ActionBtn
+                    as="modal"
+                    modalTitle="Are you suspend sure?"
+                    modalSubtitle="The account has been temporarily deactivated and can be activated at any time by the user."
+                    onSubmit={async () => {
+                      await handleAction(user.id, "suspend");
+                    }}
+                    destructive
+                    labelAction="Suspend"
+                    className="bg-amber-400 hover:bg-amber-400/90"
+                  />
+                  <ActionBtn
+                    as="modal"
+                    modalSubtitle="The account is permanently disabled and requires admin intervention for reactivation."
+                    modalTitle="Are you sure to disable this account?"
+                    destructive
+                    labelAction="Disable"
+                    onSubmit={async () => {
+                      await handleAction(user.id, "disable");
+                    }}
+                    className="bg-destructive hover:bg-destructive/90"
+                  />
+                </>
+              ) : user.status == "Suspended" ? (
                 <ActionBtn
                   as="modal"
-                  modalSubtitle={
-                    user.disabled
-                      ? "This action will enable the account"
-                      : !user.suspended
-                      ? "The account is permanently disabled and requires admin intervention for reactivation."
-                      : ""
-                  }
-                  modalTitle={
-                    user.disabled
-                      ? "Are you sure to enable this account?"
-                      : !user.suspended
-                      ? "Are you sure to disable this account?"
-                      : ""
-                  }
-                  destructive={!user.disabled}
-                  labelAction={
-                    user.disabled
-                      ? "Enabled"
-                      : !user.suspended
-                      ? "Disactivate"
-                      : ""
-                  }
+                  modalTitle="Are you reactivate sure?"
+                  modalSubtitle="This action will reactivate the account"
                   onSubmit={async () => {
-                    if (user.disabled || !user.suspended) {
-                      await handleAction(
-                        user.id,
-                        user.disabled ? "enable" : "disable"
-                      );
-                    }
+                    await handleAction(user.id, "reactivate");
                   }}
-                  className={
-                    user.disabled
-                      ? "bg-green-400 hover:bg-green-400/90"
-                      : !user.suspended
-                      ? "bg-destructive hover:bg-destructive/90"
-                      : ""
-                  }
+                  labelAction="Reactivate"
+                  className="bg-green-400 hover:bg-green-400/90"
+                />
+              ) : (
+                <ActionBtn
+                  as="modal"
+                  modalTitle="Are you sure to enable this account?"
+                  modalSubtitle="This action will enable the account"
+                  labelAction="Enabled"
+                  onSubmit={async () => await handleAction(user.id, "enable")}
+                  className="bg-green-400 hover:bg-green-400/90"
                 />
               )}
             </div>

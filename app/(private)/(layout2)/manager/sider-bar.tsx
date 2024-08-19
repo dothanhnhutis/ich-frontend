@@ -33,7 +33,7 @@ const permissions: {
     {
       icon: <ClipboardSignatureIcon className="lg:mr-2 size-6" />,
       href: "/manager/posts",
-      label: "Post",
+      label: "Posts",
       isActive: (path: string) => {
         return /^\/manager\/posts(\/create|.+\/edit)?$/.test(path);
       },

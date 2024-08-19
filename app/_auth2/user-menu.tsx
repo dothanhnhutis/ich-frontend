@@ -45,7 +45,10 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
       <DropdownMenu>
         <DropdownMenuTrigger className="outline-none">
           <Avatar>
-            <AvatarImage src={currentUser?.picture ?? AvatarDefault.src} />
+            <AvatarImage
+              referrerPolicy="no-referrer"
+              src={currentUser?.picture ?? AvatarDefault.src}
+            />
             <AvatarFallback className="bg-transparent">
               <Skeleton className="h-10 w-10 rounded-full" />
             </AvatarFallback>
@@ -54,7 +57,10 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
         <DropdownMenuContent align="end" className="w-[360px]">
           <DropdownMenuLabel className="flex items-center gap-3">
             <Avatar className="w-24 h-24">
-              <AvatarImage src={currentUser?.picture ?? AvatarDefault.src} />
+              <AvatarImage
+                referrerPolicy="no-referrer"
+                src={currentUser?.picture ?? AvatarDefault.src}
+              />
               <AvatarFallback className="bg-transparent">
                 <Skeleton className="w-24 h-24 rounded-full" />
               </AvatarFallback>
@@ -106,7 +112,10 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
       <DropdownMenu>
         <DropdownMenuTrigger className="outline-none">
           <Avatar>
-            <AvatarImage src={currentUser.picture ?? AvatarDefault.src} />
+            <AvatarImage
+              referrerPolicy="no-referrer"
+              src={currentUser.picture ?? AvatarDefault.src}
+            />
             <AvatarFallback className="bg-transparent">
               <Skeleton className="h-10 w-10 rounded-full" />
             </AvatarFallback>
@@ -119,7 +128,10 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
         >
           <DropdownMenuLabel className="flex flex-col items-center">
             <Avatar className="w-24 h-24">
-              <AvatarImage src={currentUser.picture ?? AvatarDefault.src} />
+              <AvatarImage
+                referrerPolicy="no-referrer"
+                src={currentUser.picture ?? AvatarDefault.src}
+              />
               <AvatarFallback className="bg-transparent">
                 <Skeleton className="w-24 h-24 rounded-full" />
               </AvatarFallback>
