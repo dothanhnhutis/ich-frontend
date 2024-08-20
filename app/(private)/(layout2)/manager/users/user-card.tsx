@@ -98,6 +98,9 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
                     modalSubtitle="The account has been temporarily deactivated and can be activated at any time by the user."
                     onSubmit={async () => {
                       await handleAction(user.id, "suspend");
+                      queryClient.invalidateQueries({
+                        queryKey: ["user", "active"],
+                      });
                     }}
                     destructive
                     labelAction="Suspend"
@@ -111,6 +114,9 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
                     labelAction="Disable"
                     onSubmit={async () => {
                       await handleAction(user.id, "disable");
+                      queryClient.invalidateQueries({
+                        queryKey: ["user", "active"],
+                      });
                     }}
                     className="bg-destructive hover:bg-destructive/90"
                   />
@@ -122,6 +128,9 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
                   modalSubtitle="This action will reactivate the account"
                   onSubmit={async () => {
                     await handleAction(user.id, "reactivate");
+                    queryClient.invalidateQueries({
+                      queryKey: ["user", "suspended"],
+                    });
                   }}
                   labelAction="Reactivate"
                   className="bg-green-400 hover:bg-green-400/90"
@@ -132,7 +141,12 @@ export const UserCardView = ({ data = [] }: { data?: SearchUserRes[] }) => {
                   modalTitle="Are you sure to enable this account?"
                   modalSubtitle="This action will enable the account"
                   labelAction="Enabled"
-                  onSubmit={async () => await handleAction(user.id, "enable")}
+                  onSubmit={async () => {
+                    await handleAction(user.id, "enable");
+                    queryClient.invalidateQueries({
+                      queryKey: ["user", "disabled"],
+                    });
+                  }}
                   className="bg-green-400 hover:bg-green-400/90"
                 />
               )}

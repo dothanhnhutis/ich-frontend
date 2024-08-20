@@ -4,7 +4,7 @@ import { UserPagination } from "./user-pagination";
 import { UserToolBar } from "./user-toolbar";
 import { UserCardView } from "./user-card";
 import { useQuery } from "@tanstack/react-query";
-import { useUserData } from "@/components/providers/user-provider";
+import { useUserData } from "@/components/providers/user-manager-provider";
 import UserTableView from "./user-table";
 import { searchUser } from "./actions";
 import { Loading } from "@/components/loading";
@@ -22,26 +22,19 @@ const UserData = ({
   const { isPending, data } = useQuery({
     queryKey: ["user", searchParams?.tab, filter],
     queryFn: async () => {
-      const query: SearchUserInput = {
-        email: filter?.emails,
-        role: filter?.roles,
-        page: filter?.page,
-        limit: filter?.limit,
-      };
-
       return await searchUser({
-        email: filter?.emails,
-        role: filter?.roles,
-        status:
-          typeof searchParams?.tab == "string"
-            ? searchParams?.tab == "disabled"
-              ? "Disabled"
-              : searchParams?.tab == "suspended"
-              ? "Suspended"
-              : "Active"
-            : undefined,
-        page: filter?.page,
-        limit: filter?.limit,
+        // email: filter?.emails,
+        // role: filter?.roles,
+        // status:
+        //   typeof searchParams?.tab == "string"
+        //     ? searchParams?.tab == "disabled"
+        //       ? "Disabled"
+        //       : searchParams?.tab == "suspended"
+        //       ? "Suspended"
+        //       : "Active"
+        //     : undefined,
+        // page: filter?.page,
+        // limit: filter?.limit,
       });
     },
   });

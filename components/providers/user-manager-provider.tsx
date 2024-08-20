@@ -1,12 +1,11 @@
 "use client";
-import { Role } from "@/schemas/user";
-import { useQuery } from "@tanstack/react-query";
+import { User } from "@/schemas/user";
 import { omit } from "lodash";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export interface UserConextFilterType {
   emails?: string[];
-  roles?: Role[];
+  roles?: User["role"];
   emailVerified?: boolean;
   orderBy?: UserOrderBy[];
   page?: number;

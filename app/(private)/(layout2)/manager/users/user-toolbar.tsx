@@ -1,5 +1,5 @@
 "use client";
-import { useUserData } from "@/components/providers/user-provider";
+import { useUserData } from "@/components/providers/user-manager-provider";
 import { cn } from "@/lib/utils";
 import { pick } from "lodash";
 import Link from "next/link";

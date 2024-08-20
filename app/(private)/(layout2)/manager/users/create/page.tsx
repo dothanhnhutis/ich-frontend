@@ -7,7 +7,7 @@ const CreateUserPage = () => {
   return (
     <>
       <Link
-        href="/manager/users"
+        href="/manager/users?tab=active"
         className="gap-1 hover:bg-secondary inline-flex py-1 px-2 items-center justify-center rounded"
       >
         <ChevronLeftIcon className="size-4" />

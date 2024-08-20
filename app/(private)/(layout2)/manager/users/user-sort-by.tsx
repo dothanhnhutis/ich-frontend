@@ -8,7 +8,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
-import { UserOrderBy, useUserData } from "@/components/providers/user-provider";
+import {
+  UserOrderBy,
+  useUserData,
+} from "@/components/providers/user-manager-provider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const SortBy = ({

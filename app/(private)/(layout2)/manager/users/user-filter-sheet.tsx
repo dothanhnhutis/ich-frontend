@@ -2,7 +2,7 @@
 import {
   UserConextFilterType,
   useUserData,
-} from "@/components/providers/user-provider";
+} from "@/components/providers/user-manager-provider";
 import { omit } from "lodash";
 import { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Role } from "@/schemas/user";
+import { User } from "@/schemas/user";
 
 type InputFilterType = {
   isLast?: boolean;
@@ -81,7 +81,7 @@ const InputFilter = ({
   );
 };
 
-const roleOption: Role[] = ["MANAGER", "SALER", "BLOGER", "CUSTOMER"];
+const roleOption: User["role"][] = ["Manager", "Saler", "Bloger", "Customer"];
 
 export const UserFilterSheet = (
   init: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">

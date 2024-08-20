@@ -1,5 +1,5 @@
 "use client";
-import { useUserData } from "@/components/providers/user-provider";
+import { useUserData } from "@/components/providers/user-manager-provider";
 import { Button } from "@/components/ui/button";
 import {
   ChevronLeftIcon,

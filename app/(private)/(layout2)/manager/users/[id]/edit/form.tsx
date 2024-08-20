@@ -121,7 +121,7 @@ export const EditUserForm = ({ user }: { user: User }) => {
       if (success) {
         queryClient.invalidateQueries({ queryKey: ["users"] });
         toast.success(message);
-        router.push("/manager/users");
+        router.push("/manager/users?tab=active");
       } else {
         toast.error(message);
       }

@@ -120,9 +120,9 @@ const CreateUserForm = () => {
     },
     onSuccess: ({ success, message }) => {
       if (success) {
-        queryClient.invalidateQueries({ queryKey: ["users"] });
+        queryClient.invalidateQueries({ queryKey: ["user", "active"] });
         toast.success(message);
-        router.push("/manager/users");
+        router.push("/manager/users?tab=active");
       } else {
         toast.error(message);
       }

@@ -76,7 +76,10 @@ export class FetchHttp {
     return result;
   }
 
-  protected get<ResponseData>(url: string, options?: FetchHttpOption) {
+  protected get<ResponseData>(
+    url: string,
+    options?: Omit<FetchHttpOption, "body">
+  ) {
     return this.fetchHttp<ResponseData>("GET", url, options);
   }
 

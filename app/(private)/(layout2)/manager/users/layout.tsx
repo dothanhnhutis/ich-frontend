@@ -1,4 +1,4 @@
-import UserProvider from "@/components/providers/user-provider";
+import UserProvider from "@/components/providers/user-manager-provider";
 import React from "react";
 
 const UserManagerLayout = ({ children }: { children?: React.ReactNode }) => {
