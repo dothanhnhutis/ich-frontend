@@ -9,9 +9,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoonIcon, SunIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function SwitchTheme() {
-  const { setTheme } = useTheme();
+  const { setTheme, themes } = useTheme();
 
   return (
     <DropdownMenu>
@@ -34,5 +35,31 @@ export function SwitchTheme() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+export function DarkMode() {
+  const { setTheme, theme } = useTheme();
+
+  return (
+    <button
+      onClick={() => (theme == "dark" ? setTheme("light") : setTheme("dark"))}
+      className="relative bg-input block flex-shrink-0 rounded-full w-10 h-[22px] border border-muted-foreground hover:border-primary"
+    >
+      <span
+        className={cn(
+          "absolute top-[1px] left-[1px] size-[18px] rounded-full transition-all duration-250 ease-in-out",
+          theme == "dark" ? "translate-x-full bg-black" : "bg-background"
+        )}
+      >
+        <span className="size-[18px] relative block rounded-full overflow-hidden ">
+          {theme == "dark" ? (
+            <MoonIcon className="size-3 absolute top-[3px] left-[3px] text-white" />
+          ) : (
+            <SunIcon className="size-3 absolute top-[3px] left-[3px] text-muted-foreground" />
+          )}
+        </span>
+      </span>
+    </button>
   );
 }
