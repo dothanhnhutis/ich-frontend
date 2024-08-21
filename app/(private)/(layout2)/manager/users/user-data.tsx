@@ -17,27 +17,27 @@ const UserData = ({
     [index: string]: string | string[] | undefined;
   };
 }) => {
-  const { filter, viewMode } = useUserData();
+  const { filter, view } = useUserData();
 
-  const { isPending, data } = useQuery({
-    queryKey: ["user", searchParams?.tab, filter],
-    queryFn: async () => {
-      return await searchUser({
-        // email: filter?.emails,
-        // role: filter?.roles,
-        // status:
-        //   typeof searchParams?.tab == "string"
-        //     ? searchParams?.tab == "disabled"
-        //       ? "Disabled"
-        //       : searchParams?.tab == "suspended"
-        //       ? "Suspended"
-        //       : "Active"
-        //     : undefined,
-        // page: filter?.page,
-        // limit: filter?.limit,
-      });
-    },
-  });
+  // const { isPending, data } = useQuery({
+  //   queryKey: ["user", searchParams?.tab, filter],
+  //   queryFn: async () => {
+  //     return await searchUser({
+  //       email: filter?.emails,
+  //       role: filter?.roles,
+  //       status:
+  //         typeof searchParams?.tab == "string"
+  //           ? searchParams?.tab == "disabled"
+  //             ? "Disabled"
+  //             : searchParams?.tab == "suspended"
+  //             ? "Suspended"
+  //             : "Active"
+  //           : undefined,
+  //       page: filter?.page,
+  //       limit: filter?.limit,
+  //     });
+  //   },
+  // });
 
   return (
     <>
@@ -48,17 +48,17 @@ const UserData = ({
             : "active"
         }
       />
-      {isPending && <Loading />}
-      {!isPending &&
-        (viewMode == "card" ? (
-          <UserCardView data={data?.users} />
+      {false && <Loading />}
+      {!false &&
+        (view == "grid" ? (
+          <UserCardView data={[]} />
         ) : (
-          <UserTableView data={data?.users} />
+          <UserTableView data={[]} />
         ))}
 
-      {!isPending && data?.users && data?.users.length > 0 && (
+      {/* {!isPending && data?.users && data?.users.length > 0 && (
         <UserPagination totalPage={data?.metadata.totalPage} />
-      )}
+      )} */}
     </>
   );
 };

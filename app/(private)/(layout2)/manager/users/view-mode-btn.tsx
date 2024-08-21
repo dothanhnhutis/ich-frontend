@@ -1,23 +1,17 @@
 "use client";
 import { useUserData } from "@/components/providers/user-manager-provider";
 import { Button } from "@/components/ui/button";
-import { LayoutPanelTopIcon, TableIcon } from "lucide-react";
+import { LayoutGridIcon, ListIcon } from "lucide-react";
 
 export const ViewModeBtn = () => {
-  const { setViewMode, viewMode } = useUserData();
+  const { toggleView, view } = useUserData();
 
   return (
-    <Button
-      onClick={() => {
-        setViewMode(viewMode == "card" ? "list" : "card");
-      }}
-      size="icon"
-      variant="outline"
-    >
-      {viewMode == "list" ? (
-        <TableIcon className="size-4" />
+    <Button onClick={toggleView} size="icon" variant="outline">
+      {view == "grid" ? (
+        <ListIcon className="size-4" />
       ) : (
-        <LayoutPanelTopIcon className="size-4" />
+        <LayoutGridIcon className="size-4" />
       )}
     </Button>
   );

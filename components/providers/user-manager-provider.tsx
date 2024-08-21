@@ -1,15 +1,12 @@
 "use client";
 import { User } from "@/schemas/user";
 import { omit } from "lodash";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 
-export interface UserConextFilterType {
+export interface UserFilterType {
   emails?: string[];
-  roles?: User["role"];
+  roles?: User["role"][];
   emailVerified?: boolean;
-  orderBy?: UserOrderBy[];
-  page?: number;
-  limit?: number;
 }
 
 export interface UserOrderBy {
@@ -17,32 +14,49 @@ export interface UserOrderBy {
   role?: "asc" | "desc";
   emailVerified?: "asc" | "desc";
 }
-type ViewModeType = "card" | "list";
+type ViewType = "grid" | "list";
+
+type UserPaginationType = {
+  limit: number;
+  page: number;
+};
 
 export interface UserConextType {
-  filter?: UserConextFilterType | undefined;
-  viewMode?: ViewModeType;
-  setViewMode: (viewMode: ViewModeType) => void;
-  setFilter(
-    data?: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">
-  ): void;
-  setSortBy(data?: Pick<UserConextFilterType, "orderBy">): void;
-  setPagination(data?: Pick<UserConextFilterType, "page" | "limit">): void;
+  pagination: UserPaginationType;
+  setPagination(data: Partial<UserPaginationType>): void;
+
+  view: ViewType;
+  toggleView: () => void;
+
+  filter: UserFilterType | undefined;
+  setFilter(data: UserFilterType): void;
+
+  sort: {};
+  setSortBy(data: UserOrderBy): void;
+
   clearFilter: () => void;
 }
 
 const initUserContext: UserConextType = {
-  filter: {
+  pagination: {
     limit: 10,
     page: 1,
   },
-  viewMode: "card",
-  setViewMode: (viewMode: ViewModeType) => {},
-  setFilter: (
-    data?: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">
-  ) => {},
-  setSortBy: (data?: Pick<UserConextFilterType, "orderBy">) => {},
-  setPagination: (data?: Pick<UserConextFilterType, "page" | "limit">) => {},
+  setPagination: (data: Partial<UserPaginationType>) => {},
+
+  view: "grid",
+  toggleView: () => {},
+
+  filter: {
+    emails: ["gaconght@gmail.com"],
+    emailVerified: true,
+    roles: ["Saler", "Customer"],
+  },
+  setFilter: (data: UserFilterType) => {},
+
+  sort: {},
+  setSortBy: (data: UserOrderBy) => {},
+
   clearFilter: () => {},
 };
 
@@ -53,66 +67,62 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     ...initUserContext,
   });
 
-  function setViewMode(viewMode: "card" | "list") {
-    setData((prev) => ({ ...prev, viewMode }));
-  }
-
-  function setFilter(
-    data?: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">
-  ) {
+  function toggleView() {
     setData((prev) => ({
       ...prev,
-      filter: data
-        ? { ...prev.filter, ...data }
-        : omit(prev.filter, ["emails", "roles", "emailVerified"]),
+      view: prev.view == "grid" ? "list" : "grid",
     }));
   }
 
-  function setSortBy(data?: Pick<UserConextFilterType, "orderBy">) {
-    setData((prev) => ({
-      ...prev,
-      filter: data
-        ? { ...prev.filter, ...data }
-        : omit(prev.filter, ["orderBy"]),
-    }));
-  }
-
-  function setPagination(data?: Pick<UserConextFilterType, "page" | "limit">) {
-    setData((prev) => ({
-      ...prev,
-      filter: { ...prev.filter, page: 1, limit: 10, ...data },
-    }));
-  }
-
-  function clearFilter() {
+  function setFilter(data: UserFilterType) {
     setData((prev) => ({
       ...prev,
       filter: {
-        limit: 10,
-        page: 1,
+        ...prev.filter,
+        ...data,
       },
     }));
   }
 
+  function setSortBy(data: UserOrderBy) {
+    setData((prev) => ({
+      ...prev,
+      sort: {
+        ...prev.sort,
+        ...data,
+      },
+    }));
+  }
+
+  function setPagination(data: Partial<UserPaginationType>) {
+    setData((prev) => ({
+      ...prev,
+      pagination: {
+        ...prev.pagination,
+        ...data,
+      },
+    }));
+  }
+
+  // function clearFilter() {
+  //   setData((prev) => ({
+  //     ...prev,
+  //     filter: {
+  //       limit: 10,
+  //       page: 1,
+  //     },
+  //   }));
+  // }
+
   return (
     <userContext.Provider
-      value={{
-        ...data,
-        setViewMode,
-        setFilter,
-        clearFilter,
-        setSortBy,
-        setPagination,
-      }}
+      value={{ ...data, toggleView, setPagination, setFilter, setSortBy }}
     >
       {children}
     </userContext.Provider>
   );
 };
 
-export function useUserData() {
-  const data = useContext(userContext);
-  return data;
-}
+export const useUserData = () => useContext(userContext);
 
 export default UserProvider;

@@ -32,6 +32,7 @@ import {
 import { cn } from "@/lib/utils";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { User } from "@/schemas/user";
+import { Input } from "@/components/ui/input";
 
 type InputFilterType = {
   isLast?: boolean;
@@ -41,7 +42,7 @@ type InputFilterType = {
   handleAddEmail: (email: string) => void;
 };
 
-const InputFilter = ({
+const InputFilter1 = ({
   isLast = false,
   index = -1,
   value = "",
@@ -81,13 +82,63 @@ const InputFilter = ({
   );
 };
 
+const InputFilter = ({
+  disabled,
+  className,
+  type,
+  handleClick,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  type?: "add" | "remove";
+  handleClick?: () => void;
+}) => {
+  return (
+    <div
+      className={cn(
+        "flex items-center py-2 px-3 border rounded-md h-10",
+        disabled ? "opacity-50 cursor-not-allowed" : "",
+        className
+      )}
+    >
+      <input
+        disabled={disabled}
+        className={cn(
+          "bg-transparent w-full outline-0 text-sm",
+          disabled ? "opacity-50 cursor-not-allowed" : ""
+        )}
+        {...props}
+      />
+      {type == "add" ? (
+        <PlusIcon
+          onClick={handleClick}
+          className={cn(
+            "flex flex-shrink-0 size-5 cursor-pointer ml-3",
+            disabled ? "opacity-50 cursor-not-allowed" : ""
+          )}
+        />
+      ) : type == "remove" ? (
+        <XIcon
+          onClick={handleClick}
+          className={cn(
+            "flex flex-shrink-0 size-5 cursor-pointer ml-3",
+            disabled ? "opacity-50 cursor-not-allowed" : ""
+          )}
+        />
+      ) : (
+        <></>
+      )}
+    </div>
+  );
+};
+
 const roleOption: User["role"][] = ["Manager", "Saler", "Bloger", "Customer"];
 
 export const UserFilterSheet = (
   init: Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">
 ) => {
   const [isOpenFilter, setOpenFilter] = useState<boolean>(false);
-  const { setFilter } = useUserData();
+  const { setFilter, filter } = useUserData();
+
   const [data, setData] =
     useState<Pick<UserConextFilterType, "emails" | "roles" | "emailVerified">>(
       init
@@ -98,6 +149,7 @@ export const UserFilterSheet = (
       emails: prev.emails ? [...prev.emails, email] : [email],
     }));
   };
+
   const handleRemoveEmail = (index: number) => {
     if (data.emails) {
       if (data.emails.length == 1) {
@@ -111,6 +163,7 @@ export const UserFilterSheet = (
       }
     }
   };
+
   useEffect(() => {
     if (isOpenFilter) setData(init);
   }, [isOpenFilter]);
@@ -121,7 +174,7 @@ export const UserFilterSheet = (
   };
 
   const handleClear = () => {
-    setData({});
+    // setData({});
   };
   const handleCancel = () => {
     setOpenFilter(false);
@@ -150,10 +203,23 @@ export const UserFilterSheet = (
           <div className="w-full p-4 pb-[72px] overflow-y-auto">
             <div className="flex flex-col gap-4">
               <Label>Email</Label>
+              <div className="grid gap-2 max-h-[232px] overflow-y-scroll">
+                {filter?.emails &&
+                  filter.emails.map((email, idx) => <InputFilter />)}
+
+                <Input className="" />
+                <Input className="" />
+                <Input className="" />
+              </div>
+              <Input className="" />
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <Label>Email</Label>
               <div className="flex gap-2 flex-col items-start justify-center">
-                {data.emails &&
-                  data.emails.map((email, index) => (
-                    <InputFilter
+                {filter?.emails &&
+                  filter.emails.map((email, index) => (
+                    <InputFilter1
                       key={index}
                       value={email}
                       index={index}
@@ -161,7 +227,7 @@ export const UserFilterSheet = (
                       handleRemoveEmail={handleRemoveEmail}
                     />
                   ))}
-                <InputFilter
+                <InputFilter1
                   isLast={true}
                   handleAddEmail={handleAddEmail}
                   handleRemoveEmail={handleRemoveEmail}
@@ -185,7 +251,7 @@ export const UserFilterSheet = (
                         />
 
                         <div className="space-x-1 overflow-hidden">
-                          {data.roles.slice(0, 3).map((role) => (
+                          {filter?.roles.slice(0, 3).map((role) => (
                             <Badge
                               key={role}
                               variant="secondary"

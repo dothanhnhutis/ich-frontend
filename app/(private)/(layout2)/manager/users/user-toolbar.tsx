@@ -13,13 +13,13 @@ export const UserToolBar = ({
 }: {
   tab?: "active" | "disabled" | "suspended";
 }) => {
-  const { viewMode, filter } = useUserData();
+  const { view, filter } = useUserData();
 
   return (
     <div
       className={cn(
         "bg-card text-card-foreground border p-2 space-y-2",
-        viewMode == "list" ? "rounded-tl-lg rounded-tr-lg" : "rounded-lg"
+        view == "list" ? "rounded-tl-lg rounded-tr-lg" : "rounded-lg"
       )}
     >
       <div className="flex items-center flex-grow border-b">
