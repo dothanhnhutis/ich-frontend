@@ -53,16 +53,22 @@ export async function middleware(request: NextRequest) {
 
   if (user) {
     if (emailVerified) {
-      if (nextUrl.pathname == EMAIL_VERIFY_ROUTE)
+      if (nextUrl.pathname == EMAIL_VERIFY_ROUTE) {
         return redirect(request, DEFAULT_LOGIN_REDIRECT);
+      }
+
       if (
+        isPrivateRoute &&
         !roleAccessRoutes[user.role].some((routes) =>
           routes.test(nextUrl.pathname)
         )
-      )
+      ) {
         return redirect(request, DEFAULT_LOGIN_REDIRECT);
+      }
     } else {
-      if (isPrivateRoute) return redirect(request, EMAIL_VERIFY_ROUTE);
+      if (isPrivateRoute) {
+        return redirect(request, EMAIL_VERIFY_ROUTE);
+      }
     }
     if (authRoutes.test(nextUrl.pathname)) {
       return redirect(request, DEFAULT_LOGIN_REDIRECT);

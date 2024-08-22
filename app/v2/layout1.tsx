@@ -27,61 +27,152 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 const Layout1 = () => {
   return (
-    <div className="relative bg-muted dark:bg-background">
+    <div className="relative bg-accent">
       <div className="flex h-screen">
-        <div className="relative bg-background">
-          <Link
-            href="/"
-            prefetch={false}
-            className="flex justify-center items-center p-4"
-          >
-            <div className={cn("flex items-center size-12")}>
-              <AspectRatio
-                ratio={1 / 1}
-                className="flex items-center justify-center"
+        <TooltipProvider delayDuration={100} disableHoverableContent={true}>
+          <div className="relative lg:w-[232px]">
+            <Link
+              href="/"
+              prefetch={false}
+              className="flex justify-center items-center p-2"
+            >
+              <div className={cn("flex items-center size-10 lg:size-12")}>
+                <AspectRatio
+                  ratio={1 / 1}
+                  className="flex items-center justify-center"
+                >
+                  <Image
+                    priority
+                    src={LogoImg.src}
+                    width={LogoImg.width}
+                    height={LogoImg.height}
+                    alt="logo"
+                    title="logo-ich"
+                  />
+                </AspectRatio>
+              </div>
+            </Link>
+
+            <ScrollArea className="h-[calc(100vh_-_120px)] text-popover-foreground p-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/"
+                    className={cn(
+                      "flex items-center p-2 rounded-lg",
+                      false
+                        ? "bg-primary/20 text-primary"
+                        : "hover:bg-primary/20 hover:text-primary mb-1 last:mb-0"
+                    )}
+                  >
+                    <UserIcon className="block flex-shrink-0 size-6 lg:mr-2" />
+                    <span className="text-sm hidden lg:inline">Profile</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent
+                  align="center"
+                  side="right"
+                  className="lg:hidden z-50"
+                >
+                  <p>Profile</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/"
+                    className={cn(
+                      "flex items-center p-2 rounded-lg",
+                      true
+                        ? "bg-primary/20 text-primary"
+                        : "hover:bg-primary/20 hover:text-primary mb-1 last:mb-0"
+                    )}
+                  >
+                    <UserIcon className="block flex-shrink-0 size-6 lg:mr-2" />
+                    <span className="text-sm hidden lg:inline">Profile</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent
+                  align="center"
+                  side="right"
+                  className="lg:hidden z-50"
+                >
+                  <p>Profile</p>
+                </TooltipContent>
+              </Tooltip>
+            </ScrollArea>
+
+            {/* <div className="grid gap-2 overflow-y-scroll max-h-[calc(100vh_-_120px)] text-popover-foreground p-2">
+            <div className="flex items-center p-2 rounded-lg bg-red-500">
+              <UserIcon className="block flex-shrink-0 size-6 sm:mr-2" />
+              <span className="text-sm hidden sm:inline">Profile</span>
+            </div>
+            <div className="flex items-center p-2 rounded-lg bg-red-500">
+              <UserIcon className="block flex-shrink-0 size-6 sm:mr-2" />
+              <span className="text-sm hidden sm:inline">Profile</span>
+            </div>
+          </div> */}
+
+            <div className="absolute bottom-0 left-0 right-0 p-2 border-t">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/"
+                    className={cn(
+                      "flex items-center p-2 rounded-lg",
+                      false
+                        ? "bg-primary/20 text-primary"
+                        : "hover:bg-primary/20 hover:text-primary"
+                    )}
+                  >
+                    <SettingsIcon className="block flex-shrink-0 size-6 lg:mr-2" />
+                    <span className="text-sm hidden lg:inline">Settings</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent
+                  align="center"
+                  side="right"
+                  className="lg:hidden z-50"
+                >
+                  <p>Profile</p>
+                </TooltipContent>
+              </Tooltip>
+              {/* <Link
+                href="/"
+                className={cn(
+                  "flex items-center p-2 rounded-lg",
+                  false
+                    ? "bg-primary/20 text-primary"
+                    : "hover:bg-primary/20 hover:text-primary"
+                )}
               >
-                <Image
-                  priority
-                  src={LogoImg.src}
-                  width={LogoImg.width}
-                  height={LogoImg.height}
-                  alt="logo"
-                  title="logo-ich"
-                />
-              </AspectRatio>
-            </div>
-          </Link>
-          <div className="grid px-4 py-2 sm:w-[236px] overflow-y-scroll max-h-[calc(100vh_-_132px)]">
-            <div className="flex items-center gap-2 p-2  rounded-lg">
-              <UserIcon className="block flex-shrink-0 size-5" />
-              <p className="text-sm hidden">Profile</p>
-            </div>
-            <div className="flex items-center gap-2 p-2 text-primary bg-primary/20 rounded-lg">
-              <ShieldPlusIcon className="block flex-shrink-0 size-5" />
-              <p className="text-sm hidden">Security</p>
+                <SettingsIcon className="block flex-shrink-0 size-6 lg:mr-2" />
+                <span className="text-sm hidden lg:inline">Settings</span>
+              </Link> */}
             </div>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 bg-background px-4 py-2">
-            <div className="flex items-center gap-2 p-2 rounded-lg">
-              <SettingsIcon className="block flex-shrink-0 size-5" />
-              <p className="text-sm">Settings</p>
-            </div>
-          </div>
-        </div>
-        <div className="w-full overflow-scroll p-3">
-          <header className="sticky top-0 left-0 right-0 z-50 backdrop-blur">
-            <div className="flex justify-between items-center py-2">
-              <h3 className="font-bold text-2xl">Settings</h3>
+        </TooltipProvider>
+        <div className="w-full overflow-scroll">
+          <header className="sticky top-0 left-0 right-0 z-50 backdrop-blur p-3">
+            <div className="flex justify-end items-center">
+              {/* <h3 className="font-bold text-2xl">Settings</h3> */}
               <div className="flex items-center gap-4">
-                <div className="p-2 rounded-full bg-background shadow">
+                <div className="p-2 rounded-full bg-background shadow ">
                   <BellIcon className="flex flex-shrink-0 size-4" />
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="outline-none" asChild>
-                    <div className="flex items-center gap-2 bg-background p-2 rounded-full shadow sm:rounded-md">
+                    <div className="flex items-center gap-2 bg-background p-2 cursor-pointer shadow rounded-full">
                       <Avatar className="size-8">
                         <AvatarImage
                           referrerPolicy="no-referrer"
@@ -155,23 +246,48 @@ const Layout1 = () => {
               </div>
             </div>
           </header>
-          <div className="rounded-lg bg-background p-4">
-            <div className="sm:flex sm:h-full p-4">
-              <div className="sm:border-r border-background">
-                <div className="flex gap-4 sm:block pr-4 rounded-full ">
-                  <div className="flex items-center gap-2 p-2 sm:w-[200px] rounded-full sm:rounded-lg">
-                    <UserIcon className="block flex-shrink-0 size-5" />
-                    <p className="text-sm">Profile</p>
+          <div className="rounded-lg p-4 bg-white">
+            <h4 className="text-xl font-medium mb-4">Account settings</h4>
+            <div className="lg:flex lg:gap-4">
+              <div className="flex gap-3 lg:border-r lg:pr-4">
+                <div className="flex gap-3 bg-accent rounded-full p-1 lg:flex-col lg:gap-1 lg:bg-transparent lg:rounded-none">
+                  <div className="rounded-full px-4 py-1 bg-primary/20 text-primary ">
+                    <span className="text-sm">My Profile</span>
                   </div>
-                  <div className="flex items-center gap-2 p-2 sm:w-[200px] text-primary bg-primary/20 rounded-full sm:rounded-lg">
-                    <ShieldPlusIcon className="block flex-shrink-0 size-5" />
-                    <p className="text-sm">Security</p>
+                  <div className="rounded-full bg-white px-4 py-1 lg:bg-transparent hover:bg-primary/20 hover:text-primary">
+                    <span className="text-sm">Security</span>
+                  </div>
+                  <div className="rounded-full bg-white px-4 py-1 lg:bg-transparent hover:bg-primary/20 hover:text-primary">
+                    <span className="text-sm">Notifications</span>
+                  </div>
+                  <div className="rounded-full bg-white px-4 py-1 lg:bg-transparent hover:bg-primary/20 hover:text-primary">
+                    <span className="text-sm">Appearance</span>
                   </div>
                 </div>
               </div>
 
-              <div className="">
-                <h4>My Profile</h4>
+              <div className="grid gap-4 w-full">
+                <h4>My profile</h4>
+                <div className="grid gap-2 border p-4 rounded-xl">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="size-24">
+                      <AvatarImage
+                        referrerPolicy="no-referrer"
+                        src={AvatarDefault.src}
+                      />
+                      <AvatarFallback className="bg-transparent">
+                        <Skeleton className="size-24 rounded-full" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className=""></div>
+                    <Button variant="default" className="rounded-2xl">
+                      Change picture
+                    </Button>
+                    <Button variant="destructive" className="rounded-2xl">
+                      Delete picture
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
