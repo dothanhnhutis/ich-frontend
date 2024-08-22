@@ -1,7 +1,7 @@
-import React from "react";
+import Layout1 from "./layout1";
 
 const ProfileLayout = () => {
-  return <div className="bg-foreground p-4"></div>;
+  return <Layout1 />;
 };
 
 export default ProfileLayout;

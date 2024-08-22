@@ -38,13 +38,22 @@ export function SwitchTheme() {
   );
 }
 
-export function DarkMode() {
+export function DarkMode({
+  className,
+  onClick,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { setTheme, theme } = useTheme();
-
+  const handleClick = () =>
+    theme == "dark" ? setTheme("light") : setTheme("dark");
   return (
     <button
-      onClick={() => (theme == "dark" ? setTheme("light") : setTheme("dark"))}
-      className="relative bg-input block flex-shrink-0 rounded-full w-10 h-[22px] border border-muted-foreground hover:border-primary"
+      className={cn(
+        "relative bg-input block flex-shrink-0 rounded-full w-10 h-[22px] border border-muted-foreground hover:border-primary",
+        className
+      )}
+      {...props}
+      onClick={onClick || handleClick}
     >
       <span
         className={cn(
