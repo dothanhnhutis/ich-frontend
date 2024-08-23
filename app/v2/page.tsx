@@ -1,7 +1,7 @@
-import Layout1 from "./layout1";
+import Layout2 from "./layout2";
 
 const ProfileLayout = () => {
-  return <Layout1 />;
+  return <Layout2 />;
 };
 
 export default ProfileLayout;

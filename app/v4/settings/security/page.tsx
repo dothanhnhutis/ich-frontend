@@ -23,7 +23,6 @@ const SecurityPage = () => {
           </Button>
         </div>
       </div>
-
       <div className="flex w-full gap-4 border-b py-4">
         <div className="w-full">
           <p className="font-bold">Password</p>
