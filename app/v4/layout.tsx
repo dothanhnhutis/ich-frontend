@@ -65,7 +65,7 @@ const V2Layout = ({ children }: { children: React.ReactNode }) => {
             <MenuIcon className="block flex-shrink-0 size-6" />
           </div>
         </div>
-        <div className="relative hidden sm:block sm:mt-5 sm:px-2 sm:max-h-full sm:overflow-h-scroll">
+        <div className="relative hidden sm:block sm:mt-5 sm:px-2 sm:max-h-full sm:overflow-y-scroll">
           <Link
             href="/"
             className="flex items-center p-2 rounded-lg mb-1 last:mb-0 hover:bg-primary/20 hover:text-primary"
@@ -97,7 +97,7 @@ const V2Layout = ({ children }: { children: React.ReactNode }) => {
           </Link>
         </div>
       </div>
-      <div>
+      <div className="w-full overflow-x-hidden relative">
         <div className="sticky top-0 left-0 right-0 z-50 backdrop-blur bg-background/60 hidden p-2 sm:flex sm:justify-end sm:items-center sm:gap-2">
           <div className="p-2 rounded-full hover:bg-primary/20 hover:text-primary">
             <BellIcon className=" flex-shrink-0 size-6" />

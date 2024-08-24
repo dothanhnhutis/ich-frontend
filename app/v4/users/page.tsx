@@ -59,15 +59,15 @@ const UserManagementPage = () => {
             </Button>
           </div>
         </div>
-        <ScrollArea className="border rounded-lg max-w-full">
-          <Table className="table-fixed max-w-full">
+        <ScrollArea className="border rounded-lg w-full overflow-x-scroll">
+          <Table className="table-fixed ">
             <TableHeader>
               <TableRow>
-                <TableHead className="relative w-[400px]">User name</TableHead>
-                <TableHead className="relative w-[200px]">Role</TableHead>
-                <TableHead className="relative w-[200px]">Verified</TableHead>
-                <TableHead className="relative w-[200px]">Date added</TableHead>
-                <TableHead className="relative w-[50px]"></TableHead>
+                <TableHead className="w-[400px]">User name</TableHead>
+                <TableHead className="w-[400px]">Role</TableHead>
+                <TableHead className="w-[400px]">Verified</TableHead>
+                <TableHead className="w-[400px]">Date added</TableHead>
+                <TableHead className="w-[400px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -91,7 +91,7 @@ const UserManagementPage = () => {
                 </TableCell>
                 <TableCell>Admin</TableCell>
                 <TableCell>True</TableCell>
-                <TableCell>ds</TableCell>
+                <TableCell>10:37:30 15/01/2024</TableCell>
                 <TableCell>
                   <EllipsisVerticalIcon className="size-4 flex-shrink-0" />
                 </TableCell>
@@ -115,11 +115,15 @@ const UserManagementPage = () => {
                   </div>
                 </TableCell>
                 <TableCell>Admin</TableCell>
-                <TableCell>ds</TableCell>
+                <TableCell>True</TableCell>
+                <TableCell>10:37:30 15/01/2024</TableCell>
+                <TableCell>
+                  <EllipsisVerticalIcon className="size-4 flex-shrink-0" />
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
-          <ScrollBar orientation="horizontal" asChild />
+          <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </div>
     </div>
