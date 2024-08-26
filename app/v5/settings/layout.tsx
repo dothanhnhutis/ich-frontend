@@ -10,7 +10,7 @@ const SettingLayout = ({ children }: { children: React.ReactNode }) => {
       </p>
       <div className="flex flex-col mt-4 gap-4">
         <div className="flex gap-2 items-center overflow-x-scroll">
-          <Button variant="secondary">General</Button>
+          <Button variant="secondary">Profile</Button>
           <Button variant="ghost">Security</Button>
           <Button variant="ghost">Notifications</Button>
         </div>
