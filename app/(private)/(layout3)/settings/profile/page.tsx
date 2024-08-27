@@ -1,11 +1,15 @@
+"use client";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import AvatarDefault from "@/images/avatars/user-1.jpg";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
 const ProfilePage = () => {
+  const { currentUser } = useAuthContext();
+
   return (
     <>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 border-b last:border-none py-4">
@@ -16,7 +20,10 @@ const ProfilePage = () => {
           </p>
         </div>
         <Avatar className="size-14">
-          <AvatarImage referrerPolicy="no-referrer" src={AvatarDefault.src} />
+          <AvatarImage
+            referrerPolicy="no-referrer"
+            src={currentUser?.picture || AvatarDefault.src}
+          />
           <AvatarFallback className="bg-transparent">
             <Skeleton className="size-20 rounded-full" />
           </AvatarFallback>
@@ -37,16 +44,18 @@ const ProfilePage = () => {
         <div className="grid grid-cols-2 gap-2 col-span-2 lg:col-span-1 order-2">
           <div className="grid gap-1">
             <Label className="text-sm text-muted-foreground">First name</Label>
-            <p className="font-bold text-sm">Nhut</p>
+            <p className="font-bold text-sm">{currentUser?.firstName}</p>
           </div>
           <div className="grid gap-2">
             <Label className="text-sm text-muted-foreground">Last name</Label>
-            <p className="font-bold text-sm">Thanh</p>
+            <p className="font-bold text-sm">{currentUser?.lastName}</p>
           </div>
-          <div className="grid gap-2">
-            <Label className="text-sm text-muted-foreground">Phone</Label>
-            <p className="font-bold text-sm">123456789</p>
-          </div>
+          {currentUser?.phone && (
+            <div className="grid gap-2">
+              <Label className="text-sm text-muted-foreground">Phone</Label>
+              <p className="font-bold text-sm">{currentUser?.phone}</p>
+            </div>
+          )}
         </div>
         <div className="flex justify-end order-1 lg:order-last">
           <Button className="rounded-full" variant="outline">

@@ -1,9 +1,13 @@
+"use client";
+import { useAuthContext } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
 
 const SecurityPage = () => {
+  const { currentUser } = useAuthContext();
+
   return (
     <>
       <div className="flex flex-col lg:flex-row w-full gap-4 border-b py-4">
@@ -13,10 +17,14 @@ const SecurityPage = () => {
             The email address association with your account.
           </p>
         </div>
-        <div className="flex gap-4 justify-between w-full">
+        <div className="flex gap-4 items-center justify-between w-full">
           <div className="text-sm">
-            <p>gaconght@gmail.com</p>
-            <div className="text-red-500">Unverified</div>
+            <p>{currentUser?.email}</p>
+            {!currentUser!.emailVerified ? (
+              <div className="text-red-500">Unverified</div>
+            ) : (
+              <div className="text-green-500">Verified</div>
+            )}
           </div>
           <Button className="rounded-full" variant="outline">
             Edit
@@ -30,9 +38,8 @@ const SecurityPage = () => {
             Set a unique password to protect your account.
           </p>
         </div>
-
         <Button className="rounded-full " variant="outline">
-          Change password
+          {currentUser?.hasPassword ? "Change password" : "Set password"}
         </Button>
       </div>
       <div className="flex flex-col lg:flex-row w-full gap-4 border-b py-4">
@@ -43,7 +50,7 @@ const SecurityPage = () => {
           </p>
         </div>
         <div className="flex gap-4 w-full justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 opacity-50">
             <div className="p-1 bg-white rounded-full">
               <FcGoogle className="size-8" />
             </div>

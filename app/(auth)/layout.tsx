@@ -22,7 +22,7 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
           <DarkMode />
         </div>
       </header>
-      <div className=" sm:p-8">{children}</div>
+      <div className="sm:p-8">{children}</div>
     </div>
   );
 };

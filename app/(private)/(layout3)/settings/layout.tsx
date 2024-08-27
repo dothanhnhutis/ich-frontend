@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import NavLink from "../nav-link";
@@ -11,10 +12,24 @@ const SettingLayout = ({ children }: { children: React.ReactNode }) => {
       </p>
       <div className="flex flex-col mt-4 gap-4">
         <div className="flex gap-2 items-center overflow-x-scroll">
-          <NavLink title="Profile" className="py-2 px-4" regex={/^$/} />
-          <Button variant="secondary">Profile</Button>
-          <Button variant="ghost">Security</Button>
-          <Button variant="ghost">Notifications</Button>
+          <NavLink
+            href="/settings/profile"
+            title="Profile"
+            className="py-2 px-4"
+            regex={/^\/settings\/profile$/}
+          />
+          <NavLink
+            href="/settings/security"
+            title="Security"
+            className="py-2 px-4"
+            regex={/^\/settings\/security$/}
+          />
+          <NavLink
+            href="/settings/notifications"
+            title="Notifications"
+            className="py-2 px-4"
+            regex={/^\/settings\/notifications$/}
+          />
         </div>
 
         {children}

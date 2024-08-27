@@ -16,22 +16,36 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useWindowDimensions } from "@/hook/useWindowDimensions";
+import { useAuthContext } from "@/components/providers/auth-provider";
+import { signOut } from "@/app/actions";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 const UserMenu = ({ isMobile = false }: { isMobile?: boolean }) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const { width } = useWindowDimensions();
+  const { currentUser } = useAuthContext();
 
   React.useEffect(() => {
     if (open) {
-      setOpen(false);
+      if ((isMobile && width >= 768) || (!isMobile && width <= 768)) {
+        setOpen(false);
+      }
     }
   }, [width]);
+
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  if (!currentUser) return <></>;
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger className="outline-none" asChild>
         <div className="p-1 bg-accent rounded-full">
           <Avatar className="size-8">
-            <AvatarImage referrerPolicy="no-referrer" src={AvatarDefault.src} />
+            <AvatarImage
+              referrerPolicy="no-referrer"
+              src={currentUser?.picture || AvatarDefault.src}
+            />
             <AvatarFallback className="bg-transparent">
               <Skeleton className="size-8 rounded-full" />
             </AvatarFallback>
@@ -47,7 +61,10 @@ const UserMenu = ({ isMobile = false }: { isMobile?: boolean }) => {
       >
         <DropdownMenuLabel className="flex items-center gap-3">
           <Avatar className="size-24">
-            <AvatarImage referrerPolicy="no-referrer" src={AvatarDefault.src} />
+            <AvatarImage
+              referrerPolicy="no-referrer"
+              src={currentUser?.picture || AvatarDefault.src}
+            />
             <AvatarFallback className="bg-transparent">
               <Skeleton className="size-24 rounded-full" />
             </AvatarFallback>
@@ -76,7 +93,13 @@ const UserMenu = ({ isMobile = false }: { isMobile?: boolean }) => {
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            signOut();
+            router.push("/login");
+            queryClient.clear();
+          }}
+        >
           <LogOutIcon className="mr-2 h-4 w-4" />
           <span className="font-medium">Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

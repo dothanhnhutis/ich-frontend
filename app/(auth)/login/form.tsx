@@ -125,10 +125,9 @@ export const SignInForm = ({
           </p>
         </div>
       )}
-
       <form
         onSubmit={handleSubmit}
-        className="rounded-lg sm:border bg-card text-card-foreground shadow-sm p-4 sm:p-6 sm:mx-auto sm:max-w-md transition-all"
+        className="rounded-lg sm:border bg-card text-card-foreground sm:shadow-sm p-4 sm:p-6 sm:mx-auto sm:max-w-md transition-all"
       >
         <div className="flex flex-col space-y-1.5">
           <h3 className="font-semibold tracking-tight text-2xl">Login</h3>
@@ -193,6 +192,43 @@ export const SignInForm = ({
           </div>
         </div>
       </form>
+
+      <div className="rounded-lg sm:border bg-card text-card-foreground sm:shadow-sm p-4 sm:p-6 sm:mx-auto sm:max-w-md transition-all">
+        <div className="flex flex-col space-y-1.5">
+          <h3 className="font-semibold tracking-tight text-2xl">
+            Multi-factor authentication
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Your account is secured using multi-factor authentication (MFA). To
+            finish signing in, turn on or view your MFA device and type the
+            authentication code below.
+          </p>
+        </div>
+        <div className="pt-6">
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">MFA code</Label>
+                <Link
+                  href={"#"}
+                  className="ml-auto inline-block text-sm underline "
+                >
+                  Troubleshoot MFA
+                </Link>
+              </div>
+              <Input id="code" name="code" placeholder="MFA code" />
+            </div>
+
+            <Button disabled={isPending} variant="default">
+              {isPending && (
+                <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
+              )}
+              Submit
+            </Button>
+            <Button variant="outline">Cancel</Button>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

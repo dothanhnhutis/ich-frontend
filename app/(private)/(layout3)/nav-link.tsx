@@ -31,7 +31,7 @@ export const NavLink = ({
       )}
     >
       {Icon && <Icon className="block flex-shrink-0 size-6 md:mr-2" />}
-      <span className="text-sm hidden md:inline">{title}</span>
+      <span className="text-sm">{title}</span>
     </Link>
   );
 };
