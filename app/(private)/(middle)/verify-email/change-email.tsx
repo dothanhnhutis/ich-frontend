@@ -2,13 +2,13 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LoaderPinwheelIcon } from "react-icons/ai";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { changeEmail } from "../actions";
+import { LoaderPinwheelIcon } from "lucide-react";
 
 const ChangeEmailForm = ({
   currentEmail,
@@ -64,8 +64,8 @@ const ChangeEmailForm = ({
       </Button>
       <DialogContent className="sm:max-w-screen-md">
         <div>
-          <h4 className="font-medium text-2xl">Didn't receive email?</h4>
-          <p className="text-muted-foreground mb-4">
+          <h4 className="font-bold text-2xl">Didn't receive email?</h4>
+          <p className="text-muted-foreground mb-4 text-sm">
             Here are some tips to help you find it.
           </p>
           <ol className="list-decimal [&>li]:mt-3 my-2 ml-4">
@@ -74,7 +74,7 @@ const ChangeEmailForm = ({
             </li>
             <li>
               <strong>Search for the email</strong>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 We'll send the email from "ICH", so you can quickly search for
                 it. If it isn't in your inbox, check your folders. If a spam
                 filter or email rule moved the email, it might be in Spam, Junk,
@@ -83,7 +83,7 @@ const ChangeEmailForm = ({
             </li>
             <li>
               <strong>How do I confirm my email?</strong>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 If you aren't able to click the link, copy the full URL from the
                 email and paste it into a new web browser window.
               </p>

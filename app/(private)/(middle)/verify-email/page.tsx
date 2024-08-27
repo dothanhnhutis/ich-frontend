@@ -9,8 +9,8 @@ import { useAuthContext } from "@/components/providers/auth-provider";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { sendEmailVerify } from "../actions";
-import { LoaderPinwheelIcon } from "react-icons/ai";
 import useCountDown from "@/hook/useCountDown";
+import { LoaderPinwheelIcon } from "lucide-react";
 
 const VerifyEmailPage = () => {
   const { currentUser } = useAuthContext();

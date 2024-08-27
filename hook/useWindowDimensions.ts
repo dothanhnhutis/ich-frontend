@@ -6,7 +6,7 @@ const getWindowDeimensions = () => {
     const { innerWidth: width, innerHeight: height } = window;
     return { width, height };
   } else {
-    return;
+    return { width: 0, height: 0 };
   }
 };
 
@@ -24,8 +24,4 @@ export const useWindowDimensions = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [windowDimensions]);
   return windowDimensions;
-};
-
-export const isMobile = () => {
-  return typeof window !== "undefined" && window.innerWidth < 1280;
 };

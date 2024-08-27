@@ -2,7 +2,7 @@ import Link from "next/link";
 import React from "react";
 import Image from "next/image";
 import LogoImage from "@/images/logos/logo.png";
-import { SwitchTheme } from "@/components/switch-theme";
+import { DarkMode } from "@/components/switch-theme";
 
 const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
@@ -19,7 +19,7 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
               className="w-full size-auto"
             />
           </Link>
-          <SwitchTheme />
+          <DarkMode />
         </div>
       </header>
       <div className=" sm:p-8">{children}</div>

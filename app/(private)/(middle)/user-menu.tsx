@@ -5,6 +5,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -42,11 +43,7 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          avoidCollisions
-          align="end"
-          className="w-[245px] hidden sm:block"
-        >
+        <DropdownMenuContent avoidCollisions align="end" className="w-[245px]">
           <DropdownMenuLabel className="flex flex-col items-center">
             <Avatar className="w-24 h-24">
               <AvatarImage
@@ -62,7 +59,6 @@ const UserMenu = ({ currentUser }: { currentUser: User }) => {
             </p>
             <p className="text-muted-foreground font-sm">{currentUser.role}</p>
           </DropdownMenuLabel>
-
           <DropdownMenuItem
             onClick={() => {
               setOpen(true);
