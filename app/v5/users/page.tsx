@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
-import { DarkMode } from "@/components/switch-theme";
+import { ToggleTheme } from "@/components/switch-theme";
 import { Button } from "@/components/ui/button";
 import {
   Table,

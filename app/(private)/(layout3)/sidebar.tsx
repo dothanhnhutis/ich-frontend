@@ -1,5 +1,5 @@
 "use client";
-import { DarkMode } from "@/components/switch-theme";
+import { ToggleTheme } from "@/components/switch-theme";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,8 +8,10 @@ import {
   ClipboardSignatureIcon,
   LucideIcon,
   MenuIcon,
+  MoonIcon,
   PackageIcon,
   SettingsIcon,
+  SunIcon,
   UserIcon,
   UsersIcon,
 } from "lucide-react";
@@ -99,9 +101,11 @@ const SideBar = () => {
       </ScrollArea>
 
       <div className="absolute hidden md:block left-0 bottom-0 right-0 p-2 bg-background">
-        <Label className="flex items-center p-2 rounded-lg mb-1 last:mb-0 hover:bg-primary/20 hover:text-primary">
-          <DarkMode className="md:mr-2" type="btn" />
-          <p>Theme</p>
+        <Label className="flex items-center p-2 rounded-lg mb-1 last:mb-0 hover:bg-accent hover:text-accent-foreground">
+          <MoonIcon className="hidden dark:block flex-shrink-0 size-6 md:mr-2" />
+          <SunIcon className=" dark:hidden block flex-shrink-0 size-6 md:mr-2" />
+          <p className="text-sm w-full">Theme</p>
+          <ToggleTheme />
         </Label>
 
         <NavLink

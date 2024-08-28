@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
+import DeactivateBtn from "./deactivate-btn";
+import MFASwitch from "./mfa-switch";
 
 const SecurityPage = () => {
   const { currentUser } = useAuthContext();
-
   return (
     <>
       <div className="flex flex-col lg:flex-row w-full gap-4 border-b py-4">
@@ -70,7 +71,8 @@ const SecurityPage = () => {
           </p>
         </div>
 
-        <Switch checked={currentUser?.mFAEnabled} />
+        {/* <Switch checked={currentUser?.mFAEnabled} /> */}
+        <MFASwitch />
       </div>
       <div className="flex w-full gap-4 py-4">
         <div className="w-full">
@@ -81,9 +83,7 @@ const SecurityPage = () => {
           </p>
         </div>
 
-        <Button className="rounded-full" variant="destructive">
-          Deactivate
-        </Button>
+        <DeactivateBtn />
       </div>
     </>
   );

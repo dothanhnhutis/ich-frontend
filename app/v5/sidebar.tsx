@@ -1,5 +1,5 @@
 "use client";
-import { DarkMode } from "@/components/switch-theme";
+import { ToggleTheme } from "@/components/switch-theme";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -107,7 +107,7 @@ const SideBar = () => {
 
       <div className="absolute hidden md:block left-0 bottom-0 right-0 p-2 bg-background">
         <Label className="flex items-center p-2 rounded-lg mb-1 last:mb-0 hover:bg-primary/20 hover:text-primary">
-          <DarkMode className="md:mr-2" type="btn" />
+          <ToggleTheme />
           <p>Theme</p>
         </Label>
         <Link

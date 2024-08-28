@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React from "react";
 import { Logo } from "@/components/logo";
-import { DarkMode } from "@/components/switch-theme";
+import { ToggleTheme } from "@/components/switch-theme";
 import { Button } from "@/components/ui/button";
 import { BellIcon, MenuIcon } from "lucide-react";
 import { UserMenu } from "./user-menu";
@@ -49,7 +49,7 @@ const UserHeader = () => {
 
         <div className="flex flex-1 items-center justify-end gap-4 ">
           <BellIcon className="size-5" />
-          <DarkMode />
+          <ToggleTheme />
 
           {currentUser && <UserMenu />}
         </div>
