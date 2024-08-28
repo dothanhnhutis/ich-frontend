@@ -70,7 +70,7 @@ const SecurityPage = () => {
           </p>
         </div>
 
-        <Switch />
+        <Switch checked={currentUser?.mFAEnabled} />
       </div>
       <div className="flex w-full gap-4 py-4">
         <div className="w-full">

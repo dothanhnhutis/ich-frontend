@@ -11,6 +11,12 @@ export const signInSchema = z.object({
     required_error: "Password is required",
     invalid_type_error: "Password must be string",
   }),
+  mfa_code: z
+    .string({
+      required_error: "mfa_code is required",
+      invalid_type_error: "mfa_code must be string",
+    })
+    .optional(),
 });
 
 export const signUpSchema = z

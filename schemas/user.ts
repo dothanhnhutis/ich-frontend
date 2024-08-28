@@ -173,13 +173,38 @@ export type EditUserInput = z.infer<typeof editUserSchema>;
 export type EditProfileInput = z.infer<typeof editProfileSchema>;
 export type EditPictureInput = z.infer<typeof editPictureSchema>;
 
-export type User = Omit<CreateUserInput, "password"> & {
+// export type User = Omit<CreateUserInput, "password"> & {
+//   id: string;
+//   emailVerified: boolean;
+//   picture: string | null;
+//   hasPassword: boolean;
+//   phone?: string | null;
+//   address?: string | null;
+//   createdAt: Date;
+//   updatedAt: Date;
+// };
+
+export type User = {
   id: string;
+  email: string;
+  role: CreateUserInput["role"];
   emailVerified: boolean;
-  picture: string | null;
+  status: CreateUserInput["status"];
   hasPassword: boolean;
-  phone?: string | null;
-  address?: string | null;
+  mFAEnabled: boolean;
+  profile: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    picture: string | null;
+    phone: string;
+    address: string;
+    zipCode: string;
+    country: string;
+    province: string;
+    city: string;
+    apartment: string;
+  } | null;
   createdAt: Date;
   updatedAt: Date;
 };

@@ -25,6 +25,12 @@ const SettingLayout = ({ children }: { children: React.ReactNode }) => {
             regex={/^\/settings\/security$/}
           />
           <NavLink
+            href="/settings/sessions"
+            title="Sessions"
+            className="py-2 px-4"
+            regex={/^\/settings\/sessions$/}
+          />
+          <NavLink
             href="/settings/notifications"
             title="Notifications"
             className="py-2 px-4"
