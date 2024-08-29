@@ -1,7 +1,6 @@
 "use client";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import DeactivateBtn from "./deactivate-btn";

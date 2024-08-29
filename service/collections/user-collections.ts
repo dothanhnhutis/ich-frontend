@@ -361,5 +361,62 @@ class UserService extends FetchHttp {
       }
     }
   }
+  async enableMFA(
+    cookie: string,
+    input: { mfa_code1: string; mfa_code2: string }
+  ) {
+    try {
+      return await this.post<{
+        message: string;
+        data: {
+          backupCodes: string[];
+          totp: {
+            ascii: string;
+            hex: string;
+            base32: string;
+            oauth_url: string;
+          };
+        };
+      }>("/mfa/enable", input, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService enableMFA() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
+  async disableMFA(
+    cookie: string,
+    input: { mfa_code1: string; mfa_code2: string }
+  ) {
+    try {
+      return await this.post<{
+        message: string;
+      }>("/mfa/disable", input, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService disableMFA() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
 }
 export default new UserService();

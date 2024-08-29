@@ -4,8 +4,6 @@ import "./globals.css";
 import { baseOpenGraph } from "./shared-metadata";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/components/providers/auth-provider";
-import { getCurrentUser } from "./actions";
 import { TankStackProvider } from "@/components/providers/TankStackProvider";
 
 const inter = Inter({ subsets: ["latin"] });

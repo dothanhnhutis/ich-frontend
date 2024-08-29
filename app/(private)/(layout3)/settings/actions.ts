@@ -45,10 +45,35 @@ export async function setMFA(deviceName: string) {
     await cookieServer(),
     deviceName
   );
-  console.log(data);
   if (success) {
     return { success, message: data.message, data: data.data };
   } else {
     return { success, message: data.message };
   }
+}
+
+export async function enableMFA(input: {
+  mfa_code1: string;
+  mfa_code2: string;
+}) {
+  const { success, data } = await userApi.enableMFA(
+    await cookieServer(),
+    input
+  );
+  if (success) {
+    return { success, message: data.message, data: data.data };
+  } else {
+    return { success, message: data.message };
+  }
+}
+
+export async function disableMFA(input: {
+  mfa_code1: string;
+  mfa_code2: string;
+}) {
+  const { success, data } = await userApi.disableMFA(
+    await cookieServer(),
+    input
+  );
+  return { success, message: data.message };
 }
