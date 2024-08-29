@@ -323,5 +323,31 @@ class UserService extends FetchHttp {
       }
     }
   }
+
+  async setupMFA(cookie: string, deviceName: string) {
+    try {
+      return await this.post<{ message: string }>(
+        "/user/mfa/setup",
+        {
+          deviceName,
+        },
+        {
+          headers: {
+            Cookie: cookie,
+          },
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log("UserService setupMFA() method error: ", error);
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
 }
 export default new UserService();

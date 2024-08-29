@@ -6,13 +6,11 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import React from "react";
+import React, { useMemo } from "react";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
 import { MonitorSmartphoneIcon } from "lucide-react";
@@ -20,63 +18,242 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { cn } from "@/lib/utils";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { z } from "zod";
 
 const MFASwitch = () => {
   const { currentUser } = useAuthContext();
   const [open, setOpen] = React.useState<boolean>(false);
+  const [step, setStep] = React.useState<number>(1);
+  const [qRCodeMode, setQRCodeMode] = React.useState<boolean>(true);
+
+  const [deviceName, setDeviceName] = React.useState<string>("");
+
+  const validateInput = useMemo(() => {
+    return z
+      .string({
+        invalid_type_error: "deviceName must be string",
+        required_error: "deviceName is required",
+      })
+      .max(128, "deviceName maximin 128 characters.")
+      .regex(/^[\d\w+=,.@\-_][\d\w\s+=,.@\-_]*$/, "deviceName ")
+      .safeParse(deviceName).success;
+  }, [deviceName]);
+
+  const {
+    isPending: isPendingGenerateMFA,
+    mutate: generateMFA,
+    reset: resetGenerateMFA,
+  } = useMutation({
+    mutationFn: (deviceName: string) => {
+      return true;
+    },
+  });
+
+  const { isPending, mutate, reset } = useMutation({
+    mutationFn: (deviceName: string) => {
+      return true;
+    },
+  });
+
+  const handleNext = () => {
+    if (step == 1) {
+      setStep(2);
+    }
+    if (step == 2) {
+      mutate(deviceName);
+    }
+  };
+
+  const handleBack = () => {
+    if (step == 2) {
+      setStep(1);
+      setQRCodeMode(true);
+    }
+    if (step == 1) {
+      setOpen(false);
+    }
+  };
+
+  const handleReset = () => {
+    setStep(1);
+    setQRCodeMode(true);
+    setDeviceName("");
+    resetGenerateMFA();
+  };
+
+  React.useEffect(() => {
+    handleReset();
+  }, [open]);
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog open={open}>
       <Switch onClick={() => setOpen(true)} checked={currentUser?.mFAEnabled} />
-      <AlertDialogContent className="sm:max-w-screen-sm">
+
+      <AlertDialogContent
+        className={cn(
+          "max-h-screen overflow-y-scroll",
+          step == 1 ? "sm:max-w-screen-sm" : "sm:max-w-screen-lg"
+        )}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>
             Mutiple-Factor Authentication (MFA)
           </AlertDialogTitle>
           <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="font-normal text-foreground">
+            <BreadcrumbList className="flex-nowrap justify-center sm:justify-start">
+              <BreadcrumbItem
+                className={cn(step == 1 ? "font-normal text-foreground" : "")}
+              >
                 Step 1: Enter device name
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>Step 2: Set up device</BreadcrumbItem>
+              <BreadcrumbItem
+                className={cn(step == 2 ? "font-normal text-foreground" : "")}
+              >
+                Step 2: Set up device
+              </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </AlertDialogHeader>
-
-        <div className="flex flex-col gap-8">
-          <div className="grid gap-1">
-            <Label htmlFor="device_name">Device name</Label>
-            <Input id="device_name" placeholder="MFA device" />
-            <p className="text-xs text-muted-foreground">
-              Enter a meaningful name to identity this device.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Maximun 128 characters. Use alphanumberic and '+=,.@-_'
-              characters.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 border p-2 rounded">
-            <MonitorSmartphoneIcon className="size-16" />
-            <div>
-              <p className="text-sm font-medium">Authenticator App</p>
+        {step == 1 ? (
+          <div className="flex flex-col gap-8">
+            <div className="grid gap-1">
+              <Label htmlFor="device_name">Device name</Label>
+              <Input
+                id="device_name"
+                placeholder="MFA device"
+                autoComplete="off"
+                autoCapitalize="off"
+                autoCorrect="off"
+                value={deviceName}
+                onChange={(e) => {
+                  if (e.target.value.length <= 128)
+                    setDeviceName(e.target.value);
+                }}
+                className={cn(
+                  !validateInput && deviceName.length > 0
+                    ? "border-red-500"
+                    : ""
+                )}
+              />
               <p className="text-xs text-muted-foreground">
-                Authenticator using a code generated by an app installed on your
-                mobile device or computer
+                Enter a meaningful name to identity this device.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Maximun 128 characters. Use alphanumberic and '+=,.@-_'
+                characters.
               </p>
             </div>
-          </div>
-        </div>
 
-        <div></div>
+            <div className="flex items-center gap-2 border p-2 rounded">
+              <MonitorSmartphoneIcon className="size-16" />
+              <div>
+                <p className="text-sm font-medium">Authenticator App</p>
+                <p className="text-xs text-muted-foreground">
+                  Authenticator using a code generated by an app installed on
+                  your mobile device or computer
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-6 items-center border-b last:border-none py-3">
+              <div className="hidden sm:block size-16 mx-auto rounded-full bg-muted">
+                <p className="text-center">
+                  <span className="inline-block align-middle p-5">1</span>
+                </p>
+              </div>
+
+              <div className="col-span-6 sm:col-span-5">
+                <p className="text-muted-foreground text-sm">
+                  <span className="sm:hidden">1. </span>
+                  Install a compatible application such as Google Authenticator,
+                  Duo Mobile or Authy app on your mobile device or computer.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-6 items-center border-b last:border-none py-3">
+              <div className="hidden sm:block size-16 mx-auto rounded-full bg-muted">
+                <p className="text-center">
+                  <span className="inline-block align-middle p-5">2</span>
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-5 grid gap-3">
+                <p className="text-muted-foreground text-sm">
+                  <span className="sm:hidden">2. </span>
+                  Open your authenticator app, chose{" "}
+                  <span className="font-bold text-foreground">
+                    Show QR code
+                  </span>{" "}
+                  on this page, then use the app to scan the code.
+                  Alternatively, you can type a secret key.
+                  <span
+                    onClick={() => setQRCodeMode(!qRCodeMode)}
+                    className="ml-1 text-primary cursor-pointer"
+                  >
+                    {qRCodeMode ? "Show secret key" : "Show QR code"}
+                  </span>
+                </p>
+                {qRCodeMode ? (
+                  <button className="size-[200px] border border-primary text-sm text-center text-primary">
+                    <span className="align-middle h-full">Show QR code</span>
+                  </button>
+                ) : (
+                  <p className="font-medium text-sm text-muted-foreground">
+                    Secret code:{" "}
+                    <span className="text-foreground text-base">asdasdad</span>
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-6 items-center border-b last:border-none py-3">
+              <div className="hidden sm:block size-16 mx-auto rounded-full bg-muted">
+                <p className="text-center">
+                  <span className="inline-block align-middle p-5">3</span>
+                </p>
+              </div>
+              <div className="col-span-6 sm:col-span-5">
+                <p className="text-muted-foreground text-sm">
+                  <span className="sm:hidden">3. </span>
+                  Enter the code from your authenticator app.
+                </p>
+                <div className="flex flex-row mt-3">
+                  <div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="mfa_code1" className="text-sm">
+                        MFA code 1
+                      </Label>
+                      <Input id="mfa_code1" name="mfa_code1" className="" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="mfa_code2" className="text-sm">
+                        MFA code 2
+                      </Label>
+                      <Input id="mfa_code2" name="mfa_code2" className="" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Next</AlertDialogAction>
+          <AlertDialogCancel disabled={isPending} onClick={handleBack}>
+            {step == 1 ? "Cancel" : "Back"}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleNext}
+            disabled={(step == 1 && !validateInput) || isPending}
+          >
+            {step == 1 ? "Next" : "Submit"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
