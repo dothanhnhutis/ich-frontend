@@ -326,8 +326,20 @@ class UserService extends FetchHttp {
 
   async setupMFA(cookie: string, deviceName: string) {
     try {
-      return await this.post<{ message: string }>(
-        "/user/mfa/setup",
+      return await this.post<{
+        message: string;
+        data: {
+          backupCodes: string[];
+          totp: {
+            ascii: string;
+            hex: string;
+            base32: string;
+            oauth_url: string;
+          };
+          qrCodeUrl: string;
+        };
+      }>(
+        "/mfa/setup",
         {
           deviceName,
         },

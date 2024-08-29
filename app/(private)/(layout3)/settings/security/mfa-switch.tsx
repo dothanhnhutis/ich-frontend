@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
+import { setMFA } from "../actions";
 
 const MFASwitch = () => {
   const { currentUser } = useAuthContext();
@@ -47,9 +48,11 @@ const MFASwitch = () => {
     isPending: isPendingGenerateMFA,
     mutate: generateMFA,
     reset: resetGenerateMFA,
+    status,
+    data: dataGenerateMFA,
   } = useMutation({
-    mutationFn: (deviceName: string) => {
-      return true;
+    mutationFn: async (deviceName: string) => {
+      return await setMFA(deviceName);
     },
   });
 
@@ -177,6 +180,7 @@ const MFASwitch = () => {
                 </p>
               </div>
             </div>
+            <div>{status}</div>
 
             <div className="grid grid-cols-6 items-center border-b last:border-none py-3">
               <div className="hidden sm:block size-16 mx-auto rounded-full bg-muted">
@@ -201,13 +205,28 @@ const MFASwitch = () => {
                   </span>
                 </p>
                 {qRCodeMode ? (
-                  <button className="size-[200px] border border-primary text-sm text-center text-primary">
-                    <span className="align-middle h-full">Show QR code</span>
+                  <button
+                    onClick={() => generateMFA(deviceName)}
+                    className="size-[200px] border border-primary text-sm text-center text-primary"
+                  >
+                    {/* <span className="align-middle h-full">Show QR code</span> */}
+                    <img
+                      src={dataGenerateMFA?.data?.qrCodeUrl}
+                      alt="MFA QR code"
+                    />
                   </button>
                 ) : (
                   <p className="font-medium text-sm text-muted-foreground">
                     Secret code:{" "}
-                    <span className="text-foreground text-base">asdasdad</span>
+                    <span
+                      onClick={() => generateMFA(deviceName)}
+                      className="text-primary underline"
+                    >
+                      take
+                    </span>
+                    <span className="text-foreground text-base">
+                      {dataGenerateMFA?.data?.totp.base32}
+                    </span>
                   </p>
                 )}
               </div>

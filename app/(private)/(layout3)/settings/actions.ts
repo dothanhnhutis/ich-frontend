@@ -40,4 +40,15 @@ export async function createPassword(input: string) {
   return { success, message: data.message };
 }
 
-export async function ge(params: type) {}
+export async function setMFA(deviceName: string) {
+  const { success, data } = await userApi.setupMFA(
+    await cookieServer(),
+    deviceName
+  );
+  console.log(data);
+  if (success) {
+    return { success, message: data.message, data: data.data };
+  } else {
+    return { success, message: data.message };
+  }
+}
