@@ -73,6 +73,18 @@ const SessionsPage = () => {
 
           <Button variant="ghost">Revoke</Button>
         </div>
+        <div className="flex sm:grid gap-2 border-b sm:border p-2 sm:rounded-2xl">
+          <div className="text-sm w-full">
+            <p>42.116.126.235</p>
+            <p>Chrome on Macintosh</p>
+            <p>Last accessed: Aug 21, 2024</p>
+            <p>Signed in: Aug 21, 2024</p>
+          </div>
+          <Separator className="hidden sm:block" />
+          <p className="text-sm text-center text-nowrap align-middle">
+            Current Session
+          </p>
+        </div>
       </div>
     </>
   );

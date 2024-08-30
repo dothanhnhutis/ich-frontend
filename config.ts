@@ -4,12 +4,18 @@ const envSchema = z.object({
   NEXT_PUBLIC_GOOGLE_MAP_KEY: z.string(),
   NEXT_PUBLIC_SERVER_URL: z.string(),
   NEXT_PUBLIC_CLIENT_URL: z.string(),
+  NEXT_PUBLIC_COVER_PHOTO_URL: z.string(),
+  NEXT_PUBLIC_PHOTO_URL: z.string(),
+  NEXT_PUBLIC_LOGO_URL: z.string(),
 });
 
 const configParser = envSchema.safeParse({
   NEXT_PUBLIC_GOOGLE_MAP_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY,
   NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
   NEXT_PUBLIC_CLIENT_URL: process.env.NEXT_PUBLIC_CLIENT_URL,
+  NEXT_PUBLIC_COVER_PHOTO_URL: process.env.NEXT_PUBLIC_COVER_PHOTO_URL,
+  NEXT_PUBLIC_PHOTO_URL: process.env.NEXT_PUBLIC_PHOTO_URL,
+  NEXT_PUBLIC_LOGO_URL: process.env.NEXT_PUBLIC_LOGO_URL,
 });
 
 if (!configParser.success) {

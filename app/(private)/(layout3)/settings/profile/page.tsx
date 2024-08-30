@@ -12,12 +12,74 @@ import { FaFacebookSquare, FaYoutube, FaTiktok } from "react-icons/fa";
 import tiktokLogo from "@/images/logos/logo-tiktok.png";
 import { IoLogoYoutube } from "react-icons/io";
 import { AiFillTikTok } from "react-icons/ai";
+import { CameraIcon, EditIcon, PenSquareIcon, Share2Icon } from "lucide-react";
+import configs from "@/config";
 
 const ProfilePage = () => {
   const { currentUser } = useAuthContext();
 
   return (
     <>
+      <div>
+        <div className="relative rounded-md overflow-hidden">
+          <img
+            src={configs.NEXT_PUBLIC_COVER_PHOTO_URL}
+            alt="cover_photo"
+            className="h-[300px] object-cover w-full "
+          />
+          <div className="absolute bottom-2 right-2 flex items-center bg-background rounded-lg gap-2 px-3 py-1 ">
+            <CameraIcon className="flex-shrink-0 size-6" />
+            <p className="text-sm">Edit cover photo</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 -translate-y-[24px] px-5">
+          <div className="relative">
+            <Avatar className="size-32 border-2 border-background">
+              <AvatarImage
+                referrerPolicy="no-referrer"
+                src={configs.NEXT_PUBLIC_PHOTO_URL}
+              />
+              <AvatarFallback className="bg-transparent">
+                <Skeleton className="size-20 rounded-full" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="absolute right-1 bottom-1 bg-background p-1 rounded-full">
+              <CameraIcon className="flex-shrink-0 size-6" />
+            </div>
+          </div>
+
+          <div className="w-full pt-6">
+            <p className="font-bold text-lg">Thanh Nhut</p>
+            <p>Admin</p>
+            <div className="flex gap-2">
+              <FaFacebookSquare className="flex-shrink-0 size-6 text-primary " />
+              <IoLogoYoutube className="flex-shrink-0 size-6 text-destructive" />
+              <FaTiktok className="flex-shrink-0 size-5 p-0.5 bg-black text-white rounded" />
+            </div>
+          </div>
+          <div className="flex items-center gap-2 bg-accent px-3 py-1 rounded-lg">
+            <PenSquareIcon className="flex-shrink-0 size-5" />
+            <p className="text-sm text-nowrap">Edit profile</p>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center gap-2">
+          <div>
+            <p className="font-bold text-lg">Thanh Nhut</p>
+            <p className="text-sm text-muted-foreground">
+              If you have your CSS in an external file, then it's often
+              convenient to display an image that's used frequently across the
+              site (such as a header image) as a background image, because then
+              you have the flexibility to change the image later.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <FaFacebookSquare className="flex-shrink-0 size-6 text-primary " />
+            <IoLogoYoutube className="flex-shrink-0 size-6 text-destructive" />
+            <FaTiktok className="flex-shrink-0 size-5 p-0.5 bg-black text-white rounded" />
+          </div>
+        </div>
+      </div>
       <div className="grid grid-cols-4 lg:grid-cols-6 gap-4 border-b last:border-none py-4">
         <div className="w-full col-span-3 lg:col-span-2">
           <p className="font-bold">Profile</p>
@@ -99,7 +161,6 @@ const ProfilePage = () => {
           </Button>
         </div>
       </div>
-
       <div className="grid grid-cols-4 lg:grid-cols-6 gap-4 border-b last:border-none py-4">
         <div className="w-full col-span-3 lg:col-span-2">
           <p className="font-bold">Personal Information</p>
