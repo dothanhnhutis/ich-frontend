@@ -5,7 +5,7 @@ import NavLink from "../nav-link";
 
 const SettingLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="bg-background p-4">
+    <div className="bg-background p-4 max-w-screen-xl mx-auto">
       <h3 className="font-bold text-2xl">Account settings</h3>
       <p className="text-sm font-normal leading-snug text-muted-foreground">
         Manage your account settings and set e-mail preferences.
