@@ -5,6 +5,7 @@ import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import DeactivateBtn from "./deactivate-btn";
 import MFASwitch from "./mfa-switch";
+import { PasswordBtn } from "./password-btn";
 
 const SecurityPage = () => {
   const { currentUser } = useAuthContext();
@@ -38,9 +39,8 @@ const SecurityPage = () => {
             Set a unique password to protect your account.
           </p>
         </div>
-        <Button className="rounded-full " variant="outline">
-          {currentUser?.hasPassword ? "Change password" : "Set password"}
-        </Button>
+
+        <PasswordBtn />
       </div>
       <div className="flex flex-col lg:flex-row w-full gap-4 border-b py-4">
         <div className="w-full">
@@ -63,14 +63,13 @@ const SecurityPage = () => {
       </div>
       <div className="flex w-full gap-4 border-b py-4">
         <div className="w-full">
-          <p className="font-bold">2-factor authentication (2FA)</p>
+          <p className="font-bold">Mutible-factor authentication (MFA)</p>
           <p className="text-xs font-normal leading-snug text-muted-foreground">
             Make your account extra secure. Along with your password, you'll
             need to enter a code
           </p>
         </div>
 
-        {/* <Switch checked={currentUser?.mFAEnabled} /> */}
         <MFASwitch />
       </div>
       <div className="flex w-full gap-4 py-4">

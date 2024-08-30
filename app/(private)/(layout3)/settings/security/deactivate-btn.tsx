@@ -49,7 +49,8 @@ const DeactivateBtn = () => {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will deactivate your account
+            This action will deactivate your account. Your account must be
+            activated when you sign in again
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -59,11 +60,12 @@ const DeactivateBtn = () => {
             onClick={() => {
               mutate();
             }}
+            className="bg-destructive hover:bg-destructive/80 text-foreground"
           >
             {isPending && (
               <LoaderPinwheelIcon className="h-4 w-4 animate-spin flex-shrink-0 mr-2" />
             )}
-            Delete
+            Deactivate
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

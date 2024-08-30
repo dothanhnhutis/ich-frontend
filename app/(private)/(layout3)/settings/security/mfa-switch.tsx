@@ -76,7 +76,7 @@ const MFASwitch = () => {
       if (success) {
         queryClient.invalidateQueries({ queryKey: ["me"] });
         setStep(3);
-        toast.warning(message);
+        toast.success(message);
       } else {
         toast.error(message);
       }
@@ -221,7 +221,7 @@ const MFASwitch = () => {
         <AlertDialogContent
           className={cn(
             "max-h-screen overflow-y-scroll p-4 sm:p-6",
-            step == 1 ? "sm:max-w-screen-sm" : "sm:max-w-screen-lg"
+            step == 1 ? "sm:max-w-screen-md" : "sm:max-w-screen-lg"
           )}
         >
           <AlertDialogHeader>

@@ -32,7 +32,9 @@ export async function editPassword(input: EditPasswordInput) {
   return { success, message: data.message };
 }
 
-export async function createPassword(input: string) {
+export async function createPassword(
+  input: Omit<EditPasswordInput, "oldPassword">
+) {
   const { success, data } = await userApi.createPassword(
     await cookieServer(),
     input

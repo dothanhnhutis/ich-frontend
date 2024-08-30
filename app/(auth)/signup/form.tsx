@@ -85,7 +85,6 @@ const SignUpForm = () => {
       return await signUp(input);
     },
     onSuccess({ success, message }) {
-      console.log(message);
       if (success) {
         toast.success(message);
         handleReset();
