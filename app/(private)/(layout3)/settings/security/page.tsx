@@ -1,11 +1,11 @@
 "use client";
+import React from "react";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
-import React from "react";
-import { FcGoogle } from "react-icons/fc";
 import DeactivateBtn from "./deactivate-btn";
 import MFASwitch from "./mfa-switch";
 import { PasswordBtn } from "./password-btn";
+import ProviderList from "./provider-list";
 
 const SecurityPage = () => {
   const { currentUser } = useAuthContext();
@@ -49,17 +49,7 @@ const SecurityPage = () => {
             Another way to log in to your account.
           </p>
         </div>
-        <div className="flex gap-4 w-full justify-between">
-          <div className="flex items-center gap-2 opacity-50">
-            <div className="p-1 bg-white rounded-full">
-              <FcGoogle className="size-8" />
-            </div>
-            <p>Google</p>
-          </div>
-          <Button className="rounded-full " variant="outline">
-            Connect
-          </Button>
-        </div>
+        <ProviderList oauthProviders={currentUser!.oauthProviders} />
       </div>
       <div className="flex w-full gap-4 border-b py-4">
         <div className="w-full">

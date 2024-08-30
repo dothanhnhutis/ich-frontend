@@ -418,5 +418,35 @@ class UserService extends FetchHttp {
       }
     }
   }
+  async disconnectOauthProvider(
+    cookie: string,
+    input: {
+      provider: string;
+      providerId: string;
+    }
+  ) {
+    try {
+      return await this.post<{
+        message: string;
+      }>("/disconnect", input, {
+        headers: {
+          Cookie: cookie,
+        },
+      });
+    } catch (error: any) {
+      if (error instanceof FetchHttpError) {
+        return error.serialize();
+      } else {
+        console.log(
+          "UserService disconnectOauthProvider() method error: ",
+          error
+        );
+        return {
+          success: false,
+          data: { message: error.message },
+        } as IError;
+      }
+    }
+  }
 }
 export default new UserService();

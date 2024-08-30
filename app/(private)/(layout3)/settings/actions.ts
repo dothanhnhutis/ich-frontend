@@ -79,3 +79,14 @@ export async function disableMFA(input: {
   );
   return { success, message: data.message };
 }
+
+export async function disconnectOauth(input: {
+  provider: string;
+  providerId: string;
+}) {
+  const { success, data } = await userApi.disconnectOauthProvider(
+    await cookieServer(),
+    input
+  );
+  return { success, message: data.message };
+}

@@ -205,6 +205,7 @@ export type User = {
     city: string;
     apartment: string;
   } | null;
+  oauthProviders: { id: string; provider: string; providerId: string }[];
   createdAt: Date;
   updatedAt: Date;
 };
