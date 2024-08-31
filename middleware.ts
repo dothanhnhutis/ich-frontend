@@ -7,7 +7,7 @@ import {
   DEFAULT_LOGOUT_REDIRECT,
   EMAIL_VERIFY_ROUTE,
 } from "@/routes";
-import { NextResponse } from "next/server";
+import { NextResponse, userAgent } from "next/server";
 import type { NextRequest } from "next/server";
 import { getCurrentUser } from "./app/actions";
 import { cookies } from "next/headers";
@@ -19,9 +19,11 @@ function redirect(request: NextRequest, path?: string) {
   const headers = new Headers(request.headers);
   headers.set("x-current-path", nextUrl.pathname);
   headers.set("x-current-search-params", nextUrl.searchParams.toString());
+  headers.set("x-forwarded-for", request.ip || "");
+  headers.set("x-userAgent", userAgent(request).ua || "");
 
   if (path) {
-    const response = NextResponse.redirect(new URL(path, url), {
+    const response = NextResponse.redirect(new URL(path, request.nextUrl), {
       headers,
     });
     if (path == "/login") response.cookies.delete("session");
@@ -39,6 +41,7 @@ function redirect(request: NextRequest, path?: string) {
 export async function middleware(request: NextRequest) {
   //Protected Route
   const { nextUrl } = request;
+
   let emailVerified: boolean = false;
   let user: User | undefined;
   if (cookies().has("session")) {
@@ -78,6 +81,7 @@ export async function middleware(request: NextRequest) {
       return redirect(request, DEFAULT_LOGOUT_REDIRECT);
     }
   }
+  return redirect(request);
 }
 
 export const config = {

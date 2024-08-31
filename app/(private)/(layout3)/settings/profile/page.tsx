@@ -8,11 +8,9 @@ import { Label } from "@/components/ui/label";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { FaImage } from "react-icons/fa6";
 import { Textarea } from "@/components/ui/textarea";
-import { FaFacebookSquare, FaYoutube, FaTiktok } from "react-icons/fa";
-import tiktokLogo from "@/images/logos/logo-tiktok.png";
+import { FaFacebookSquare, FaTiktok } from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io";
-import { AiFillTikTok } from "react-icons/ai";
-import { CameraIcon, EditIcon, PenSquareIcon, Share2Icon } from "lucide-react";
+import { CameraIcon, MapPinIcon, PenSquareIcon } from "lucide-react";
 import configs from "@/config";
 
 const ProfilePage = () => {
@@ -28,13 +26,13 @@ const ProfilePage = () => {
             className="h-[300px] object-cover w-full "
           />
           <div className="absolute bottom-2 right-2 flex items-center bg-background rounded-lg gap-2 px-3 py-1 ">
-            <CameraIcon className="flex-shrink-0 size-6" />
-            <p className="text-sm">Edit cover photo</p>
+            <CameraIcon className="flex-shrink-0 size-5 min-[450px]:size-6" />
+            <p className="text-sm hidden min-[450px]:block">Edit cover photo</p>
           </div>
         </div>
-        <div className="flex items-center gap-4 -translate-y-[24px] px-5">
+        <div className="flex gap-4 -translate-y-[24px] pl-5 pr-3">
           <div className="relative">
-            <Avatar className="size-32 border-2 border-background">
+            <Avatar className="size-16 min-[450px]:size-32 border-2 border-background">
               <AvatarImage
                 referrerPolicy="no-referrer"
                 src={configs.NEXT_PUBLIC_PHOTO_URL}
@@ -47,39 +45,65 @@ const ProfilePage = () => {
               <CameraIcon className="flex-shrink-0 size-6" />
             </div>
           </div>
-
-          <div className="w-full pt-6">
-            <p className="font-bold text-lg">Thanh Nhut</p>
-            <p>Admin</p>
-            <div className="flex gap-2">
-              <FaFacebookSquare className="flex-shrink-0 size-6 text-primary " />
-              <IoLogoYoutube className="flex-shrink-0 size-6 text-destructive" />
-              <FaTiktok className="flex-shrink-0 size-5 p-0.5 bg-black text-white rounded" />
+          <div className="flex justify-between w-full pt-7">
+            <div>
+              <p className="font-bold text-base min-[450px]:text-lg">
+                Thanh Nhut
+              </p>
+              <p className="text-xs min-[450px]:text-sm">Admin</p>
             </div>
-          </div>
-          <div className="flex items-center gap-2 bg-accent px-3 py-1 rounded-lg">
-            <PenSquareIcon className="flex-shrink-0 size-5" />
-            <p className="text-sm text-nowrap">Edit profile</p>
-          </div>
-        </div>
-
-        <div className="flex justify-between items-center gap-2">
-          <div>
-            <p className="font-bold text-lg">Thanh Nhut</p>
-            <p className="text-sm text-muted-foreground">
-              If you have your CSS in an external file, then it's often
-              convenient to display an image that's used frequently across the
-              site (such as a header image) as a background image, because then
-              you have the flexibility to change the image later.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <FaFacebookSquare className="flex-shrink-0 size-6 text-primary " />
-            <IoLogoYoutube className="flex-shrink-0 size-6 text-destructive" />
-            <FaTiktok className="flex-shrink-0 size-5 p-0.5 bg-black text-white rounded" />
+            <div>
+              <div className="flex items-center gap-2 bg-accent px-3 py-1 rounded-lg">
+                <PenSquareIcon className="flex-shrink-0 size-4 min-[450px]:size-5" />
+                <p className="text-sm text-nowrap hidden min-[450px]:block">
+                  Edit profile
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <div className="grid grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="gap-4 w-full col-span-4 lg:col-span-2 border p-3 rounded-lg space-y-3">
+          <p className="font-bold text-lg">Instruction</p>
+          <p className="text-sm text-muted-foreground">
+            If you have your CSS in an external file, then it's often convenient
+            to display an image that's used frequently across the site (such as
+            a header image) as a background image, because then you have the
+            flexibility to change the image later.
+          </p>
+          <div className="grid gap-1 col-span-6">
+            <div className="flex gap-2 items-center">
+              <MapPinIcon className="flex-shrink-0 size-6" />
+              <p className="text-xs font-normal text-muted-foreground">
+                159 Nguyen Dinh Chieu, Phuong 4, TP. Soc Trang, T. Soc Trang
+              </p>
+            </div>
+            <div className="flex gap-2 items-center">
+              <FaFacebookSquare className="flex-shrink-0 size-6 text-primary " />
+              <p className="text-xs font-normal text-muted-foreground">
+                https://facebooke.com/dothanhnhutis
+              </p>
+            </div>
+            <div className="flex gap-2 items-center">
+              <IoLogoYoutube className="flex-shrink-0 size-6 text-destructive" />
+              <p className="text-xs font-normal text-muted-foreground">
+                https://facebooke.com/dothanhnhutis
+              </p>
+            </div>
+            <div className="flex gap-2 items-center">
+              <FaTiktok className="flex-shrink-0 size-5 p-0.5 bg-black text-white rounded" />
+              <p className="text-xs font-normal text-muted-foreground">
+                https://facebooke.com/dothanhnhutis
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-6 gap-4 col-span-4 lg:col-span-4 order-2">
+          asdsd
+        </div>
+      </div>
+
       <div className="grid grid-cols-4 lg:grid-cols-6 gap-4 border-b last:border-none py-4">
         <div className="w-full col-span-3 lg:col-span-2">
           <p className="font-bold">Profile</p>
@@ -141,14 +165,7 @@ const ProfilePage = () => {
               </p>
             </div>
             <div className="flex gap-2 items-center">
-              {/* <img
-                src={tiktokLogo.src}
-                alt=""
-                className="flex-shrink-0 size-6 rounded"
-              /> */}
-
               <FaTiktok className="flex-shrink-0 size-5 p-0.5 bg-black text-white rounded" />
-
               <p className="text-xs font-normal text-muted-foreground">
                 https://facebooke.com/dothanhnhutis
               </p>

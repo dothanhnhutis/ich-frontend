@@ -2,7 +2,7 @@
 import { ResetPasswordInput, SignInInput, SignUpInput } from "@/schemas/auth";
 import userApi from "@/service/collections/user-collections";
 import authApi from "@/service/collections/auth.collection";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { cookieParser } from "@/lib/cookies-parser";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -14,7 +14,12 @@ export async function signUp(input: SignUpInput) {
 }
 
 export async function signIn(input: SignInInput) {
-  const res = await authApi.signIn(input);
+  const ua = headers().get("x-userAgent");
+  const res = await authApi.signIn(input, {
+    headers: {
+      "User-Agent": ua || "",
+    },
+  });
   if (res.success) {
     cookies().delete("registered");
     for (const cookie of res.headers.getSetCookie()) {

@@ -28,7 +28,7 @@ const SecurityPage = () => {
             )}
           </div>
           <Button className="rounded-full" variant="outline">
-            Edit
+            Change
           </Button>
         </div>
       </div>

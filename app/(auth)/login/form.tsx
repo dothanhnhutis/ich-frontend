@@ -67,7 +67,6 @@ export const SignInForm = ({
       );
     },
     onSuccess({ success, data }) {
-      console.log(data);
       if (!success) {
         if (data.message == "Your account is currently closed") {
           handleReset(true);

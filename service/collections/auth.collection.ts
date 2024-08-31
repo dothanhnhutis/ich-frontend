@@ -1,14 +1,23 @@
 import { ResetPasswordInput, SignInInput, SignUpInput } from "@/schemas/auth";
-import { FetchHttp, FetchHttpError, IError, ISuccess } from "./http";
+import {
+  FetchHttp,
+  FetchHttpError,
+  FetchHttpOption,
+  IError,
+  ISuccess,
+} from "./http";
 
 class AuthService extends FetchHttp {
   constructor() {
     super("/api/v1/auth");
   }
 
-  async signIn(input: SignInInput | Pick<SignInInput, "email">) {
+  async signIn(
+    input: SignInInput | Pick<SignInInput, "email">,
+    options?: FetchHttpOption
+  ) {
     try {
-      return await this.post<{ message: string }>("/signin", input);
+      return await this.post<{ message: string }>("/signin", input, options);
     } catch (error: any) {
       if (error instanceof FetchHttpError) {
         return error.serialize();

@@ -1,6 +1,6 @@
 import configs from "@/config";
 
-type FetchHttpOption = RequestInit & {
+export type FetchHttpOption = RequestInit & {
   baseUrl?: string;
 };
 
