@@ -14,10 +14,12 @@ export async function signUp(input: SignUpInput) {
 }
 
 export async function signIn(input: SignInInput) {
-  const ua = headers().get("x-userAgent");
+  const ua = headers().get("x-user-agent") || "";
+  const ip = headers().get("x-forwarded-for") || "";
   const res = await authApi.signIn(input, {
     headers: {
-      "User-Agent": ua || "",
+      "user-agent": ua,
+      "x-forwarded-for": ip,
     },
   });
   if (res.success) {

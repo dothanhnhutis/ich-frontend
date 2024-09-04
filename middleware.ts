@@ -19,8 +19,13 @@ function redirect(request: NextRequest, path?: string) {
   const headers = new Headers(request.headers);
   headers.set("x-current-path", nextUrl.pathname);
   headers.set("x-current-search-params", nextUrl.searchParams.toString());
-  headers.set("x-forwarded-for", request.ip || "");
-  headers.set("x-userAgent", userAgent(request).ua || "");
+  headers.set(
+    "x-forwarded-for",
+    request.headers.get("x-real-ip") ||
+      request.headers.get("x-forwarded-for") ||
+      ""
+  );
+  headers.set("x-user-agent", userAgent(request).ua || "");
 
   if (path) {
     const response = NextResponse.redirect(new URL(path, request.nextUrl), {
@@ -39,6 +44,14 @@ function redirect(request: NextRequest, path?: string) {
 }
 
 export async function middleware(request: NextRequest) {
+  console.log(
+    "ip",
+    request.headers.get("x-real-ip") ||
+      request.headers.get("x-forwarded-for") ||
+      ""
+  );
+  console.log("ua", userAgent(request).ua);
+
   //Protected Route
   const { nextUrl } = request;
 
