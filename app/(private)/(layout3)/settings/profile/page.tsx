@@ -10,8 +10,15 @@ import { FaImage } from "react-icons/fa6";
 import { Textarea } from "@/components/ui/textarea";
 import { FaFacebookSquare, FaTiktok } from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io";
-import { CameraIcon, MapPinIcon, PenSquareIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  CameraIcon,
+  MapPinIcon,
+  PenSquareIcon,
+  SmartphoneIcon,
+} from "lucide-react";
 import configs from "@/config";
+import EditProfileForm from "./edit-profile-form";
 
 const ProfilePage = () => {
   const { currentUser } = useAuthContext();
@@ -23,11 +30,11 @@ const ProfilePage = () => {
           <img
             src={configs.NEXT_PUBLIC_COVER_PHOTO_URL}
             alt="cover_photo"
-            className="h-[300px] object-cover w-full "
+            className="h-[200px] xs:h-[300px] object-cover w-full "
           />
           <div className="absolute bottom-2 right-2 flex items-center bg-background rounded-lg gap-2 px-3 py-1 ">
-            <CameraIcon className="flex-shrink-0 size-5 min-[450px]:size-6" />
-            <p className="text-sm hidden min-[450px]:block">Edit cover photo</p>
+            <CameraIcon className="flex-shrink-0 size-5 xs:size-6" />
+            <p className="text-sm hidden xs:block">Edit cover photo</p>
           </div>
         </div>
         <div className="flex gap-4 -translate-y-[24px] pl-5 pr-3">
@@ -37,13 +44,10 @@ const ProfilePage = () => {
                 referrerPolicy="no-referrer"
                 src={configs.NEXT_PUBLIC_PHOTO_URL}
               />
-              <AvatarFallback className="bg-transparent">
-                <Skeleton className="size-20 rounded-full" />
+              <AvatarFallback>
+                <Skeleton className="size-16 min-[450px]:size-32 rounded-full" />
               </AvatarFallback>
             </Avatar>
-            <div className="absolute right-1 bottom-1 bg-background p-1 rounded-full">
-              <CameraIcon className="flex-shrink-0 size-6" />
-            </div>
           </div>
           <div className="flex justify-between w-full pt-7">
             <div>
@@ -52,17 +56,10 @@ const ProfilePage = () => {
               </p>
               <p className="text-xs min-[450px]:text-sm">Admin</p>
             </div>
-            <div>
-              <div className="flex items-center gap-2 bg-accent px-3 py-1 rounded-lg">
-                <PenSquareIcon className="flex-shrink-0 size-4 min-[450px]:size-5" />
-                <p className="text-sm text-nowrap hidden min-[450px]:block">
-                  Edit profile
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
+      <EditProfileForm />
       <div className="grid grid-cols-4 lg:grid-cols-6 gap-4">
         <div className="gap-4 w-full col-span-4 lg:col-span-2 border p-3 rounded-lg space-y-3">
           <p className="font-bold text-lg">Instruction</p>
@@ -73,6 +70,18 @@ const ProfilePage = () => {
             flexibility to change the image later.
           </p>
           <div className="grid gap-1 col-span-6">
+            <div className="flex gap-2 items-center">
+              <SmartphoneIcon className="flex-shrink-0 size-6" />
+              <p className="text-xs font-normal text-muted-foreground">
+                0948548844
+              </p>
+            </div>
+            <div className="flex gap-2 items-center">
+              <CalendarIcon className="flex-shrink-0 size-6" />
+              <p className="text-xs font-normal text-muted-foreground">
+                09 / 10 / 1999
+              </p>
+            </div>
             <div className="flex gap-2 items-center">
               <MapPinIcon className="flex-shrink-0 size-6" />
               <p className="text-xs font-normal text-muted-foreground">

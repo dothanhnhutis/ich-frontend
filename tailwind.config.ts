@@ -23,7 +23,7 @@ const config = {
         "not-found": "url('../assets/gif/dribbble.gif')",
       },
       screens: {
-        xs: "560px",
+        xs: "450px",
       },
       colors: {
         border: "hsl(var(--border))",
