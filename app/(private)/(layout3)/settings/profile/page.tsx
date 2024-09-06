@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import configs from "@/config";
 import EditProfileForm from "./edit-profile-form";
+import EditPhoto from "./edit-avatar-form";
 
 const ProfilePage = () => {
   const { currentUser } = useAuthContext();
@@ -60,6 +61,7 @@ const ProfilePage = () => {
         </div>
       </div>
       <EditProfileForm />
+      <EditPhoto />
       <div className="grid grid-cols-4 lg:grid-cols-6 gap-4">
         <div className="gap-4 w-full col-span-4 lg:col-span-2 border p-3 rounded-lg space-y-3">
           <p className="font-bold text-lg">Instruction</p>

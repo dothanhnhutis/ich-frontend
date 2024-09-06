@@ -11,12 +11,14 @@ export const NavLink = ({
   title = "",
   Icon,
   className,
+  reverse,
 }: {
   href?: string;
   regex?: RegExp;
   title?: string;
   Icon?: LucideIcon;
   className?: string;
+  reverse?: boolean;
 }) => {
   const path = usePathname();
   return (
@@ -25,8 +27,12 @@ export const NavLink = ({
       className={cn(
         "flex items-center p-2 rounded-lg mb-1 last:mb-0",
         regex?.test(path)
-          ? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-          : "hover:bg-accent hover:text-accent-foreground",
+          ? reverse
+            ? "bg-muted"
+            : "bg-background text-accent-foreground hover:bg-background"
+          : reverse
+          ? "hover:bg-muted"
+          : "hover:bg-background hover:text-accent-foreground",
         className
       )}
     >

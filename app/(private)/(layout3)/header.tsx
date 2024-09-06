@@ -4,7 +4,7 @@ import UserMenu from "./user-menu";
 
 const Header = () => {
   return (
-    <header className="hidden md:p-2 md:flex md:justify-end md:items-center md:gap-2 md:sticky md:top-0 md:right-0 md:w-full md:backdrop-blur md:bg-background/60 md:z-50">
+    <header className="hidden md:p-2 md:flex md:justify-end md:items-center md:gap-2 md:sticky md:top-0 md:right-0 md:w-full md:backdrop-blur md:bg-muted/60 md:z-50">
       <div className="p-2 rounded-full hover:bg-primary/20 hover:text-primary">
         <BellIcon className=" flex-shrink-0 size-6" />
       </div>

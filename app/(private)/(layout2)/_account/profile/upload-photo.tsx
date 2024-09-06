@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { editPicture } from "../actions";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import configs from "@/config";
 
 export const UploadPhoto = ({ children }: { children: React.ReactNode }) => {
   const { currentUser } = useAuthContext();
@@ -29,7 +30,7 @@ export const UploadPhoto = ({ children }: { children: React.ReactNode }) => {
   const cropperRef = useRef<ReactCropperElement>(null);
   const [zoomSlider, setZoomSlider] = useState<number>(0.2);
   const [dataUrl, setDataUrl] = useState<string | undefined>(
-    currentUser?.picture || undefined
+    currentUser?.profile?.picture || configs.NEXT_PUBLIC_PHOTO_URL
   );
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +66,7 @@ export const UploadPhoto = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     setZoomSlider(0.2);
-    setDataUrl(currentUser?.picture || undefined);
+    setDataUrl(currentUser?.profile?.picture || undefined);
   }, [open]);
 
   const { isPending, mutate } = useMutation({

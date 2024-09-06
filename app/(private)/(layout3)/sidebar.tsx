@@ -58,7 +58,7 @@ const permission: {
 const SideBar = () => {
   const { currentUser } = useAuthContext();
   return (
-    <div className="sticky top-0 left-0 w-full z-50 flex md:block justify-between items-center backdrop-blur bg-background/60 md:w-[200px] md:h-screen md:flex-shrink-0 ">
+    <div className="sticky top-0 left-0 w-full z-50 flex md:block justify-between items-center backdrop-blur bg-background/60 md:bg-transparent md:backdrop-blur-none md:w-[200px] md:h-screen md:flex-shrink-0 ">
       <Link href="/" prefetch={false} className="flex items-center p-2">
         <div className={cn("flex items-center size-12")}>
           <AspectRatio
@@ -80,6 +80,7 @@ const SideBar = () => {
         <div className="flex items-center p-2 rounded-full hover:bg-primary/20 hover:text-primary">
           <BellIcon className="block flex-shrink-0 size-6" />
         </div>
+
         <UserMenu isMobile />
 
         <div className="flex items-center p-2 rounded-full hover:bg-primary/20 hover:text-primary">
@@ -100,8 +101,8 @@ const SideBar = () => {
           ))}
       </ScrollArea>
 
-      <div className="absolute hidden md:block left-0 bottom-0 right-0 p-2 bg-background">
-        <Label className="flex items-center p-2 rounded-lg mb-1 last:mb-0 hover:bg-accent hover:text-accent-foreground">
+      <div className="absolute hidden md:block left-0 bottom-0 right-0 p-2 bg-muted">
+        <Label className="flex items-center p-2 rounded-lg mb-1 last:mb-0 hover:bg-background hover:text-accent-foreground">
           <MoonIcon className="hidden dark:block flex-shrink-0 size-6 md:mr-2" />
           <SunIcon className=" dark:hidden block flex-shrink-0 size-6 md:mr-2" />
           <p className="text-sm w-full">Theme</p>

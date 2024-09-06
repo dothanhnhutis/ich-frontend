@@ -44,7 +44,7 @@ const UserMenu = ({ isMobile = false }: { isMobile?: boolean }) => {
           <Avatar className="size-8">
             <AvatarImage
               referrerPolicy="no-referrer"
-              src={currentUser?.picture || AvatarDefault.src}
+              src={currentUser?.profile?.picture || AvatarDefault.src}
             />
             <AvatarFallback className="bg-transparent">
               <Skeleton className="size-8 rounded-full" />
@@ -63,7 +63,7 @@ const UserMenu = ({ isMobile = false }: { isMobile?: boolean }) => {
           <Avatar className="size-24">
             <AvatarImage
               referrerPolicy="no-referrer"
-              src={currentUser?.picture || AvatarDefault.src}
+              src={currentUser?.profile?.picture || AvatarDefault.src}
             />
             <AvatarFallback className="bg-transparent">
               <Skeleton className="size-24 rounded-full" />

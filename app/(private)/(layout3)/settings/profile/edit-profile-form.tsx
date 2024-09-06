@@ -17,16 +17,27 @@ import {
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { DndContext, closestCorners } from "@dnd-kit/core";
 import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  UniqueIdentifier,
+  closestCorners,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
   SortableContext,
+  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-
+import { CSS } from "@dnd-kit/utilities";
 type Profile = {
   bio: string;
-  urls: string[];
+  urls: { id: number; url: string }[];
   firstName: string;
   lastName: string;
   birhtDate: Date;
@@ -38,29 +49,41 @@ type Profile = {
   city: string;
 };
 
-const SortUrl = ({ id }: { id: number }) => {
+const SortUrl = ({ data }: { data: { url: string; id: number } }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id });
+    useSortable({ id: data.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   return (
     <div
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      style={{ transform, transition }}
-      className="flex items-center py-2 px-3 border rounded-md h-10"
+      style={style}
+      className="flex items-center gap-2 py-2 px-3 border rounded-md h-10 bg-background"
     >
-      <input type="text" className="bg-transparent w-full outline-0 text-sm" />
-      <GripVerticalIcon className="flex-shrink-0 size-4" />
+      <GripVerticalIcon
+        className="flex-shrink-0 size-4 cursor-grab"
+        {...listeners}
+        {...attributes}
+      />
+      <p className="text-sm text-muted-foreground w-full">{data.url}</p>
+      <XIcon className="flex-shrink-0 size-4 cursor-pointer" />
     </div>
   );
 };
 
 const EditProfileForm = () => {
-  const [date, setDate] = React.useState<Date>();
   const [open, setOpen] = React.useState<boolean>(false);
   const [formData, setFormData] = React.useState<Profile>({
     bio: "",
-    urls: ["https://example.xyz"],
+    urls: [
+      { id: 1, url: "https://example1.xyz" },
+      { id: 2, url: "https://example2.xyz" },
+      { id: 3, url: "https://example3.xyz" },
+    ],
     firstName: "",
     lastName: "",
     birhtDate: new Date(),
@@ -77,15 +100,35 @@ const EditProfileForm = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const getUrlPos = (id: UniqueIdentifier) =>
+    formData.urls.findIndex((url) => id === url.id);
+
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (active.id === over?.id) return;
+    setFormData((prev) => {
+      const originalPos = getUrlPos(active.id);
+      const newPos = getUrlPos(over!.id);
+      return { ...prev, urls: arrayMove(formData.urls, originalPos, newPos) };
+    });
+  };
+
   const handleClose = () => {
     setOpen(false);
   };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleSave = () => {};
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="outline">Show Dialog</Button>
+        <Button variant="outline">Edit profile</Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="lg:max-w-screen-lg max-h-screen overflow-y-scroll">
         <div className="flex justify-between">
@@ -106,63 +149,10 @@ const EditProfileForm = () => {
             </Button>
           </div>
         </div>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div className="grid gap-1 col-span-6">
-            <Label htmlFor="bio" className="text-sm text-muted-foreground">
-              Bio
-            </Label>
-            <Textarea
-              value={formData.bio}
-              onChange={handleOnchange}
-              name="bio"
-              id="bio"
-              placeholder="Type your message here."
-              maxLength={256}
-            />
-            <div className="flex justify-between">
-              <p className="text-xs text-muted-foreground">
-                Write a few sentences about yourself.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {formData.bio.length}/256
-              </p>
-            </div>
-          </div>
-          <div className="grid gap-1 col-span-6">
-            <Label className="text-sm text-muted-foreground">URLs</Label>
-            <p className="text-xs font-normal text-muted-foreground">
-              Add links to your website, blog, or social media profiles.
-            </p>
-            <div className="flex items-center py-2 px-3 border rounded-md h-10">
-              <input
-                type="text"
-                className="bg-transparent w-full outline-0 text-sm"
-              />
-              <GripVerticalIcon className="flex-shrink-0 size-4" />
-            </div>
-            <DndContext collisionDetection={closestCorners}>
-              <SortableContext
-                items={formData.urls}
-                strategy={verticalListSortingStrategy}
-              >
-                {formData.urls.map((url, idx) => (
-                  <>
-                    <Input
-                      key={url}
-                      value={url}
-                      placeholder="https://example.xyz"
-                    />
-                    <SortUrl id={idx} />
-                  </>
-                ))}
-              </SortableContext>
-            </DndContext>
-            <Input placeholder="https://example.xyz" />
-          </div>
-        </div>
+
         <p className="font-bold">Personal Information</p>
         <div className="grid sm:grid-cols-2 gap-4">
-          <div className="grid gap-1 ">
+          <div className="grid gap-1">
             <Label
               htmlFor="firstName"
               className="text-sm text-muted-foreground"
@@ -177,7 +167,7 @@ const EditProfileForm = () => {
               placeholder="First name"
             />
           </div>
-          <div className="grid gap-1 ">
+          <div className="grid gap-1">
             <Label htmlFor="lastName" className="text-sm text-muted-foreground">
               Last name
             </Label>
@@ -189,7 +179,7 @@ const EditProfileForm = () => {
               placeholder="Last name"
             />
           </div>
-          <div className="grid gap-1 ">
+          <div className="grid gap-1">
             <Label
               htmlFor="birthDate"
               className="text-sm text-muted-foreground"
@@ -230,7 +220,7 @@ const EditProfileForm = () => {
               </PopoverContent>
             </Popover>
           </div>
-          <div className="grid gap-1 ">
+          <div className="grid gap-1">
             <Label htmlFor="phone" className="text-sm text-muted-foreground">
               Phone number
             </Label>
@@ -241,6 +231,56 @@ const EditProfileForm = () => {
               value={formData.phone}
               onChange={handleOnchange}
             />
+          </div>
+          <div className="grid gap-1 col-span-2">
+            <Label htmlFor="bio" className="text-sm text-muted-foreground">
+              Bio
+            </Label>
+            <Textarea
+              value={formData.bio}
+              onChange={handleOnchange}
+              name="bio"
+              id="bio"
+              placeholder="Type your message here."
+              maxLength={256}
+            />
+            <div className="flex justify-between">
+              <p className="text-xs text-muted-foreground">
+                Write a few sentences about yourself.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {formData.bio.length}/256
+              </p>
+            </div>
+          </div>
+          <div className="grid gap-1 col-span-2">
+            <Label className="text-sm text-muted-foreground">URLs</Label>
+            <p className="text-xs font-normal text-muted-foreground">
+              Add links to your website, blog, or social media profiles.
+            </p>
+            {/* <div className="flex items-center py-2 px-3 border rounded-md h-10">
+              <input
+                type="text"
+                className="bg-transparent w-full outline-0 text-sm"
+              />
+              <GripVerticalIcon className="flex-shrink-0 size-4" />
+            </div> */}
+
+            <DndContext
+              sensors={sensors}
+              onDragEnd={handleDragEnd}
+              collisionDetection={closestCorners}
+            >
+              <SortableContext
+                items={formData.urls}
+                strategy={verticalListSortingStrategy}
+              >
+                {formData.urls.map((url) => (
+                  <SortUrl key={url.id} data={url} />
+                ))}
+              </SortableContext>
+            </DndContext>
+            {/* <Input placeholder="https://example.xyz" /> */}
           </div>
         </div>
         <p className="font-bold">Personal Location</p>
