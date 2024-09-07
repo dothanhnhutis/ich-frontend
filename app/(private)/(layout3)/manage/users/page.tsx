@@ -13,6 +13,7 @@ import React from "react";
 import FilterPopover from "./filter";
 import SortPopeover from "./sort";
 import UserTable from "./table";
+import { UserPagination } from "./pagination";
 
 const UserManagerPage = async ({
   searchParams,
@@ -28,8 +29,12 @@ const UserManagerPage = async ({
   }
 
   return (
-    <div className="mt-4">
-      <div className="flex justify-between">
+    <div className="">
+      <h3 className="font-bold text-4xl">User Management</h3>
+      <p className="text-sm font-normal leading-snug text-muted-foreground">
+        Manage your user and their account permissions here.
+      </p>
+      <div className="flex justify-between mt-4">
         <div className="flex gap-2 items-center">
           <Link
             href="/manage/users?tab=active"
@@ -95,6 +100,7 @@ const UserManagerPage = async ({
         </div>
       </div>
       <UserTable />
+      <UserPagination totalPage={50} />
     </div>
   );
 };
