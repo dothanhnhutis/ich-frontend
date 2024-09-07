@@ -44,13 +44,13 @@ function redirect(request: NextRequest, path?: string) {
 }
 
 export async function middleware(request: NextRequest) {
-  console.log(
-    "ip",
-    request.headers.get("x-real-ip") ||
-      request.headers.get("x-forwarded-for") ||
-      ""
-  );
-  console.log("ua", userAgent(request).ua);
+  // console.log(
+  //   "ip",
+  //   request.headers.get("x-real-ip") ||
+  //     request.headers.get("x-forwarded-for") ||
+  //     ""
+  // );
+  // console.log("ua", userAgent(request).ua);
 
   //Protected Route
   const { nextUrl } = request;

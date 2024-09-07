@@ -28,10 +28,10 @@ export const NavLink = ({
         "flex items-center p-2 rounded-lg mb-1 last:mb-0",
         regex?.test(path)
           ? reverse
-            ? "bg-muted"
+            ? "bg-secondary"
             : "bg-background text-accent-foreground hover:bg-background"
           : reverse
-          ? "hover:bg-muted"
+          ? "hover:bg-secondary"
           : "hover:bg-background hover:text-accent-foreground",
         className
       )}

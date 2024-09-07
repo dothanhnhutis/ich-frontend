@@ -40,7 +40,7 @@ const UserMenu = ({ isMobile = false }: { isMobile?: boolean }) => {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger className="outline-none" asChild>
-        <div className="p-1 bg-accent rounded-full">
+        <div className="p-1 bg-accent hover:bg-accent/80 rounded-full cursor-pointer">
           <Avatar className="size-8">
             <AvatarImage
               referrerPolicy="no-referrer"

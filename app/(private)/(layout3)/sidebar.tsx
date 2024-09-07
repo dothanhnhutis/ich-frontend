@@ -58,63 +58,60 @@ const permission: {
 const SideBar = () => {
   const { currentUser } = useAuthContext();
   return (
-    <div className="sticky top-0 left-0 w-full z-50 flex md:block justify-between items-center backdrop-blur bg-background/60 md:bg-transparent md:backdrop-blur-none md:w-[200px] md:h-screen md:flex-shrink-0 ">
-      <Link href="/" prefetch={false} className="flex items-center p-2">
-        <div className={cn("flex items-center size-12")}>
-          <AspectRatio
-            ratio={1 / 1}
-            className="flex items-center justify-center"
-          >
-            <Image
-              priority
-              src={LogoImg.src}
-              width={LogoImg.width}
-              height={LogoImg.height}
-              alt="logo"
-              title="logo-ich"
-            />
-          </AspectRatio>
+    <div className="sticky top-0 left-0 w-full z-50  backdrop-blur bg-background/60 md:bg-transparent md:backdrop-blur-none md:w-[200px] md:h-screen md:flex-shrink-0 ">
+      <div className="flex md:block justify-between items-center p-2 md:p-2 md:pb-0 md:m-2 md:mb-0 md:bg-secondary bg-transparent rounded-tl-lg rounded-tr-lg">
+        <Link href="/" prefetch={false}>
+          <div className={cn(" size-12")}>
+            <AspectRatio ratio={1 / 1}>
+              <Image
+                priority
+                src={LogoImg.src}
+                width={LogoImg.width}
+                height={LogoImg.height}
+                alt="logo"
+                title="logo-ich"
+              />
+            </AspectRatio>
+          </div>
+        </Link>
+        <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center p-2 rounded-full bg-secondary hover:bg-secondary/80 cursor-pointer">
+            <BellIcon className="block flex-shrink-0 size-6" />
+          </div>
+          <UserMenu isMobile />
+          <div className="flex items-center p-2 rounded-full bg-secondary hover:bg-secondary/80">
+            <MenuIcon className="block flex-shrink-0 size-6" />
+          </div>
         </div>
-      </Link>
-      <div className="flex items-center gap-2 px-2 md:hidden">
-        <div className="flex items-center p-2 rounded-full hover:bg-primary/20 hover:text-primary">
-          <BellIcon className="block flex-shrink-0 size-6" />
+        <ScrollArea className="relative hidden md:block md:pt-4 h-[calc(100vh_-_172px)]">
+          {permission
+            .filter((p) => p.roles.includes(currentUser!.role))
+            .map((nav, idx) => (
+              <NavLink
+                key={idx}
+                href={nav.href}
+                regex={nav.regex}
+                title={nav.title}
+                Icon={nav.Icon}
+              />
+            ))}
+        </ScrollArea>
+
+        <div className="absolute hidden md:block left-2 bottom-2 right-2 p-2 bg-muted rounded-bl-lg rounded-br-lg">
+          <Label className="flex items-center p-2 rounded-lg mb-1 last:mb-0 hover:bg-background hover:text-accent-foreground">
+            <MoonIcon className="hidden dark:block flex-shrink-0 size-6 md:mr-2" />
+            <SunIcon className=" dark:hidden block flex-shrink-0 size-6 md:mr-2" />
+            <p className="text-sm w-full">Theme</p>
+            <ToggleTheme />
+          </Label>
+
+          <NavLink
+            Icon={SettingsIcon}
+            href="/settings/profile"
+            regex={/^\/settings(\/profile|\/security)?$/}
+            title="Settings"
+          />
         </div>
-
-        <UserMenu isMobile />
-
-        <div className="flex items-center p-2 rounded-full hover:bg-primary/20 hover:text-primary">
-          <MenuIcon className="block flex-shrink-0 size-6" />
-        </div>
-      </div>
-      <ScrollArea className="relative hidden md:block md:mt-5 md:px-2 h-[calc(100vh_-_182px)]">
-        {permission
-          .filter((p) => p.roles.includes(currentUser!.role))
-          .map((nav, idx) => (
-            <NavLink
-              key={idx}
-              href={nav.href}
-              regex={nav.regex}
-              title={nav.title}
-              Icon={nav.Icon}
-            />
-          ))}
-      </ScrollArea>
-
-      <div className="absolute hidden md:block left-0 bottom-0 right-0 p-2 bg-muted">
-        <Label className="flex items-center p-2 rounded-lg mb-1 last:mb-0 hover:bg-background hover:text-accent-foreground">
-          <MoonIcon className="hidden dark:block flex-shrink-0 size-6 md:mr-2" />
-          <SunIcon className=" dark:hidden block flex-shrink-0 size-6 md:mr-2" />
-          <p className="text-sm w-full">Theme</p>
-          <ToggleTheme />
-        </Label>
-
-        <NavLink
-          Icon={SettingsIcon}
-          href="/settings/profile"
-          regex={/^\/settings(\/profile|\/security)?$/}
-          title="Settings"
-        />
       </div>
     </div>
   );
