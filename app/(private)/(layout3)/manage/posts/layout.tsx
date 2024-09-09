@@ -1,6 +1,6 @@
 import React from "react";
 
-const UserManageLayout = ({ children }: { children: React.ReactNode }) => {
+const PostManageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="bg-background p-4 max-w-screen-2xl mx-auto md:rounded-xl mb-2">
       {children}
@@ -8,4 +8,4 @@ const UserManageLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default UserManageLayout;
+export default PostManageLayout;
