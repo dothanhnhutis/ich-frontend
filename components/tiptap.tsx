@@ -7,6 +7,9 @@ import {
   Node,
   Mark,
   mergeAttributes,
+  Editor,
+  useEditorState,
+  Extensions,
 } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -61,6 +64,278 @@ import { Separator } from "./ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "./ui/skeleton";
+
+export const extensions: Extensions = [
+  Document,
+  Paragraph.configure({
+    HTMLAttributes: {
+      class: "leading-7 [&:not(:first-child)]:mt-6",
+    },
+  }),
+  Text,
+  Heading.extend({
+    renderHTML({ node, HTMLAttributes }) {
+      const classes: Record<number, string> = {
+        1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
+        2: "scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0",
+        3: "scroll-m-20 text-2xl font-semibold tracking-tight",
+        4: "scroll-m-20 text-xl font-semibold tracking-tight",
+      };
+      const hasLevel = this.options.levels.includes(node.attrs.level);
+      const level = hasLevel ? node.attrs.level : this.options.levels[0];
+
+      return [
+        `h${level}`,
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+          class: `${classes[level]}`,
+        }),
+        0,
+      ];
+    },
+  }),
+  Blockquote.configure({
+    HTMLAttributes: {
+      class: "mt-6 border-l-2 pl-6 italic",
+    },
+  }),
+  Bold,
+  Italic,
+  Underline,
+  Strike,
+  Code.configure({
+    HTMLAttributes: {
+      class:
+        "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
+    },
+  }),
+  BulletList.configure({
+    keepMarks: true,
+    keepAttributes: false,
+    HTMLAttributes: {
+      class: "my-6 ml-6 list-disc [&>li]:mt-2",
+    },
+  }),
+  OrderedList.configure({
+    keepMarks: true,
+    keepAttributes: false,
+    HTMLAttributes: {
+      class: "my-6 ml-6 list-decimal [&>li]:mt-2",
+    },
+  }),
+  ListItem,
+  TextAlign.configure({
+    types: ["heading", "paragraph"],
+  }),
+  TextStyle,
+  Color.configure({
+    types: ["textStyle"],
+  }),
+  Highlight.configure({
+    multicolor: true,
+  }),
+  Link.configure({
+    HTMLAttributes: {
+      rel: "noopener noreferrer",
+      target: null,
+      class: "font-bold text-primary ",
+    },
+    openOnClick: false,
+  }),
+];
+
+type ColorMetadata = {
+  color: RgbaColor;
+  tempColor: RgbaColor;
+  open: boolean;
+  storeData: RgbaColor[];
+};
+
+function useStore(key: string): [string | null, (data: string) => void] {
+  const data: string | null =
+    typeof window != "undefined" ? window.localStorage.getItem(key) : null;
+  const handleSetData = (data: string): void => {
+    if (typeof window != "undefined") window.localStorage.setItem(key, data);
+  };
+  return [data, handleSetData];
+}
+
+const defaultColor: RgbaColor[] = [
+  { r: 36, g: 86, b: 184, a: 1 },
+  { r: 255, g: 0, b: 0, a: 1 },
+  { r: 217, g: 249, b: 157, a: 1 },
+  { r: 165, g: 243, b: 252, a: 1 },
+  { r: 165, g: 180, b: 252, a: 1 },
+  { r: 126, g: 211, b: 33, a: 1 },
+];
+
+const TiptapColor = ({
+  editor,
+  type,
+  storeKey,
+}: {
+  editor: Editor;
+  type: "textStyle" | "highlight";
+  storeKey: string;
+}) => {
+  const [storeData, setStoreData] = useStore(storeKey);
+  const [colorData, setColorData] = useState<ColorMetadata>(() => {
+    if (storeData == null) {
+      setStoreData(JSON.stringify(defaultColor));
+      return {
+        open: false,
+        color: {
+          a: 1,
+          b: 0,
+          g: 0,
+          r: 0,
+        },
+        tempColor: {
+          a: 1,
+          b: 0,
+          g: 0,
+          r: 0,
+        },
+        storeData: defaultColor,
+      };
+    }
+    return {
+      open: false,
+      color: {
+        a: 1,
+        b: 0,
+        g: 0,
+        r: 0,
+      },
+      tempColor: {
+        a: 1,
+        b: 0,
+        g: 0,
+        r: 0,
+      },
+      storeData: JSON.parse(storeData),
+    };
+  });
+
+  editor.on("selectionUpdate", ({ editor }) => {
+    const colorRegex =
+      /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
+    // if (editor.getAttributes("highlight").color) {
+    //   const color: string = editor.getAttributes("highlight").color;
+    //   const colorMatch = color.match(colorRegex);
+    //   setHighlightColor({
+    //     r: parseInt(colorMatch?.[1] || "0"),
+    //     g: parseInt(colorMatch?.[2] || "0"),
+    //     b: parseInt(colorMatch?.[3] || "0"),
+    //     a: parseFloat(colorMatch?.[4] || "1"),
+    //   });
+    // }
+    if (editor.getAttributes("textStyle").color) {
+      const color: string = editor.getAttributes("textStyle").color;
+      const colorMatch = color.match(colorRegex);
+      setColorData((prev) => ({
+        ...prev,
+        color: {
+          r: parseInt(colorMatch?.[1] || "0"),
+          g: parseInt(colorMatch?.[2] || "0"),
+          b: parseInt(colorMatch?.[3] || "0"),
+          a: parseFloat(colorMatch?.[4] || "1"),
+        },
+      }));
+    }
+  });
+
+  const handleAdd = () => {
+    setColorData((prev) => {
+      setStoreData(JSON.stringify([...prev.storeData, prev.tempColor]));
+      return {
+        ...prev,
+        storeData: [...prev.storeData, prev.tempColor],
+      };
+    });
+  };
+  const handleCancel = () => {
+    editor.commands.setColor(
+      `rgba(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}, ${colorData.color.a})`
+    );
+    setColorData((prev) => ({ ...prev, open: false }));
+  };
+
+  const handleClearColor = () => {
+    editor.commands.unsetColor();
+  };
+
+  const handleSetColor = ({ r, g, b, a }: RgbaColor) => {
+    editor.commands.setColor(`rgba(${r}, ${g}, ${b}, ${a})`);
+    setColorData((prev) => ({
+      ...prev,
+      tempColor: { r, g, b, a },
+    }));
+  };
+
+  return (
+    <Popover
+      open={colorData.open}
+      onOpenChange={(open) => setColorData((prev) => ({ ...prev, open }))}
+    >
+      <PopoverTrigger asChild>
+        <div
+          className={cn(
+            "flex gap-3 items-center rounded-lg overflow-hidden p-2  flex-shrink-0",
+            editor.isActive("textStyle") ? "bg-secondary" : "hover:bg-secondary"
+          )}
+        >
+          <PaletteIcon className="size-5 flex-shrink-0" />
+        </div>
+      </PopoverTrigger>
+      <PopoverContent className="p-2 w-auto space-y-1">
+        <p className="text-sm">Color</p>
+        <RgbaColorPicker
+          color={colorData.tempColor}
+          onChange={handleSetColor}
+        />
+        <div className="flex items-center flex-wrap max-w-[200px]">
+          <button
+            type="button"
+            onClick={handleClearColor}
+            className="p-1.5 hover:bg-secondary rounded"
+          >
+            <CircleOffIcon className="size-4 rounded" />
+          </button>
+          {colorData.storeData.map((color, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleSetColor(color)}
+              className="p-1 hover:bg-secondary rounded"
+            >
+              <div
+                style={{
+                  backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
+                }}
+                className={`size-5 rounded`}
+              />
+            </button>
+          ))}
+          <button
+            type="button"
+            className="p-1.5 hover:bg-secondary rounded"
+            onClick={handleAdd}
+          >
+            <PlusIcon className="size-4 rounded" />
+          </button>
+        </div>
+        <div className="flex gap-2">
+          <button type="button" onClick={handleCancel}>
+            cancel
+          </button>
+          <button type="button">save</button>
+          <div></div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 const Tiptap = () => {
   const [highlightColor, setHighlightColor] = useState<RgbaColor>({
@@ -69,102 +344,12 @@ const Tiptap = () => {
     g: 0,
     r: 0,
   });
-  const [hinglightColor, setHighLight] = useState<RgbaColor>({
-    a: 1,
-    b: 0,
-    g: 0,
-    r: 0,
-  });
 
   const editor = useEditor({
-    extensions: [
-      Document,
-      Paragraph.configure({
-        HTMLAttributes: {
-          class: "leading-7 [&:not(:first-child)]:mt-6",
-        },
-      }),
-      Text,
-      Heading.extend({
-        renderHTML({ node, HTMLAttributes }) {
-          const classes: Record<number, string> = {
-            1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
-            2: "scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0",
-            3: "scroll-m-20 text-2xl font-semibold tracking-tight",
-            4: "scroll-m-20 text-xl font-semibold tracking-tight",
-          };
-          const hasLevel = this.options.levels.includes(node.attrs.level);
-          const level = hasLevel ? node.attrs.level : this.options.levels[0];
-
-          return [
-            `h${level}`,
-            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-              class: `${classes[level]}`,
-            }),
-            0,
-          ];
-        },
-      }),
-      Blockquote.configure({
-        HTMLAttributes: {
-          class: "mt-6 border-l-2 pl-6 italic",
-        },
-      }),
-      Bold,
-      Italic,
-      Underline,
-      Strike,
-      Code.configure({
-        HTMLAttributes: {
-          class:
-            "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
-        },
-      }),
-      BulletList.configure({
-        keepMarks: true,
-        keepAttributes: false,
-        HTMLAttributes: {
-          class: "my-6 ml-6 list-disc [&>li]:mt-2",
-        },
-      }),
-      OrderedList.configure({
-        keepMarks: true,
-        keepAttributes: false,
-        HTMLAttributes: {
-          class: "my-6 ml-6 list-decimal [&>li]:mt-2",
-        },
-      }),
-      ListItem,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      TextStyle,
-      Color.configure({
-        types: ["textStyle"],
-      }),
-      Highlight.configure({
-        multicolor: true,
-      }),
-      Link.configure({
-        HTMLAttributes: {
-          rel: "noopener noreferrer",
-          target: null,
-          class: "font-bold text-primary ",
-        },
-        openOnClick: false,
-      }),
-    ],
+    immediatelyRender: false,
+    shouldRerenderOnTransaction: true,
+    extensions,
     content: "<p>Hello World! </p>",
-    onSelectionUpdate({ editor }) {
-      const colorRegex = /rgba((), 75, 150, 1)/;
-      if (editor.getAttributes("highlight").color) {
-        console.log(editor.getAttributes("highlight").color);
-      }
-      if (editor.getAttributes("textStyle").color) {
-        console.log(editor.getAttributes("textStyle").color);
-        const;
-      }
-    },
     onUpdate({ editor }) {
       console.log({
         json: editor.getJSON(),
@@ -174,7 +359,7 @@ const Tiptap = () => {
     },
   });
 
-  if (!editor) return <div>123</div>;
+  if (editor == null) return <div>loading...</div>;
 
   return (
     <div className="border rounded-lg">
@@ -293,7 +478,7 @@ const Tiptap = () => {
           <PopoverTrigger asChild>
             <div
               className={cn(
-                "flex gap-3 items-center rounded-lg overflow-hidden p-2  flex-shrink-0",
+                "flex gap-3 items-center rounded-lg overflow-hidden p-2 flex-shrink-0",
                 editor.isActive("highlight")
                   ? "bg-secondary"
                   : "hover:bg-secondary"
@@ -342,60 +527,7 @@ const Tiptap = () => {
             </div>
           </PopoverContent>
         </Popover>
-        <Popover>
-          <PopoverTrigger asChild>
-            <div
-              className={cn(
-                "flex gap-3 items-center rounded-lg overflow-hidden p-2  flex-shrink-0",
-                editor.isActive("textStyle")
-                  ? "bg-secondary"
-                  : "hover:bg-secondary"
-              )}
-            >
-              <PaletteIcon className="size-5 flex-shrink-0" />
-            </div>
-          </PopoverTrigger>
-          <PopoverContent className="p-2 w-auto space-y-1">
-            <p className="text-sm">Color</p>
-            <RgbaColorPicker
-              color={{ a: 100, b: 75, g: 75, r: 75 }}
-              onChange={() => {}}
-            />
-            <div className="flex items-center">
-              <button
-                type="button"
-                onClick={() => editor.commands.unsetColor()}
-                className="p-2 hover:bg-secondary rounded"
-              >
-                <CircleOffIcon className="size-4 rounded" />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  editor.commands.setColor(`rgba(${75}, ${75}, ${150}, ${1})`)
-                }
-                className="p-1 hover:bg-secondary rounded"
-              >
-                <div className="size-5 bg-[#2456b8] rounded" />
-              </button>
-              <button type="button" className="p-1 hover:bg-secondary rounded">
-                <div className="size-5 bg-[#ff0000] rounded" />
-              </button>
-              <button type="button" className="p-1 hover:bg-secondary rounded">
-                <div className="size-5 bg-[#a5f3fc] rounded" />
-              </button>
-              <button type="button" className="p-1 hover:bg-secondary rounded">
-                <div className="size-5 bg-[#a5b4fc] rounded" />
-              </button>
-              <button type="button" className="p-1 hover:bg-secondary rounded">
-                <div className="size-5 bg-[#7ED321] rounded" />
-              </button>
-              <button type="button" className="p-2 hover:bg-secondary rounded">
-                <PlusIcon className="size-4 rounded" />
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        <TiptapColor storeKey="textStyle" type="textStyle" editor={editor} />
         <Separator orientation="vertical" />
         <button
           type="button"
