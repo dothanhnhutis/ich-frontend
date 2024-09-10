@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { RgbaColor } from "react-colorful";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -82,4 +83,50 @@ export function caculatorPagination({
     result = [1, -1, ...centerList, -1, totalPage];
   }
   return result.filter((v, ix, arr) => v == -1 || arr.indexOf(v) === ix);
+}
+
+export function convertHexToRGBA(hex: string) {
+  let hex1 = hex.replace(/^#/, "");
+  if (hex1.length === 3) {
+    hex1 += "f";
+  }
+  if (hex1.length === 4) {
+    hex1 = hex1
+      .split("")
+      .map((h) => `${h}${h}`)
+      .join("");
+  }
+
+  if (hex1.length === 6) {
+    hex1 += "ff";
+  }
+  if (hex1.length !== 8) {
+    throw new Error("Invalid hex color format. Must be 6 or 8 characters.");
+  }
+  // Extract the red, green, blue, and alpha components
+  const r = parseInt(hex1.slice(0, 2), 16);
+  const g = parseInt(hex1.slice(2, 4), 16);
+  const b = parseInt(hex1.slice(4, 6), 16);
+  const a = parseFloat((parseInt(hex1.slice(6, 8), 16) / 255).toFixed(2)); // Convert alpha from 0–255 to 0–1
+
+  return {
+    r,
+    g,
+    b,
+    a,
+  };
+}
+
+export function convertRGBAToHex(color: RgbaColor) {
+  const toHex = (value: number) => {
+    const hex = Math.round(value).toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+  };
+
+  const red = toHex(color.r);
+  const green = toHex(color.g);
+  const blue = toHex(color.b);
+  const alpha = toHex(color.a * 255);
+
+  return `#${red}${green}${blue}${alpha}`;
 }

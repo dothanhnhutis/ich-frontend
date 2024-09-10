@@ -57,13 +57,15 @@ import {
   PlusIcon,
   StrikethroughIcon,
   TextQuoteIcon,
+  TrashIcon,
   TriangleRightIcon,
   UnderlineIcon,
+  XIcon,
 } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
-import { cn } from "@/lib/utils";
+import { cn, convertHexToRGBA, convertRGBAToHex } from "@/lib/utils";
 import { Skeleton } from "./ui/skeleton";
 
 export const extensions: Extensions = [
@@ -175,11 +177,11 @@ const TiptapColor = ({
   storeKey,
 }: {
   editor: Editor;
-  type: "textStyle" | "highlight";
-  storeKey: string;
+  type: "textstyle" | "highlight";
+  storeKey?: string;
 }) => {
-  const [storeData, setStoreData] = useStore(storeKey);
-  const [colorData, setColorData] = useState<ColorMetadata>(() => {
+  const [storeData, setStoreData] = useStore(storeKey || type);
+  const [colorData, setColorData] = React.useState<ColorMetadata>(() => {
     if (storeData == null) {
       setStoreData(JSON.stringify(defaultColor));
       return {
@@ -216,26 +218,29 @@ const TiptapColor = ({
       storeData: JSON.parse(storeData),
     };
   });
+  const [isInputChange, setIsInputChange] = React.useState<boolean>(false);
 
   editor.on("selectionUpdate", ({ editor }) => {
     const colorRegex =
       /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
-    // if (editor.getAttributes("highlight").color) {
-    //   const color: string = editor.getAttributes("highlight").color;
-    //   const colorMatch = color.match(colorRegex);
-    //   setHighlightColor({
-    //     r: parseInt(colorMatch?.[1] || "0"),
-    //     g: parseInt(colorMatch?.[2] || "0"),
-    //     b: parseInt(colorMatch?.[3] || "0"),
-    //     a: parseFloat(colorMatch?.[4] || "1"),
-    //   });
-    // }
-    if (editor.getAttributes("textStyle").color) {
-      const color: string = editor.getAttributes("textStyle").color;
+    if (
+      (type == "textstyle" && editor.getAttributes("textStyle").color) ||
+      (type == "highlight" && editor.getAttributes("highlight").color)
+    ) {
+      const color: string =
+        type == "textstyle"
+          ? editor.getAttributes("textStyle").color
+          : editor.getAttributes("highlight").color;
       const colorMatch = color.match(colorRegex);
       setColorData((prev) => ({
         ...prev,
         color: {
+          r: parseInt(colorMatch?.[1] || "0"),
+          g: parseInt(colorMatch?.[2] || "0"),
+          b: parseInt(colorMatch?.[3] || "0"),
+          a: parseFloat(colorMatch?.[4] || "1"),
+        },
+        tempColor: {
           r: parseInt(colorMatch?.[1] || "0"),
           g: parseInt(colorMatch?.[2] || "0"),
           b: parseInt(colorMatch?.[3] || "0"),
@@ -246,33 +251,86 @@ const TiptapColor = ({
   });
 
   const handleAdd = () => {
-    setColorData((prev) => {
-      setStoreData(JSON.stringify([...prev.storeData, prev.tempColor]));
-      return {
-        ...prev,
-        storeData: [...prev.storeData, prev.tempColor],
-      };
-    });
+    if (colorData.storeData.length < 13)
+      setColorData((prev) => {
+        setStoreData(JSON.stringify([...prev.storeData, prev.tempColor]));
+        return {
+          ...prev,
+          storeData: [...prev.storeData, prev.tempColor],
+        };
+      });
   };
   const handleCancel = () => {
-    editor.commands.setColor(
-      `rgba(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}, ${colorData.color.a})`
-    );
+    if (type == "textstyle") {
+      editor.commands.setColor(
+        `rgba(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}, ${colorData.color.a})`
+      );
+    } else {
+      editor.commands.setHighlight({
+        color: `rgba(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}, ${colorData.color.a})`,
+      });
+    }
+
     setColorData((prev) => ({ ...prev, open: false }));
   };
 
   const handleClearColor = () => {
-    editor.commands.unsetColor();
+    if (type == "textstyle") {
+      editor.commands.unsetColor();
+    } else {
+      editor.commands.unsetHighlight();
+    }
   };
 
   const handleSetColor = ({ r, g, b, a }: RgbaColor) => {
-    editor.commands.setColor(`rgba(${r}, ${g}, ${b}, ${a})`);
+    setIsInputChange(false);
+    if (type == "textstyle") {
+      editor.commands.setColor(`rgba(${r}, ${g}, ${b}, ${a})`);
+    } else {
+      editor.commands.setHighlight({
+        color: `rgba(${r}, ${g}, ${b}, ${a})`,
+      });
+    }
+
     setColorData((prev) => ({
       ...prev,
       tempColor: { r, g, b, a },
     }));
   };
 
+  const handleSave = () => {
+    if (type == "textstyle") {
+      editor.commands.setColor(
+        `rgba(${colorData.tempColor.r}, ${colorData.tempColor.g}, ${colorData.tempColor.b}, ${colorData.tempColor.a})`
+      );
+    } else {
+      editor.commands.setHighlight({
+        color: `rgba(${colorData.tempColor.r}, ${colorData.tempColor.g}, ${colorData.tempColor.b}, ${colorData.tempColor.a})`,
+      });
+    }
+    setColorData((prev) => ({
+      ...prev,
+      color: prev.tempColor,
+      open: false,
+    }));
+  };
+
+  const handleRemoveColor = (idx: number) => {
+    setColorData((prev) => ({
+      ...prev,
+      storeData: prev.storeData.filter((_, index) => index !== idx),
+    }));
+  };
+
+  const isSelected = React.useMemo(() => {
+    return colorData.storeData.findIndex(
+      (color) =>
+        colorData.tempColor.r == color.r &&
+        colorData.tempColor.g == color.g &&
+        colorData.tempColor.b == color.b &&
+        colorData.tempColor.a == color.a
+    );
+  }, [colorData.tempColor]);
   return (
     <Popover
       open={colorData.open}
@@ -281,11 +339,18 @@ const TiptapColor = ({
       <PopoverTrigger asChild>
         <div
           className={cn(
-            "flex gap-3 items-center rounded-lg overflow-hidden p-2  flex-shrink-0",
-            editor.isActive("textStyle") ? "bg-secondary" : "hover:bg-secondary"
+            "flex gap-3 items-center rounded-lg overflow-hidden p-2  flex-shrink-0 border",
+            (type == "textstyle" && editor.isActive("textStyle")) ||
+              (type == "highlight" && editor.isActive("highlight"))
+              ? "bg-secondary"
+              : "hover:bg-secondary"
           )}
         >
-          <PaletteIcon className="size-5 flex-shrink-0" />
+          {type == "textstyle" ? (
+            <PaletteIcon className="size-5 flex-shrink-0" />
+          ) : (
+            <HighlighterIcon className="size-5 flex-shrink-0" />
+          )}
         </div>
       </PopoverTrigger>
       <PopoverContent className="p-2 w-auto space-y-1">
@@ -307,7 +372,15 @@ const TiptapColor = ({
               key={idx}
               type="button"
               onClick={() => handleSetColor(color)}
-              className="p-1 hover:bg-secondary rounded"
+              className={cn(
+                "p-1 rounded",
+                colorData.tempColor.r == color.r &&
+                  colorData.tempColor.g == color.g &&
+                  colorData.tempColor.b == color.b &&
+                  colorData.tempColor.a == color.a
+                  ? "bg-secondary"
+                  : "hover:bg-secondary"
+              )}
             >
               <div
                 style={{
@@ -317,20 +390,57 @@ const TiptapColor = ({
               />
             </button>
           ))}
+        </div>
+        <div className="flex gap-2 items-center w-[200px] ">
+          <input
+            type="text"
+            placeholder="#000000"
+            value={
+              isInputChange ? undefined : convertRGBAToHex(colorData.tempColor)
+            }
+            onChange={(e) => {
+              setIsInputChange(true);
+              const hexRegex =
+                /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+              if (hexRegex.test(e.target.value))
+                setColorData((prev) => ({
+                  ...prev,
+                  tempColor: convertHexToRGBA(e.target.value),
+                }));
+            }}
+            className="bg-transparent w-full outline-0 text-sm border p-0.5 rounded h-[30px]"
+          />
           <button
             type="button"
-            className="p-1.5 hover:bg-secondary rounded"
+            className="p-1.5 hover:bg-secondary rounded border"
             onClick={handleAdd}
           >
             <PlusIcon className="size-4 rounded" />
           </button>
+          <button
+            type="button"
+            className="p-1.5 hover:bg-secondary rounded border disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+            onClick={() => handleRemoveColor(isSelected)}
+            disabled={isSelected == -1}
+          >
+            <TrashIcon className="size-4 rounded" />
+          </button>
         </div>
-        <div className="flex gap-2">
-          <button type="button" onClick={handleCancel}>
+        <div className="flex gap-2 justify-end">
+          <button
+            className="disabled:opacity-50 px-1 py-0.5 border rounded text-sm"
+            type="button"
+            onClick={handleCancel}
+          >
             cancel
           </button>
-          <button type="button">save</button>
-          <div></div>
+          <button
+            type="button"
+            className="px-1 py-0.5 border rounded text-sm bg-secondary"
+            onClick={handleSave}
+          >
+            save
+          </button>
         </div>
       </PopoverContent>
     </Popover>
@@ -338,24 +448,17 @@ const TiptapColor = ({
 };
 
 const Tiptap = () => {
-  const [highlightColor, setHighlightColor] = useState<RgbaColor>({
-    a: 1,
-    b: 0,
-    g: 0,
-    r: 0,
-  });
-
   const editor = useEditor({
     immediatelyRender: false,
     shouldRerenderOnTransaction: true,
     extensions,
     content: "<p>Hello World! </p>",
     onUpdate({ editor }) {
-      console.log({
-        json: editor.getJSON(),
-        text: editor.getText(),
-        html: editor.getHTML(),
-      });
+      // console.log({
+      //   json: editor.getJSON(),
+      //   text: editor.getText(),
+      //   html: editor.getHTML(),
+      // });
     },
   });
 
@@ -474,60 +577,8 @@ const Tiptap = () => {
           </PopoverContent>
         </Popover>
         <Separator orientation="vertical" />
-        <Popover>
-          <PopoverTrigger asChild>
-            <div
-              className={cn(
-                "flex gap-3 items-center rounded-lg overflow-hidden p-2 flex-shrink-0",
-                editor.isActive("highlight")
-                  ? "bg-secondary"
-                  : "hover:bg-secondary"
-              )}
-            >
-              <HighlighterIcon className="size-5 flex-shrink-0" />
-            </div>
-          </PopoverTrigger>
-          <PopoverContent className="p-2 w-auto space-y-1">
-            <p className="text-sm">Highlight</p>
-
-            <div className="flex items-center">
-              <button
-                type="button"
-                onClick={() => editor.commands.unsetHighlight()}
-                className="p-2 hover:bg-secondary rounded"
-              >
-                <CircleOffIcon className="size-4 rounded" />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  editor.commands.setHighlight({
-                    color: `rgba(${75}, ${75}, ${150}, ${1})`,
-                  })
-                }
-                className="p-1 hover:bg-secondary rounded"
-              >
-                <div className="size-5 bg-[#2456b8] rounded" />
-              </button>
-              <button type="button" className="p-1 hover:bg-secondary rounded">
-                <div className="size-5 bg-[#ff0000] rounded" />
-              </button>
-              <button type="button" className="p-1 hover:bg-secondary rounded">
-                <div className="size-5 bg-[#a5f3fc] rounded" />
-              </button>
-              <button type="button" className="p-1 hover:bg-secondary rounded">
-                <div className="size-5 bg-[#a5b4fc] rounded" />
-              </button>
-              <button type="button" className="p-1 hover:bg-secondary rounded">
-                <div className="size-5 bg-[#7ED321] rounded" />
-              </button>
-              <button type="button" className="p-2 hover:bg-secondary rounded">
-                <PlusIcon className="size-4 rounded" />
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
-        <TiptapColor storeKey="textStyle" type="textStyle" editor={editor} />
+        <TiptapColor storeKey="highlight" type="highlight" editor={editor} />
+        <TiptapColor storeKey="textstyle" type="textstyle" editor={editor} />
         <Separator orientation="vertical" />
         <button
           type="button"
