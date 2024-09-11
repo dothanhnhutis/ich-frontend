@@ -1,15 +1,11 @@
 "use client";
-import React, { useState } from "react";
-
+import React from "react";
 import {
   useEditor,
   EditorContent,
-  Node,
-  Mark,
   mergeAttributes,
-  Editor,
-  useEditorState,
   Extensions,
+  Mark,
 } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -30,8 +26,6 @@ import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 
-import { RgbaColor, RgbaColorPicker } from "react-colorful";
-
 import {
   AlignCenterIcon,
   AlignJustifyIcon,
@@ -39,34 +33,36 @@ import {
   AlignRightIcon,
   BoldIcon,
   ChevronDownIcon,
-  CircleOffIcon,
   Code2Icon,
-  CodeIcon,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
   Heading4Icon,
-  HighlighterIcon,
   ImageIcon,
   ItalicIcon,
   LinkIcon,
   ListIcon,
   ListOrderedIcon,
-  PaletteIcon,
   PilcrowIcon,
-  PlusIcon,
   StrikethroughIcon,
   TextQuoteIcon,
-  TrashIcon,
-  TriangleRightIcon,
   UnderlineIcon,
-  XIcon,
 } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
-import { cn, convertHexToRGBA, convertRGBAToHex } from "@/lib/utils";
-import { Skeleton } from "./ui/skeleton";
+import { cn } from "@/lib/utils";
+import TiptapColor from "./tiptap-color";
+import TipTapLink from "./tiptap-link";
+
+const LinkExtension = Link.configure({
+  HTMLAttributes: {
+    rel: "noopener noreferrer",
+    target: null,
+    class: "font-bold text-primary ",
+  },
+  openOnClick: false,
+}).extend({});
 
 export const extensions: Extensions = [
   Document,
@@ -136,323 +132,15 @@ export const extensions: Extensions = [
   Highlight.configure({
     multicolor: true,
   }),
-  Link.configure({
-    HTMLAttributes: {
-      rel: "noopener noreferrer",
-      target: null,
-      class: "font-bold text-primary ",
-    },
-    openOnClick: false,
-  }),
+  LinkExtension,
 ];
-
-type ColorMetadata = {
-  color: RgbaColor;
-  tempColor: RgbaColor;
-  open: boolean;
-  storeData: RgbaColor[];
-};
-
-function useStore(key: string): [string | null, (data: string) => void] {
-  const data: string | null =
-    typeof window != "undefined" ? window.localStorage.getItem(key) : null;
-  const handleSetData = (data: string): void => {
-    if (typeof window != "undefined") window.localStorage.setItem(key, data);
-  };
-  return [data, handleSetData];
-}
-
-const defaultColor: RgbaColor[] = [
-  { r: 36, g: 86, b: 184, a: 1 },
-  { r: 255, g: 0, b: 0, a: 1 },
-  { r: 217, g: 249, b: 157, a: 1 },
-  { r: 165, g: 243, b: 252, a: 1 },
-  { r: 165, g: 180, b: 252, a: 1 },
-  { r: 126, g: 211, b: 33, a: 1 },
-];
-
-const TiptapColor = ({
-  editor,
-  type,
-  storeKey,
-}: {
-  editor: Editor;
-  type: "textstyle" | "highlight";
-  storeKey?: string;
-}) => {
-  const [storeData, setStoreData] = useStore(storeKey || type);
-  const [colorData, setColorData] = React.useState<ColorMetadata>(() => {
-    if (storeData == null) {
-      setStoreData(JSON.stringify(defaultColor));
-      return {
-        open: false,
-        color: {
-          a: 1,
-          b: 0,
-          g: 0,
-          r: 0,
-        },
-        tempColor: {
-          a: 1,
-          b: 0,
-          g: 0,
-          r: 0,
-        },
-        storeData: defaultColor,
-      };
-    }
-    return {
-      open: false,
-      color: {
-        a: 1,
-        b: 0,
-        g: 0,
-        r: 0,
-      },
-      tempColor: {
-        a: 1,
-        b: 0,
-        g: 0,
-        r: 0,
-      },
-      storeData: JSON.parse(storeData),
-    };
-  });
-  const [isInputChange, setIsInputChange] = React.useState<boolean>(false);
-
-  editor.on("selectionUpdate", ({ editor }) => {
-    const colorRegex =
-      /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
-    if (
-      (type == "textstyle" && editor.getAttributes("textStyle").color) ||
-      (type == "highlight" && editor.getAttributes("highlight").color)
-    ) {
-      const color: string =
-        type == "textstyle"
-          ? editor.getAttributes("textStyle").color
-          : editor.getAttributes("highlight").color;
-      const colorMatch = color.match(colorRegex);
-      setColorData((prev) => ({
-        ...prev,
-        color: {
-          r: parseInt(colorMatch?.[1] || "0"),
-          g: parseInt(colorMatch?.[2] || "0"),
-          b: parseInt(colorMatch?.[3] || "0"),
-          a: parseFloat(colorMatch?.[4] || "1"),
-        },
-        tempColor: {
-          r: parseInt(colorMatch?.[1] || "0"),
-          g: parseInt(colorMatch?.[2] || "0"),
-          b: parseInt(colorMatch?.[3] || "0"),
-          a: parseFloat(colorMatch?.[4] || "1"),
-        },
-      }));
-    }
-  });
-
-  const handleAdd = () => {
-    if (colorData.storeData.length < 13)
-      setColorData((prev) => {
-        setStoreData(JSON.stringify([...prev.storeData, prev.tempColor]));
-        return {
-          ...prev,
-          storeData: [...prev.storeData, prev.tempColor],
-        };
-      });
-  };
-  const handleCancel = () => {
-    if (type == "textstyle") {
-      editor.commands.setColor(
-        `rgba(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}, ${colorData.color.a})`
-      );
-    } else {
-      editor.commands.setHighlight({
-        color: `rgba(${colorData.color.r}, ${colorData.color.g}, ${colorData.color.b}, ${colorData.color.a})`,
-      });
-    }
-
-    setColorData((prev) => ({ ...prev, open: false }));
-  };
-
-  const handleClearColor = () => {
-    if (type == "textstyle") {
-      editor.commands.unsetColor();
-    } else {
-      editor.commands.unsetHighlight();
-    }
-  };
-
-  const handleSetColor = ({ r, g, b, a }: RgbaColor) => {
-    setIsInputChange(false);
-    if (type == "textstyle") {
-      editor.commands.setColor(`rgba(${r}, ${g}, ${b}, ${a})`);
-    } else {
-      editor.commands.setHighlight({
-        color: `rgba(${r}, ${g}, ${b}, ${a})`,
-      });
-    }
-
-    setColorData((prev) => ({
-      ...prev,
-      tempColor: { r, g, b, a },
-    }));
-  };
-
-  const handleSave = () => {
-    if (type == "textstyle") {
-      editor.commands.setColor(
-        `rgba(${colorData.tempColor.r}, ${colorData.tempColor.g}, ${colorData.tempColor.b}, ${colorData.tempColor.a})`
-      );
-    } else {
-      editor.commands.setHighlight({
-        color: `rgba(${colorData.tempColor.r}, ${colorData.tempColor.g}, ${colorData.tempColor.b}, ${colorData.tempColor.a})`,
-      });
-    }
-    setColorData((prev) => ({
-      ...prev,
-      color: prev.tempColor,
-      open: false,
-    }));
-  };
-
-  const handleRemoveColor = (idx: number) => {
-    setColorData((prev) => ({
-      ...prev,
-      storeData: prev.storeData.filter((_, index) => index !== idx),
-    }));
-  };
-
-  const isSelected = React.useMemo(() => {
-    return colorData.storeData.findIndex(
-      (color) =>
-        colorData.tempColor.r == color.r &&
-        colorData.tempColor.g == color.g &&
-        colorData.tempColor.b == color.b &&
-        colorData.tempColor.a == color.a
-    );
-  }, [colorData.tempColor]);
-  return (
-    <Popover
-      open={colorData.open}
-      onOpenChange={(open) => setColorData((prev) => ({ ...prev, open }))}
-    >
-      <PopoverTrigger asChild>
-        <div
-          className={cn(
-            "flex gap-3 items-center rounded-lg overflow-hidden p-2  flex-shrink-0 border",
-            (type == "textstyle" && editor.isActive("textStyle")) ||
-              (type == "highlight" && editor.isActive("highlight"))
-              ? "bg-secondary"
-              : "hover:bg-secondary"
-          )}
-        >
-          {type == "textstyle" ? (
-            <PaletteIcon className="size-5 flex-shrink-0" />
-          ) : (
-            <HighlighterIcon className="size-5 flex-shrink-0" />
-          )}
-        </div>
-      </PopoverTrigger>
-      <PopoverContent className="p-2 w-auto space-y-1">
-        <p className="text-sm">Color</p>
-        <RgbaColorPicker
-          color={colorData.tempColor}
-          onChange={handleSetColor}
-        />
-        <div className="flex items-center flex-wrap max-w-[200px]">
-          <button
-            type="button"
-            onClick={handleClearColor}
-            className="p-1.5 hover:bg-secondary rounded"
-          >
-            <CircleOffIcon className="size-4 rounded" />
-          </button>
-          {colorData.storeData.map((color, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => handleSetColor(color)}
-              className={cn(
-                "p-1 rounded",
-                colorData.tempColor.r == color.r &&
-                  colorData.tempColor.g == color.g &&
-                  colorData.tempColor.b == color.b &&
-                  colorData.tempColor.a == color.a
-                  ? "bg-secondary"
-                  : "hover:bg-secondary"
-              )}
-            >
-              <div
-                style={{
-                  backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
-                }}
-                className={`size-5 rounded`}
-              />
-            </button>
-          ))}
-        </div>
-        <div className="flex gap-2 items-center w-[200px] ">
-          <input
-            type="text"
-            placeholder="#000000"
-            value={
-              isInputChange ? undefined : convertRGBAToHex(colorData.tempColor)
-            }
-            onChange={(e) => {
-              setIsInputChange(true);
-              const hexRegex =
-                /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
-              if (hexRegex.test(e.target.value))
-                setColorData((prev) => ({
-                  ...prev,
-                  tempColor: convertHexToRGBA(e.target.value),
-                }));
-            }}
-            className="bg-transparent w-full outline-0 text-sm border p-0.5 rounded h-[30px]"
-          />
-          <button
-            type="button"
-            className="p-1.5 hover:bg-secondary rounded border"
-            onClick={handleAdd}
-          >
-            <PlusIcon className="size-4 rounded" />
-          </button>
-          <button
-            type="button"
-            className="p-1.5 hover:bg-secondary rounded border disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
-            onClick={() => handleRemoveColor(isSelected)}
-            disabled={isSelected == -1}
-          >
-            <TrashIcon className="size-4 rounded" />
-          </button>
-        </div>
-        <div className="flex gap-2 justify-end">
-          <button
-            className="disabled:opacity-50 px-1 py-0.5 border rounded text-sm"
-            type="button"
-            onClick={handleCancel}
-          >
-            cancel
-          </button>
-          <button
-            type="button"
-            className="px-1 py-0.5 border rounded text-sm bg-secondary"
-            onClick={handleSave}
-          >
-            save
-          </button>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-};
 
 const Tiptap = () => {
   const editor = useEditor({
     immediatelyRender: false,
     shouldRerenderOnTransaction: true,
     extensions,
-    content: "<p>Hello World! </p>",
+    content: "<p>Hello World!  </p>",
     onUpdate({ editor }) {
       // console.log({
       //   json: editor.getJSON(),
@@ -672,7 +360,7 @@ const Tiptap = () => {
             <button
               type="button"
               className={cn(
-                "p-2 border rounded-lg",
+                "p-2 border rounded-lg relative",
                 editor.isActive({ textAlign: "left" }) ||
                   editor.isActive({ textAlign: "center" }) ||
                   editor.isActive({ textAlign: "right" }) ||
@@ -753,17 +441,7 @@ const Tiptap = () => {
           </PopoverContent>
         </Popover>
         <Separator orientation="vertical" />
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              className="p-2 border rounded-lg hover:bg-secondary"
-            >
-              <LinkIcon className="size-5" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="p-2 w-auto space-y-1"></PopoverContent>
-        </Popover>
+        <TipTapLink editor={editor} />
 
         <button
           type="button"
