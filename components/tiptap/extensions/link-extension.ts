@@ -68,74 +68,105 @@ function isAllowedUri(
   );
 }
 
-export default Node.create<LinkOptions>({
-  name: "linkcustom",
-  priority: 9999,
-  group: "inline",
-  inline: true,
-  marks: "_",
-  addOptions() {
-    return {
-      protocols: [],
-      HTMLAttributes: {
-        target: "_blank",
-        rel: "noopener noreferrer nofollow",
-        class: null,
-      },
-    };
-  },
-  addAttributes() {
-    return {
-      href: {
-        default: null,
-        parseHTML(element) {
-          return element.getAttribute("href");
-        },
-      },
-      class: {
-        default: this.options.HTMLAttributes.class,
-      },
-    };
-  },
-  parseHTML() {
-    return [
-      {
-        tag: "link-custom[href]",
-        getAttrs: (dom) => {
-          const href = dom.getAttribute("href");
+// export default Node.create<LinkOptions>({
+//   name: "linkcustom",
+//   priority: 9999,
+//   group: "inline",
+//   inline: true,
+//   marks: "_",
+//   addOptions() {
+//     return {
+//       protocols: [],
+//       HTMLAttributes: {
+//         target: "_blank",
+//         rel: "noopener noreferrer nofollow",
+//         class: null,
+//       },
+//     };
+//   },
+//   addAttributes() {
+//     return {
+//       href: {
+//         default: null,
+//         parseHTML(element) {
+//           return element.getAttribute("href");
+//         },
+//       },
+//       class: {
+//         default: this.options.HTMLAttributes.class,
+//       },
+//     };
+//   },
+//   parseHTML() {
+//     return [
+//       {
+//         tag: "link-custom[href]",
+//         getAttrs: (dom) => {
+//           const href = dom.getAttribute("href");
+//           return null;
+//         },
+//       },
+//     ];
+//   },
+//   renderHTML({ HTMLAttributes, node }) {
+//     return [
+//       "a",
+//       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+//       0,
+//     ];
+//   },
+//   addNodeView() {
+//     return ReactNodeViewRenderer(LinkNodeViewComponent);
+//   },
+// });
+import { Link as TiptapLink } from "@tiptap/extension-link";
 
-          // prevent XSS attacks
-          // if (!href || !isAllowedUri(href, this.options.protocols)) {
-          //   return false;
-          // }
-          return null;
-        },
-      },
-    ];
-  },
-  renderHTML({ HTMLAttributes, node }) {
-    // if (!isAllowedUri(HTMLAttributes.href, this.options.protocols)) {
-    //   // strip out the href
-    //   return [
-    //     "a",
-    //     mergeAttributes(this.options.HTMLAttributes, {
-    //       ...HTMLAttributes,
-    //       href: "",
-    //     }),
-    //     0,
-    //   ];
-    // }
+function showPopover(linkElement: HTMLElement) {
+  // Create your popover element (You can use a library like Popper.js)
+  const popover = document.createElement("div");
+  popover.className = "popover";
+  popover.innerHTML = "<p>Link Options</p>";
 
+  // Position the popover near the link
+  popover.style.position = "absolute";
+  popover.style.top = `${
+    linkElement.getBoundingClientRect().bottom + window.scrollY
+  }px`;
+  popover.style.left = `${
+    linkElement.getBoundingClientRect().left + window.scrollX
+  }px`;
+
+  // Append to the body
+  document.body.appendChild(popover);
+
+  // Handle close logic (for example, clicking outside the popover)
+  // document.addEventListener("click", (e) => {
+  //   if (!popover.contains(e.target as Node)) {
+  //     popover.remove();
+  //   }
+  // });
+}
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+
+export default TiptapLink.extend({
+  addProseMirrorPlugins() {
+    const editor = this.editor;
     return [
-      "a",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
+      new Plugin({
+        key: new PluginKey("eventHandler"),
+        props: {
+          handleClick(view, pos, event) {
+            const target = event.target as HTMLElement;
+            console.log("clicked", target.tagName);
+            if (target.tagName === "A") {
+              // Custom logic for displaying the popover
+              showPopover(target);
+              return true; // Prevent the default action
+            }
+            return false;
+          },
+        },
+      }),
     ];
-  },
-  addNodeView() {
-    return ReactNodeViewRenderer(LinkNodeViewComponent);
-  },
-  renderText() {
-    return "textcontent";
   },
 });

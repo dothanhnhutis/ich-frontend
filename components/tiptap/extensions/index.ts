@@ -89,6 +89,6 @@ export const extensions: Extensions = [
     multicolor: true,
   }),
   // Link,
-  LinkExtension,
+  // LinkExtension,
   ImageExtension,
 ];

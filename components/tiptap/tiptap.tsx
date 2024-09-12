@@ -36,13 +36,14 @@ const Tiptap = () => {
     shouldRerenderOnTransaction: true,
     extensions,
     content:
-      "<p>Hello World! <a href='http://localhost:4000/api/v1/users/me'>123</a> <link-custom href='http://localhost:4000/api/v1/users/me'> nhut <i>dep</i> <b>trai</b></link-custom>  </p><image-upload class='size-10' src='https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg'>title</image-upload>",
+      "<p>Hello World! nhut <i>dep</i><b>trai</b><a href='http://localhost:4000/api/v1/users/me'>nhut</a></p><image-upload class='size-10' data-width='50' data-align='right' alt='hihi' src='https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg'>title</image-upload><p>Hello World! nhut <i>dep</i><b>trai</b></p>",
     onUpdate({ editor }) {
       // console.log({
       //   json: editor.getJSON(),
       //   text: editor.getText(),
       //   html: editor.getHTML(),
       // });
+      console.log(editor.getHTML());
     },
   });
 
