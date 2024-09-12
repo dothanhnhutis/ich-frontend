@@ -2,7 +2,7 @@ import React from "react";
 import { Editor } from "@tiptap/react";
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
 import { useStore } from "@/hook/useStore";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { cn, convertHexToRGBA, convertRGBAToHex } from "@/lib/utils";
 import {
   CircleOffIcon,

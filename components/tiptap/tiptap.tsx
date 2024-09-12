@@ -1,31 +1,6 @@
 "use client";
 import React from "react";
-import {
-  useEditor,
-  EditorContent,
-  mergeAttributes,
-  Extensions,
-  Mark,
-} from "@tiptap/react";
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
-import Bold from "@tiptap/extension-bold";
-import Italic from "@tiptap/extension-italic";
-import Underline from "@tiptap/extension-underline";
-import Strike from "@tiptap/extension-strike";
-import BulletList from "@tiptap/extension-bullet-list";
-import ListItem from "@tiptap/extension-list-item";
-import OrderedList from "@tiptap/extension-ordered-list";
-import TextAlign from "@tiptap/extension-text-align";
-import Heading from "@tiptap/extension-heading";
-import Blockquote from "@tiptap/extension-blockquote";
-import Code from "@tiptap/extension-code";
-import TextStyle from "@tiptap/extension-text-style";
-import Color from "@tiptap/extension-color";
-import Highlight from "@tiptap/extension-highlight";
-import Link from "@tiptap/extension-link";
-
+import { useEditor, EditorContent } from "@tiptap/react";
 import {
   AlignCenterIcon,
   AlignJustifyIcon,
@@ -40,7 +15,6 @@ import {
   Heading4Icon,
   ImageIcon,
   ItalicIcon,
-  LinkIcon,
   ListIcon,
   ListOrderedIcon,
   PilcrowIcon,
@@ -48,216 +22,13 @@ import {
   TextQuoteIcon,
   UnderlineIcon,
 } from "lucide-react";
-import { Separator } from "./ui/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Separator } from "../ui/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
-import TiptapColor from "./tiptap-color";
-import TipTapLink from "./tiptap-link";
-
-// const LinkExtension = Link.configure({
-//   HTMLAttributes: {
-//     rel: "noopener noreferrer",
-//     target: null,
-//   },
-//   openOnClick: false,
-// }).extend({});
-
-export interface LinkProtocolOptions {
-  /**
-   * The protocol scheme to be registered.
-   * @default '''
-   * @example 'ftp'
-   * @example 'git'
-   */
-  scheme: string;
-
-  /**
-   * If enabled, it allows optional slashes after the protocol.
-   * @default false
-   * @example true
-   */
-  optionalSlashes?: boolean;
-}
-
-interface LinkOptions {
-  protocols: Array<LinkProtocolOptions | string>;
-  HTMLAttributes: Record<string, any>;
-}
-const ATTR_WHITESPACE =
-  /[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g;
-
-function isAllowedUri(
-  uri: string | undefined,
-  protocols?: LinkOptions["protocols"]
-) {
-  const allowedProtocols: string[] = [
-    "http",
-    "https",
-    "ftp",
-    "ftps",
-    "mailto",
-    "tel",
-    "callto",
-    "sms",
-    "cid",
-    "xmpp",
-  ];
-
-  if (protocols) {
-    protocols.forEach((protocol) => {
-      const nextProtocol =
-        typeof protocol === "string" ? protocol : protocol.scheme;
-
-      if (nextProtocol) {
-        allowedProtocols.push(nextProtocol);
-      }
-    });
-  }
-
-  // eslint-disable-next-line no-useless-escape
-  return (
-    !uri ||
-    uri
-      .replace(ATTR_WHITESPACE, "")
-      .match(
-        new RegExp(
-          `^(?:(?:${allowedProtocols.join(
-            "|"
-          )}):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))`,
-          "i"
-        )
-      )
-  );
-}
-
-const LinkExtension = Mark.create<LinkOptions>({
-  name: "linkcustom",
-  priority: 1000,
-  addOptions() {
-    return {
-      protocols: [],
-      HTMLAttributes: {
-        target: "_blank",
-        rel: "noopener noreferrer nofollow",
-        class: null,
-      },
-    };
-  },
-  addAttributes() {
-    return {
-      class: {
-        default: this.options.HTMLAttributes.class,
-      },
-    };
-  },
-  parseHTML() {
-    return [
-      {
-        tag: "linkcustom[href]",
-        getAttrs: (dom) => {
-          const href = dom.getAttribute("href");
-
-          // prevent XSS attacks
-          // if (!href || !isAllowedUri(href, this.options.protocols)) {
-          //   return false;
-          // }
-          return null;
-        },
-      },
-    ];
-  },
-  renderHTML({ HTMLAttributes }) {
-    if (!isAllowedUri(HTMLAttributes.href, this.options.protocols)) {
-      // strip out the href
-      return [
-        "a",
-        mergeAttributes(this.options.HTMLAttributes, {
-          ...HTMLAttributes,
-          href: "",
-        }),
-        0,
-      ];
-    }
-
-    return [
-      "a",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
-    ];
-  },
-});
-
-export const extensions: Extensions = [
-  Document,
-  Paragraph.configure({
-    HTMLAttributes: {
-      class: "leading-7 [&:not(:first-child)]:mt-6",
-    },
-  }),
-  Text,
-  Heading.extend({
-    renderHTML({ node, HTMLAttributes }) {
-      const classes: Record<number, string> = {
-        1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
-        2: "scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0",
-        3: "scroll-m-20 text-2xl font-semibold tracking-tight",
-        4: "scroll-m-20 text-xl font-semibold tracking-tight",
-      };
-      const hasLevel = this.options.levels.includes(node.attrs.level);
-      const level = hasLevel ? node.attrs.level : this.options.levels[0];
-
-      return [
-        `h${level}`,
-        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-          class: `${classes[level]}`,
-        }),
-        0,
-      ];
-    },
-  }),
-  Blockquote.configure({
-    HTMLAttributes: {
-      class: "mt-6 border-l-2 pl-6 italic",
-    },
-  }),
-  Bold,
-  Italic,
-  Underline,
-  Strike,
-  Code.configure({
-    HTMLAttributes: {
-      class:
-        "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
-    },
-  }),
-  BulletList.configure({
-    keepMarks: true,
-    keepAttributes: false,
-    HTMLAttributes: {
-      class: "my-6 ml-6 list-disc [&>li]:mt-2",
-    },
-  }),
-  OrderedList.configure({
-    keepMarks: true,
-    keepAttributes: false,
-    HTMLAttributes: {
-      class: "my-6 ml-6 list-decimal [&>li]:mt-2",
-    },
-  }),
-  ListItem,
-  TextAlign.configure({
-    types: ["heading", "paragraph"],
-  }),
-  TextStyle,
-  Color.configure({
-    types: ["textStyle"],
-  }),
-  Highlight.configure({
-    multicolor: true,
-  }),
-  LinkExtension,
-];
+import TiptapColor from "./components/tiptap-color";
+import TipTapLink from "./components/tiptap-link";
+import { extensions } from "./extensions";
 
 const Tiptap = () => {
   const editor = useEditor({
@@ -265,7 +36,7 @@ const Tiptap = () => {
     shouldRerenderOnTransaction: true,
     extensions,
     content:
-      "<p>Hello World! <linkcustom href='http://localhost:4000/api/v1/users/me'>123</linkcustom>  </p>",
+      "<p>Hello World! <a href='http://localhost:4000/api/v1/users/me'>123</a> <link-custom href='http://localhost:4000/api/v1/users/me'> nhut <i>dep</i> <b>trai</b></link-custom>  </p><image-upload class='size-10' src='https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg'>title</image-upload>",
     onUpdate({ editor }) {
       // console.log({
       //   json: editor.getJSON(),

@@ -1,5 +1,5 @@
 import React from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
 import { LinkIcon } from "lucide-react";
 import { Editor } from "@tiptap/react";
 

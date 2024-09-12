@@ -1,4 +1,4 @@
-import Tiptap from "@/components/tiptap";
+import Tiptap from "@/components/tiptap/tiptap";
 import React from "react";
 
 const CreatePostPage = () => {
