@@ -15,10 +15,16 @@ import Code from "@tiptap/extension-code";
 import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
-import Link from "@tiptap/extension-link";
+import Gapcursor from "@tiptap/extension-gapcursor";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+
 import { Extensions, mergeAttributes } from "@tiptap/react";
 import LinkExtension from "./link-extension";
 import ImageExtension from "./image-extension";
+import { CustomTableHeader } from "./table-header";
 
 export const extensions: Extensions = [
   Document,
@@ -88,7 +94,23 @@ export const extensions: Extensions = [
   Highlight.configure({
     multicolor: true,
   }),
-  // Link,
-  // LinkExtension,
+  Gapcursor,
+  Table.configure({
+    resizable: true,
+  }),
+  TableRow.configure({}),
+  CustomTableHeader,
+  TableCell.configure({
+    HTMLAttributes: {
+      class: "border bg-transparent",
+    },
+  }),
+  LinkExtension.configure({
+    HTMLAttributes: {
+      rel: "noopener noreferrer",
+      target: null,
+    },
+    openOnClick: false,
+  }),
   ImageExtension,
 ];

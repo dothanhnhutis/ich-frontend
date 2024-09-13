@@ -19,6 +19,7 @@ import {
   ListOrderedIcon,
   PilcrowIcon,
   StrikethroughIcon,
+  Table2Icon,
   TextQuoteIcon,
   UnderlineIcon,
 } from "lucide-react";
@@ -35,8 +36,15 @@ const Tiptap = () => {
     immediatelyRender: false,
     shouldRerenderOnTransaction: true,
     extensions,
-    content:
-      "<p>Hello World! nhut <i>dep</i><b>trai</b><a href='http://localhost:4000/api/v1/users/me'>nhut</a></p><image-upload class='size-10' data-width='50' data-align='right' alt='hihi' src='https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg'>title</image-upload><p>Hello World! nhut <i>dep</i><b>trai</b></p>",
+    content: `<p>Hello <link-custom href='http://localhost:4000/api/v1/users/me'>link here</link-custom> World! <a href='http://localhost:4000/api/v1/users/me'>nhut</a></p><image-upload class='size-10' data-width='50' data-align='right' alt='hihi' src='https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg'>title</image-upload><p>Hello World! nhut <i>dep</i><b>trai</b></p><table><tbody><tr><th>Name</th><th colspan="3">Description</th></tr>
+            <tr>
+              <td>Cyndi Lauper</td>
+              <td>Singer</td>
+              <td>Songwriter</td>
+              <td>Actress</td>
+            </tr>
+          </tbody>
+        </table>`,
     onUpdate({ editor }) {
       // console.log({
       //   json: editor.getJSON(),
@@ -275,7 +283,6 @@ const Tiptap = () => {
               ) : (
                 <AlignJustifyIcon className="size-5 flex-shrink-0" />
               )}
-              {/* <AlignCenterIcon className="size-5 flex-shrink-0" /> */}
               <TriangleDownIcon className="size-2 flex-shrink-0 absolute bottom-[1px] right-[1px] -rotate-45" />
             </button>
           </PopoverTrigger>
@@ -345,6 +352,22 @@ const Tiptap = () => {
           className="p-2 border rounded-lg hover:bg-secondary"
         >
           <ImageIcon className="size-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            editor
+              .chain()
+              .focus()
+              .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+              .run()
+          }
+          className={cn(
+            "p-2 border rounded-lg",
+            editor.isActive("table") ? "bg-secondary" : "hover:bg-secondary"
+          )}
+        >
+          <Table2Icon className="size-5 flex-shrink-0" />
         </button>
       </div>
 
