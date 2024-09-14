@@ -1,8 +1,7 @@
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import CreateUserForm from "./form";
-import UserForm from "../../../user-form";
+import UserForm from "../user-form";
 
 const CreateUserPage = () => {
   return (

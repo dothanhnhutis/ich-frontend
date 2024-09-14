@@ -1,13 +1,11 @@
-import Tiptap from "@/components/tiptap/tiptap";
 import React from "react";
+import PostForm from "../post-form";
 
 const CreatePostPage = () => {
   return (
     <div>
       <h3>Create new post</h3>
-      <div>
-        <Tiptap />
-      </div>
+      <PostForm type="create" />
     </div>
   );
 };

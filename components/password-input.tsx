@@ -5,7 +5,7 @@ import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 
 const PasswordInput = ({
   className,
-  defaultOpen,
+  defaultOpen = true,
   open,
   onOpenChange,
   disabled,

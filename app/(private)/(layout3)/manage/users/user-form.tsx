@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { User } from "@/schemas/user";
+import { CreateUserInput, User } from "@/schemas/user";
 import {
   closestCorners,
   DndContext,
@@ -29,10 +29,28 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { format } from "date-fns";
-import { CalendarIcon, GripVerticalIcon, PlusIcon, XIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  GripVerticalIcon,
+  OctagonAlertIcon,
+  OctagonPauseIcon,
+  OctagonXIcon,
+  PlusIcon,
+  XIcon,
+} from "lucide-react";
 import React from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { nanoid } from "nanoid";
+import PasswordInput from "@/components/password-input";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 const SortUrl = ({
   data,
@@ -76,6 +94,33 @@ const SortUrl = ({
   );
 };
 
+const rolesDropDown: {
+  id: number;
+  name: string;
+  subtitle: string;
+}[] = [
+  {
+    id: 1,
+    name: "Manager",
+    subtitle: "Can manage post and invoice",
+  },
+  {
+    id: 2,
+    name: "Saler",
+    subtitle: "Can manage invoice",
+  },
+  {
+    id: 3,
+    name: "Bloger",
+    subtitle: "Can manage post",
+  },
+  {
+    id: 4,
+    name: "Customer",
+    subtitle: "Just normal user",
+  },
+];
+
 type UserFormType = {
   firstName: string;
   lastName: string;
@@ -108,6 +153,7 @@ const UserForm = (
     role: props.type == "edit" ? props.data.role : "Customer",
     status: props.type == "edit" ? props.data.status : "Active",
   });
+  const [open, setOpen] = React.useState(false);
 
   const handleOnchange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -186,7 +232,155 @@ const UserForm = (
 
   return (
     <form>
-      <p className="font-bold">Personal Information</p>
+      <p className="font-bold">Account Information</p>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid gap-1 col-span-2 sm:col-span-1">
+          <Label htmlFor="phone" className="text-sm text-muted-foreground">
+            Email
+          </Label>
+          <Input id="phone" name="phone" placeholder="abc@example.com" />
+        </div>
+        <div className="flex flex-col  gap-1 col-span-2 sm:col-span-1">
+          <Label htmlFor="phone" className="text-sm text-muted-foreground">
+            Role
+          </Label>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                id="role"
+                variant="outline"
+                role="combobox"
+                className="justify-between"
+              >
+                {formData.role}
+                <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Command>
+                <CommandList>
+                  <CommandGroup>
+                    {rolesDropDown.map((r) => (
+                      <CommandItem
+                        key={r.id}
+                        value={r.name}
+                        onSelect={(currentValue) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            role: currentValue as CreateUserInput["role"],
+                          }));
+                          setOpen(false);
+                        }}
+                      >
+                        <CheckIcon
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            r.name == formData.role
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        <div>
+                          <Label>{r.name}</Label>
+                          <p className="text-xs font-normal leading-snug text-muted-foreground">
+                            {r.subtitle}
+                          </p>
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div className="grid gap-1 col-span-2 sm:col-span-1">
+          <Label htmlFor="phone" className="text-sm text-muted-foreground">
+            Password
+          </Label>
+          <PasswordInput
+            id="password"
+            autoComplete="off"
+            placeholder="Password"
+            name="password"
+          />
+          <div className="flex flex-col gap-1 justify-center">
+            <p className="font-medium text-sm">Your password must include:</p>
+            <p
+              className={cn(
+                "inline-flex space-x-2 items-center text-gray-500",
+                true ? "" : "text-green-400"
+              )}
+            >
+              <CheckIcon size={16} />
+              <span className="font-medium text-xs">8 to 40 characters</span>
+            </p>
+            <p
+              className={cn(
+                "inline-flex space-x-2 items-center text-gray-500",
+                true ? "" : "text-green-400"
+              )}
+            >
+              <CheckIcon size={16} />
+              <span className="font-medium text-xs">
+                Letters, numbers and special characters
+              </span>
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-1 col-span-2 sm:col-span-1">
+          <Label htmlFor="phone" className="text-sm text-muted-foreground">
+            Status
+          </Label>
+          <div className="flex gap-4">
+            <ToggleGroup
+              type="single"
+              className="grid max-[400px]:grid-cols-1 grid-cols-3 gap-4 w-full"
+              value={formData.status}
+              onValueChange={(value) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  status: value as CreateUserInput["status"],
+                }));
+              }}
+            >
+              <ToggleGroupItem
+                disabled={true}
+                variant="outline"
+                value="Active"
+                aria-label="Active"
+                className="size-full flex-col items-center justify-center gap-2 p-4 min-[400px:p-4"
+              >
+                <OctagonPauseIcon className="size-6 flex-shrink-0" />
+                Active
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                disabled={true}
+                variant="outline"
+                size="lg"
+                value="Suspended"
+                aria-label="Suspend"
+                className="size-full flex-col items-center justify-center gap-2 p-4 min-[400px:p-4"
+              >
+                <OctagonAlertIcon className="size-6 flex-shrink-0" />
+                Suspend
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                disabled={true}
+                variant="outline"
+                size="lg"
+                value="Disabled"
+                aria-label="Disable"
+                className="flex-col items-center justify-center gap-2 size-full p-4 min-[400px]:p-4"
+              >
+                <OctagonXIcon className="size-6 flex-shrink-0" />
+                Disable
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+        </div>
+      </div>
+      <p className="font-bold mt-4">Personal Information</p>
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="grid gap-1 col-span-2 sm:col-span-1">
           <Label htmlFor="firstName" className="text-sm text-muted-foreground">
@@ -261,6 +455,7 @@ const UserForm = (
             onChange={handleOnchange}
           />
         </div>
+
         <div className="grid gap-1 col-span-2">
           <Label htmlFor="bio" className="text-sm text-muted-foreground">
             Bio
@@ -315,7 +510,7 @@ const UserForm = (
             />
             <button
               type="button"
-              onClick={() => handleAddUrls("http://localhost:4000")}
+              onClick={() => handleAddUrls("http:localhost:4000")}
             >
               <PlusIcon className="flex-shrink-0 size-5" />
             </button>
@@ -385,6 +580,12 @@ const UserForm = (
             onChange={handleOnchange}
           />
         </div>
+      </div>
+      <div className="flex min-[400px]:flex-row flex-col gap-4 justify-end mt-4">
+        <Button variant="secondary" type="button">
+          Cancel
+        </Button>
+        <Button>Create/Save</Button>
       </div>
     </form>
   );
