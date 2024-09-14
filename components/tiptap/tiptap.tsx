@@ -31,7 +31,7 @@ import TiptapColor from "./components/tiptap-color";
 import TipTapLink from "./components/tiptap-link";
 import { extensions } from "./extensions";
 
-const Tiptap = () => {
+const Tiptap = ({ className }: { className?: string | undefined }) => {
   const editor = useEditor({
     immediatelyRender: false,
     shouldRerenderOnTransaction: true,
@@ -58,7 +58,7 @@ const Tiptap = () => {
   if (editor == null) return <div>loading...</div>;
 
   return (
-    <div className="border rounded-lg">
+    <div className={cn("border rounded-lg", className)}>
       <div className="flex p-3 border-b gap-3 h-[65px] overflow-x-scroll">
         <Popover>
           <PopoverTrigger asChild>
