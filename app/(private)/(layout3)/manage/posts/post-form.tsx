@@ -39,15 +39,24 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import configs from "@/config";
 import { cn } from "@/lib/utils";
-import { HashIcon, TagsIcon } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronDownIcon,
+  HashIcon,
+  TagsIcon,
+  UserPlusIcon,
+} from "lucide-react";
+import Image from "next/image";
 import React from "react";
+import { DayPicker } from "react-day-picker";
 
 type PostData = {
   title: string;
   slug: string;
   tags: string[];
   category: string;
-  isPublish: boolean;
+  status: "draft" | "private" | "not-public" | "public";
+  shareWithEmail: string[];
   publishAt: Date;
   authorId: string;
 };
@@ -89,11 +98,14 @@ const PostForm = (props: PostFormType) => {
     slug: "",
     tags: [],
     category: "",
-    isPublish: true,
+    status: "draft",
+    shareWithEmail: [],
     publishAt: new Date(),
     authorId: "",
   });
   const [tag, setTag] = React.useState<string>("");
+
+  const [isSchedule, setIsSchedule] = React.useState<boolean>(false);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -125,7 +137,19 @@ const PostForm = (props: PostFormType) => {
   return (
     <form onSubmit={handleSubmit}>
       {tab == "content" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2 sm:col-span-2">
+            <Label htmlFor="thumnail" className="text-sm text-muted-foreground">
+              Thumnail
+            </Label>
+            <Image
+              alt="thumnail"
+              src={configs.NEXT_PUBLIC_PHOTO_URL}
+              className=""
+              width={440}
+              height={440}
+            />
+          </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="title" className="text-sm text-muted-foreground">
               Title
@@ -172,7 +196,6 @@ const PostForm = (props: PostFormType) => {
               </SelectContent>
             </Select>
           </div>
-
           <div className="flex flex-col gap-2">
             <Label htmlFor="slug" className="text-sm text-muted-foreground">
               Author
@@ -233,7 +256,6 @@ const PostForm = (props: PostFormType) => {
               </div>
             </div>
           </div>
-
           <div className="flex flex-col gap-2 ">
             <Label htmlFor="tag" className="text-sm text-muted-foreground">
               Tag
@@ -302,47 +324,6 @@ const PostForm = (props: PostFormType) => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col space-y-1.5">
-            <Label>Publish At</Label>
-            <RadioGroup defaultValue="comfortable">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="comfortable" id="r2" />
-                <Label htmlFor="r2">Publish as soon as you create a post</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="compact" id="r3" />
-                <Label htmlFor="r3">
-                  Choose a date to make your post public.
-                </Label>
-              </div>
-            </RadioGroup>
-            <DatePicker
-              // disabled={(post && isPast(new Date(post.publishAt))) || isPending}
-              // defaultDate={new Date(form.publishAt)}
-              onSubmit={(date) => {
-                // setForm((prev) => ({
-                //   ...prev,
-                //   publishAt: date.toISOString(),
-                // }));
-              }}
-            />
-          </div>
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="status">Enable</Label>
-            <div className="flex items-center justify-between space-y-1.5">
-              <p className="text-sm font-light text-card-foreground mt-1">
-                Do you want post to be enable?
-              </p>
-              <Switch
-                id="status"
-                checked={true}
-                // onCheckedChange={(checked) =>
-                //   setForm((prev) => ({ ...prev, isActive: checked }))
-                // }
-              />
-            </div>
-          </div>
-
           <div className="flex flex-col gap-2 sm:col-span-2">
             <Label>Content</Label>
             <Tiptap className="sm:col-span-2" />
@@ -356,19 +337,150 @@ const PostForm = (props: PostFormType) => {
           <p className="text-xs font-normal leading-snug text-muted-foreground">
             Choose when you publish and who can see your post
           </p>
-          <div className="p-4 border rounded-lg">
+
+          <div className="grid gap-4 p-4 border rounded-lg">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="font-bold">Save or Publish</h4>
                 <p className="text-xs font-normal leading-snug text-muted-foreground">
-                  Make your video public, unlisted, or private
+                  Make your post <b>public</b>, <b>no public</b>, or{" "}
+                  <b>private</b>
                 </p>
               </div>
 
-              <div>down</div>
+              {isSchedule && (
+                <ChevronDownIcon
+                  onClick={() => setIsSchedule(false)}
+                  className="shrink-0 size-12 p-2  hover:bg-secondary rounded-full"
+                />
+              )}
             </div>
+
+            {!isSchedule && (
+              <div className="grid gap-2 ml-6">
+                <div>
+                  <div className="flex items-center gap-2 ">
+                    <button
+                      id="private"
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({ ...prev, status: "private" }));
+                      }}
+                      className="inline border-foreground border-2 rounded-full p-1 cursor-pointer "
+                    >
+                      <div
+                        data-selected={formData.status == "private"}
+                        className="rounded-full size-3 bg-transparent data-[selected=true]:bg-foreground"
+                      />
+                    </button>
+                    <label htmlFor="private" className="cursor-pointer">
+                      Private
+                    </label>
+                  </div>
+                  <p className="ml-8 text-xs font-normal leading-snug text-muted-foreground">
+                    Only you and the people you choose can see your posts
+                  </p>
+                  <button
+                    data-selected={formData.status == "private"}
+                    type="button"
+                    className="bg-secondary rounded-full px-3 py-2  items-center gap-2 mt-2 ml-8 hidden data-[selected=true]:flex"
+                  >
+                    <UserPlusIcon className="shrink-0 size-5" />
+                    <p>Share privately</p>
+                  </button>
+                </div>
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      id="not-public"
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          status: "not-public",
+                        }));
+                      }}
+                      className="inline border-foreground border-2 rounded-full p-1 cursor-pointer "
+                    >
+                      <div
+                        data-selected={formData.status == "not-public"}
+                        className="rounded-full size-3 bg-transparent data-[selected=true]:bg-foreground"
+                      />
+                    </button>
+                    <label htmlFor="not-public" className="cursor-pointer">
+                      No Public
+                    </label>
+                  </div>
+                  <p className="ml-8 text-xs font-normal leading-snug text-muted-foreground">
+                    Anyone with a link to the post can view the post
+                  </p>
+                </div>
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      id="public"
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          status: "public",
+                        }));
+                      }}
+                      className="inline border-foreground border-2 rounded-full p-1 cursor-pointer "
+                    >
+                      <div
+                        data-selected={formData.status == "public"}
+                        className="rounded-full size-3 bg-transparent data-[selected=true]:bg-foreground"
+                      />
+                    </button>
+                    <label htmlFor="public" className="cursor-pointer">
+                      Public
+                    </label>
+                  </div>
+                  <p className="ml-8 text-xs font-normal leading-snug text-muted-foreground">
+                    Everyone can see your posts
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
-          <div></div>
+
+          <div className="grid gap-2 p-4 border rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-bold">Schedule</h4>
+                <p className="text-xs font-normal leading-snug text-muted-foreground">
+                  Select a date to switch your post to <b>public</b> mode.
+                </p>
+              </div>
+              {!isSchedule && (
+                <ChevronDownIcon
+                  onClick={() => setIsSchedule(true)}
+                  className="shrink-0 size-12 p-2  hover:bg-secondary rounded-full"
+                />
+              )}
+            </div>
+            {isSchedule && (
+              <>
+                <p className="text-sm">
+                  Set a schedule to switch to public mode
+                </p>
+                <DatePicker
+                  // disabled={(post && isPast(new Date(post.publishAt))) || isPending}
+                  // defaultDate={new Date(form.publishAt)}
+                  onSubmit={(date) => {
+                    // setForm((prev) => ({
+                    //   ...prev,
+                    //   publishAt: date.toISOString(),
+                    // }));
+                  }}
+                />
+                <p className="text-xs font-normal leading-snug text-muted-foreground">
+                  The video will be <b>private</b> before publishing
+                </p>
+              </>
+            )}
+          </div>
         </div>
       )}
       <div className="flex justify-end items-center gap-2 mt-4">
