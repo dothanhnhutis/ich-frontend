@@ -14,7 +14,7 @@ const Tag = ({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1 bg-secondary p-1 rounded-l-[12px] rounded-tr rounded-br group",
+        "inline-flex items-center gap-1 bg-primary text-white p-1 rounded-l-[12px] rounded-tr rounded-br group",
         className
       )}
     >
@@ -23,7 +23,7 @@ const Tag = ({
         onClick={onRemove}
         className="bg-background rounded-full size-2 cursor-pointer"
       >
-        <XIcon className="shrink-0 size-2 group-hover:block hidden" />
+        <XIcon className="shrink-0 size-2 group-hover:block hidden text-black dark:text-white" />
       </button>
       <p className="text-xs">{title}</p>
     </div>
