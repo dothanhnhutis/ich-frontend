@@ -36,15 +36,17 @@ const Tiptap = ({ className }: { className?: string | undefined }) => {
     immediatelyRender: false,
     shouldRerenderOnTransaction: true,
     extensions,
-    content: `<p>Hello <link-custom href='http://localhost:4000/api/v1/users/me'>link here</link-custom> World! <a href='http://localhost:4000/api/v1/users/me'>nhut</a></p><image-upload class='size-10' data-width='50' data-align='right' alt='hihi' src='https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg'>title</image-upload><p>Hello World! nhut <i>dep</i><b>trai</b></p><table><tbody><tr><th>Name</th><th colspan="3">Description</th></tr>
-            <tr>
-              <td>Cyndi Lauper</td>
-              <td>Singer</td>
-              <td>Songwriter</td>
-              <td>Actress</td>
-            </tr>
-          </tbody>
-        </table>`,
+    // content: `<p>Hello <link-custom href='http://localhost:4000/api/v1/users/me'>link here</link-custom> World! <a href='http://localhost:4000/api/v1/users/me'>nhut</a></p><image-upload class='size-10' data-width='50' data-align='right' alt='hihi' src='https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg'>title</image-upload><p>Hello World! nhut <i>dep</i><b>trai</b></p>
+    // <table><tbody><tr><th>Name</th><th colspan="3">Description</th></tr>
+    //         <tr>
+    //           <td>Cyndi Lauper</td>
+    //           <td>Singer</td>
+    //           <td>Songwriter</td>
+    //           <td>Actress</td>
+    //         </tr>
+    //       </tbody>
+    //     </table>`,
+    content: ``,
     onUpdate({ editor }) {
       // console.log({
       //   json: editor.getJSON(),
@@ -58,8 +60,13 @@ const Tiptap = ({ className }: { className?: string | undefined }) => {
   if (editor == null) return <div>loading...</div>;
 
   return (
-    <div className={cn("border rounded-lg", className)}>
-      <div className="flex p-3 border-b gap-3 h-[65px] overflow-x-scroll">
+    <div
+      className={cn(
+        "relative border rounded-lg overflow-hidden w-full",
+        className
+      )}
+    >
+      <div className="flex p-3 border-b gap-3 h-[65px] overflow-scroll w-full">
         <Popover>
           <PopoverTrigger asChild>
             <div className="flex gap-3 items-center rounded-lg overflow-hidden p-2 hover:bg-secondary flex-shrink-0">

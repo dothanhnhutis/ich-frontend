@@ -43,6 +43,7 @@ import {
   ChevronDown,
   ChevronDownIcon,
   HashIcon,
+  ImageIcon,
   TagsIcon,
   UserPlusIcon,
 } from "lucide-react";
@@ -136,21 +137,45 @@ const PostForm = (props: PostFormType) => {
 
   return (
     <form onSubmit={handleSubmit}>
+      <div className="mb-10 flex flex-grow gap-2">
+        <div>content</div>
+        <div>metadata</div>
+        <div>display mode</div>
+      </div>
       {tab == "content" ? (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-2 sm:col-span-2">
+        <div className="grid gap-2 w-full grid-cols-2">
+          <div className="col-span-2 order-first">
             <Label htmlFor="thumnail" className="text-sm text-muted-foreground">
               Thumnail
             </Label>
-            <Image
-              alt="thumnail"
-              src={configs.NEXT_PUBLIC_PHOTO_URL}
-              className=""
-              width={440}
-              height={440}
-            />
+            <div className="border-dashed border-2 rounded-lg hover:border-primary flex items-center justify-center p-[100px]">
+              <div className="w-[200px] h-[100px] flex flex-col items-center justify-center text-center">
+                <ImageIcon className="shrink-0 size-10" />
+                <p className="text-sm">
+                  Drop your images here, or select{" "}
+                  <label
+                    htmlFor="upload"
+                    className="text-primary cursor-pointer"
+                  >
+                    click to browse
+                  </label>
+                </p>
+                <input type="file" id="upload" className="hidden" />
+              </div>
+            </div>
+            <div className="relative h-[400px] bg-secondary">
+              <Image
+                fill
+                alt="thumnail"
+                src={configs.NEXT_PUBLIC_COVER_PHOTO_URL}
+                className="aspect-[4/3] object-contain"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                // width={440}
+                // height={440}
+              />
+            </div>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="col-span-2 order-1">
             <Label htmlFor="title" className="text-sm text-muted-foreground">
               Title
             </Label>
@@ -163,7 +188,7 @@ const PostForm = (props: PostFormType) => {
               placeholder="Name of your project"
             />
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="col-span-2 lg:col-span-1 order-2">
             <Label htmlFor="slug" className="text-sm text-muted-foreground">
               Slug
             </Label>
@@ -176,31 +201,99 @@ const PostForm = (props: PostFormType) => {
               placeholder="Slug"
             />
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="col-span-2 lg:col-span-1 order-3">
             <Label htmlFor="slug" className="text-sm text-muted-foreground">
               Category
             </Label>
             <Select>
-              <SelectTrigger className="focus-visible:ring-transparent focus:ring-transparent text-start h-auto">
-                <SelectValue className="h-10" placeholder="Select tag" />
+              <SelectTrigger className="focus-visible:ring-transparent focus:ring-transparent text-start h-10">
+                <SelectValue placeholder="Select tag" />
               </SelectTrigger>
               <SelectContent id="tags">
                 {categoriesDataTemplate.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     <div className="flex flex-col">
                       <p>{category.name}</p>
-                      <p className="text-xs">{category.slug}</p>
+                      {/* <p className="text-xs">{category.slug}</p> */}
                     </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="col-span-2 lg:col-span-1 order-4 lg:order-5">
+            <Label htmlFor="tag" className="text-sm text-muted-foreground">
+              Tag
+            </Label>
+            <div className="relative border p-2 rounded-lg min-h-[58px]">
+              <div className="flex gap-2 flex-wrap items-center">
+                {formData.tags.map((tag, idx) => (
+                  <Tag
+                    key={idx}
+                    title={tag}
+                    onRemove={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        tags: prev.tags.filter((_, idx1) => idx1 != idx),
+                      }));
+                    }}
+                  />
+                ))}
+
+                {formData.tags.length >= 3 && (
+                  <Tag
+                    className="bg-destructive cursor-pointer"
+                    title={"Remove All"}
+                    onRemove={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        tags: [],
+                      }))
+                    }
+                  />
+                )}
+                <input
+                  className="bg-transparent outline-0 text-sm"
+                  type="text"
+                  name="tag"
+                  id="tag"
+                  placeholder="Type tag..."
+                  value={tag}
+                  onChange={(e) => setTag(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+              <div
+                className={cn(
+                  "bg-background shadow z-50 rounded dark:border absolute mt-1 top-full left-0 w-full  max-h-[200px] overflow-y-auto overflow-x-hidden p-1",
+                  tagsNoSelected.length > 0 && tag.length > 0
+                    ? "grid"
+                    : "hidden"
+                )}
+              >
+                {tagsNoSelected.map((t) => (
+                  <div
+                    key={t.id}
+                    onClick={() => {
+                      setTag("");
+                      setFormData((prev) => ({
+                        ...prev,
+                        tags: [...prev.tags, t.name],
+                      }));
+                    }}
+                    className="flex gap-2 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-secondary"
+                  >
+                    <HashIcon className="shrink-0 size-4" />
+                    <p>{t.name}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="col-span-2 lg:col-span-1 order-5 lg:order-4">
             <Label htmlFor="slug" className="text-sm text-muted-foreground">
               Author
             </Label>
-
             <Select
             // disabled={isPending}
             // onValueChange={(v) => {
@@ -239,7 +332,8 @@ const PostForm = (props: PostFormType) => {
                 </div>
               </SelectContent>
             </Select>
-            <div className="flex items-center gap-2 border p-2 px-3 rounded-lg">
+
+            {/* <div className="flex items-center gap-2 border p-2 px-3 rounded-lg">
               <Avatar>
                 <AvatarImage
                   src={configs.NEXT_PUBLIC_PHOTO_URL}
@@ -254,86 +348,20 @@ const PostForm = (props: PostFormType) => {
                   gaconght@gmail.com
                 </p>
               </div>
-            </div>
+            </div> */}
           </div>
-          <div className="flex flex-col gap-2 ">
-            <Label htmlFor="tag" className="text-sm text-muted-foreground">
-              Tag
-            </Label>
-
-            <div className="relative border flex p-2 items-center gap-2 flex-wrap rounded-lg">
-              {formData.tags.map((tag, idx) => (
-                <Tag
-                  key={idx}
-                  title={tag}
-                  onRemove={() => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      tags: prev.tags.filter((_, idx1) => idx1 != idx),
-                    }));
-                  }}
-                />
-              ))}
-
-              {formData.tags.length >= 3 && (
-                <Tag
-                  className="bg-destructive cursor-pointer"
-                  title={"Remove All"}
-                  onRemove={() =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      tags: [],
-                    }))
-                  }
-                />
-              )}
-              <input
-                className="bg-transparent outline-0 text-sm"
-                type="text"
-                name="tag"
-                id="tag"
-                placeholder="Type tag..."
-                value={tag}
-                onChange={(e) => setTag(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-              <div
-                className={cn(
-                  "bg-background shadow z-50 rounded dark:border absolute mt-1 top-full left-0 w-full  max-h-[200px] overflow-y-auto overflow-x-hidden p-1",
-                  tagsNoSelected.length > 0 && tag.length > 0
-                    ? "grid"
-                    : "hidden"
-                )}
-              >
-                {tagsNoSelected.map((t) => (
-                  <div
-                    key={t.id}
-                    onClick={() => {
-                      setTag("");
-                      setFormData((prev) => ({
-                        ...prev,
-                        tags: [...prev.tags, t.name],
-                      }));
-                    }}
-                    className="flex gap-2 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-secondary"
-                  >
-                    <HashIcon className="shrink-0 size-4" />
-                    <p>{t.name}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2 sm:col-span-2">
-            <Label>Content</Label>
-            <Tiptap className="sm:col-span-2" />
+          <div className="col-span-2 order-last">
+            <Label className="text-sm text-muted-foreground">Content</Label>
+            <Tiptap />
           </div>
         </div>
       ) : tab == "metadata" ? (
-        <div>metadata</div>
+        <div className="grid grid-cols-1 gap-2">
+          <h3 className="font-bold text-xl">Metadata</h3>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-2">
-          <h3 className="font-bold">Display Mode</h3>
+          <h3 className="font-bold text-xl">Display Mode</h3>
           <p className="text-xs font-normal leading-snug text-muted-foreground">
             Choose when you publish and who can see your post
           </p>
@@ -341,7 +369,7 @@ const PostForm = (props: PostFormType) => {
           <div className="grid gap-4 p-4 border rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-bold">Save or Publish</h4>
+                <h4 className="font-bold text-lg">Save or Publish</h4>
                 <p className="text-xs font-normal leading-snug text-muted-foreground">
                   Make your post <b>public</b>, <b>no public</b>, or{" "}
                   <b>private</b>
@@ -366,11 +394,11 @@ const PostForm = (props: PostFormType) => {
                       onClick={() => {
                         setFormData((prev) => ({ ...prev, status: "private" }));
                       }}
-                      className="inline border-foreground border-2 rounded-full p-1 cursor-pointer "
+                      className="inline border-foreground border-2 rounded-full p-[3px] cursor-pointer "
                     >
                       <div
                         data-selected={formData.status == "private"}
-                        className="rounded-full size-3 bg-transparent data-[selected=true]:bg-foreground"
+                        className="rounded-full size-2.5 bg-transparent data-[selected=true]:bg-foreground"
                       />
                     </button>
                     <label htmlFor="private" className="cursor-pointer">
@@ -400,11 +428,11 @@ const PostForm = (props: PostFormType) => {
                           status: "not-public",
                         }));
                       }}
-                      className="inline border-foreground border-2 rounded-full p-1 cursor-pointer "
+                      className="inline border-foreground border-2 rounded-full p-[3px] cursor-pointer "
                     >
                       <div
                         data-selected={formData.status == "not-public"}
-                        className="rounded-full size-3 bg-transparent data-[selected=true]:bg-foreground"
+                        className="rounded-full size-2.5 bg-transparent data-[selected=true]:bg-foreground"
                       />
                     </button>
                     <label htmlFor="not-public" className="cursor-pointer">
@@ -426,11 +454,11 @@ const PostForm = (props: PostFormType) => {
                           status: "public",
                         }));
                       }}
-                      className="inline border-foreground border-2 rounded-full p-1 cursor-pointer "
+                      className="inline border-foreground border-2 rounded-full p-[3px] cursor-pointer "
                     >
                       <div
                         data-selected={formData.status == "public"}
-                        className="rounded-full size-3 bg-transparent data-[selected=true]:bg-foreground"
+                        className="rounded-full size-2.5 bg-transparent data-[selected=true]:bg-foreground"
                       />
                     </button>
                     <label htmlFor="public" className="cursor-pointer">
@@ -448,7 +476,7 @@ const PostForm = (props: PostFormType) => {
           <div className="grid gap-2 p-4 border rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-bold">Schedule</h4>
+                <h4 className="font-bold text-lg">Schedule</h4>
                 <p className="text-xs font-normal leading-snug text-muted-foreground">
                   Select a date to switch your post to <b>public</b> mode.
                 </p>
@@ -483,7 +511,7 @@ const PostForm = (props: PostFormType) => {
           </div>
         </div>
       )}
-      <div className="flex justify-end items-center gap-2 mt-4">
+      {/* <div className="flex justify-end items-center gap-2 mt-4">
         {tab != "content" && (
           <Button
             variant="secondary"
@@ -506,7 +534,7 @@ const PostForm = (props: PostFormType) => {
         >
           Next/Save/Publish/schedule
         </Button>
-      </div>
+      </div> */}
     </form>
   );
 };
