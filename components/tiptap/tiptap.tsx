@@ -46,14 +46,14 @@ const Tiptap = ({ className }: { className?: string | undefined }) => {
     //         </tr>
     //       </tbody>
     //     </table>`,
-    content: ``,
-    onUpdate({ editor }) {
+    content: `<image-upload class='size-10' data-width='50' data-align='right' alt='hihi' src='https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg'/>`,
+    onUpdate({ editor, transaction }) {
       // console.log({
       //   json: editor.getJSON(),
       //   text: editor.getText(),
       //   html: editor.getHTML(),
       // });
-      console.log(editor.getHTML());
+      // console.log(editor.getHTML());
     },
   });
 
@@ -357,6 +357,7 @@ const Tiptap = ({ className }: { className?: string | undefined }) => {
         <button
           type="button"
           className="p-2 border rounded-lg hover:bg-secondary"
+          onClick={() => editor.commands.insertImage()}
         >
           <ImageIcon className="size-5" />
         </button>

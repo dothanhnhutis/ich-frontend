@@ -7,6 +7,13 @@ interface ImageOptions {
   HTMLAttributes: Record<string, any>;
 }
 
+declare module "@tiptap/react" {
+  interface Commands<ReturnType> {
+    image: {
+      insertImage: () => ReturnType;
+    };
+  }
+}
 export default Node.create<ImageOptions>({
   name: "image",
   group: "block",
@@ -84,5 +91,22 @@ export default Node.create<ImageOptions>({
   },
   addNodeView() {
     return ReactNodeViewRenderer(ImageNodeViewComponent);
+  },
+  addCommands() {
+    return {
+      insertImage:
+        () =>
+        ({ commands }) => {
+          return commands.insertContent({
+            type: "image",
+            attrs: {
+              alt: "title",
+              src: "https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg",
+              width: 50,
+              alignment: "center",
+            },
+          });
+        },
+    };
   },
 });

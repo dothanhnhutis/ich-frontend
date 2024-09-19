@@ -94,7 +94,16 @@ export const extensions: Extensions = [
   Highlight.configure({
     multicolor: true,
   }),
+  LinkExtension.configure({
+    HTMLAttributes: {
+      rel: "noopener noreferrer",
+      target: null,
+    },
+    openOnClick: false,
+  }),
+  ImageExtension,
   Gapcursor,
+
   Table.configure({
     resizable: true,
   }),
@@ -105,12 +114,4 @@ export const extensions: Extensions = [
       class: "border bg-transparent",
     },
   }),
-  LinkExtension.configure({
-    HTMLAttributes: {
-      rel: "noopener noreferrer",
-      target: null,
-    },
-    openOnClick: false,
-  }),
-  ImageExtension,
 ];
