@@ -46,14 +46,15 @@ const Tiptap = ({ className }: { className?: string | undefined }) => {
     //         </tr>
     //       </tbody>
     //     </table>`,
-    content: `<image-upload class='size-10' data-width='50' data-align='right' alt='hihi' src='https://res.cloudinary.com/dr1ntj4ar/image/upload/v1724856849/cover_photo.jpg'/>`,
+    // content: `<table><tbody><tr><th>Name</th><th colspan="3">Description</th></tr><tr><td>Cyndi Lauper</td><td>Singer</td><td>Songwriter</td><td>Actress</td></tr></tbody></table>`,
+    content: "",
     onUpdate({ editor, transaction }) {
       // console.log({
       //   json: editor.getJSON(),
       //   text: editor.getText(),
       //   html: editor.getHTML(),
       // });
-      // console.log(editor.getHTML());
+      console.log(editor.getHTML());
     },
   });
 

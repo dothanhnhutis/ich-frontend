@@ -24,7 +24,7 @@ import TableRow from "@tiptap/extension-table-row";
 import { Extensions, mergeAttributes } from "@tiptap/react";
 import LinkExtension from "./link-extension";
 import ImageExtension from "./image-extension";
-import { CustomTableHeader } from "./table-header";
+import { CustomTableHeader, TableExtension } from "./table-extension";
 
 export const extensions: Extensions = [
   Document,
@@ -104,10 +104,8 @@ export const extensions: Extensions = [
   ImageExtension,
   Gapcursor,
 
-  Table.configure({
-    resizable: true,
-  }),
-  TableRow.configure({}),
+  TableExtension,
+  TableRow,
   CustomTableHeader,
   TableCell.configure({
     HTMLAttributes: {
