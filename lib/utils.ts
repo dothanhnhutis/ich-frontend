@@ -130,3 +130,30 @@ export function convertRGBAToHex(color: RgbaColor) {
 
   return `#${red}${green}${blue}${alpha}`;
 }
+
+export const getAspectRatio = (url: string): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    const img: HTMLImageElement = document.createElement("img");
+    img.src = url;
+    img.onload = function (event) {
+      resolve(img.width / img.height);
+    };
+    img.onerror = () => {
+      reject("There was some problem with the image.");
+    };
+  });
+};
+
+export const getData = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result);
+    };
+    reader.onerror = () => {
+      reject("There was some problem with the image.");
+    };
+  });
+};

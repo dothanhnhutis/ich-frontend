@@ -21,7 +21,7 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 
-import { Extensions, mergeAttributes } from "@tiptap/react";
+import { Extensions, mergeAttributes, Mark, Node } from "@tiptap/react";
 import LinkExtension from "./link-extension";
 import ImageExtension from "./image-extension";
 import { CustomTableHeader, TableExtension } from "./table-extension";
